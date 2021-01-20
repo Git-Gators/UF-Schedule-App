@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "26049855203",
+    "firebase_url": "https://uf-schedule-app-default-rtdb.firebaseio.com",
+    "project_id": "uf-schedule-app",
+    "storage_bucket": "uf-schedule-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:26049855203:android:36593e31f6d75bdc6f0fd6",
+        "android_client_info": {
+          "package_name": "com.example.uf_schedule_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "26049855203-fdok95bqgasv3of9l09eu07uc0r9595f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvmiIxlIi0_DqBEdOhqImCF0Wp6RvW2dk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "26049855203-fdok95bqgasv3of9l09eu07uc0r9595f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
