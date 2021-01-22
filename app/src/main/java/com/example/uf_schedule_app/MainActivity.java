@@ -46,50 +46,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        DatabaseUpdater dbUpdater = new DatabaseUpdater();
+        dbUpdater.getUFCourses();
     }
 
     /** Called when the user taps the Send button */
     public void sendMessage(View view) {
-        // Instantiate the RequestQueue.
-        String url ="https://one.ufl.edu/apix/soc/schedule/?category=RES&term=2211";
-        RequestQueue queue = Volley.newRequestQueue(this);
-
-        // prepare the Request
-        JsonArrayRequest getRequest = new JsonArrayRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONArray>()
-                {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        // display response
-                        System.out.println("Response JSON" + response.toString());
-
-                        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                        try {
-                            ArrayList<String> listdata = new ArrayList<String>();
-                            if (response != null) {
-                                for (int i=0;i<response.length();i++){
-                                    listdata.add(response.getString(i));
-                                }
-                            }
-                            System.out.println("ListData: " + listdata.toString());
-                            mDatabase.setValue(listdata);
-                        } catch (Exception e) {
-                            System.out.println("Error Caught: " + e);
-                        }
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        System.out.println("Error.Response" + error.toString());
-                    }
-                }
-        );
-
-        // Access the RequestQueue through your singleton class.
-        queue.add(getRequest);
-
         Intent intent = new Intent(this, DisplayMessageActivity.class);
         EditText editText = (EditText) findViewById(R.id.editText);
         String message = editText.getText().toString();
