@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         //dbUpdater.getUFCourses();
 //        Map<String,String> course = dbUpdater.getUFCourse("Advertising Sales");
 //        System.out.println("Course: " + course.toString());
-        dbUpdater.getUFCourse("Biological Engineering Design 2");
+        dbUpdater.getUFCourse("Special Topics: App Life Cycle Assessmnt in BE");
     }
 
     /** Called when the user taps the Send button */
