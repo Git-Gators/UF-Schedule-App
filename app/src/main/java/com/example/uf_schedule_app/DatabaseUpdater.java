@@ -34,8 +34,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,8 +52,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DatabaseUpdater extends Context {
+
     public void getUFCourses() {
         // Instantiate the RequestQueue.
         String url ="https://one.ufl.edu/apix/soc/schedule/?category=RES&term=2211";
@@ -120,6 +127,38 @@ public class DatabaseUpdater extends Context {
 
         // Access the RequestQueue through your singleton class.
         queue.add(getRequest);
+    }
+
+    public void getUFCourse(String courseName) {
+        DatabaseReference course = FirebaseDatabase.getInstance().getReference().child("Courses").child(courseName);
+
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Course courseObj = new Course();
+                courseObj.updateCourseInfo((HashMap<String, String>) dataSnapshot.getValue());
+
+                // Get Post object and use the values to update the UI
+                HashMap<String, String> courseInfo = (HashMap<String, String>) dataSnapshot.getValue();
+                for (DataSnapshot child : dataSnapshot.getChildren()){
+                    if(child.getValue().getClass().equals(courseInfo.getClass())){
+                        //This is the sections
+                        System.out.println("Child Super: " + child.getValue().getClass() + " " + child.getValue());
+                        courseObj.setSections(child.getValue().toString());
+                    }
+                }
+
+                for (Map.Entry<String, String> set : courseObj.getCourseInfo().entrySet()) {
+                    System.out.println(set.getKey() + " = " + set.getValue());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+            }
+        };
+        course.addValueEventListener(postListener);
     }
 
     @Override

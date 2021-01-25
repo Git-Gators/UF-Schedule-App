@@ -37,6 +37,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -47,7 +49,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         DatabaseUpdater dbUpdater = new DatabaseUpdater();
-        dbUpdater.getUFCourses();
+        //dbUpdater.getUFCourses();
+//        Map<String,String> course = dbUpdater.getUFCourse("Advertising Sales");
+//        System.out.println("Course: " + course.toString());
+        dbUpdater.getUFCourse("Biological Engineering Design 2");
     }
 
     /** Called when the user taps the Send button */
