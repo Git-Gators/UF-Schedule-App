@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.UserHandle;
 import android.view.Display;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,7 +37,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -55,14 +55,39 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class DatabaseUpdater extends Context {
+
+    public ArrayList<Course> coursesRetr = new ArrayList<>();
+
+    public void getCourseFromDB(ArrayList<String> courseCodes) {
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child("Courses").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Iterable<DataSnapshot> children = snapshot.getChildren();
+                for (DataSnapshot child : children) {
+                    Course test = child.getValue(Course.class);
+                    for(int i = 0; i < courseCodes.size(); i++)
+                        if(courseCodes.get(i).equals(test.courseInfo.get("code")))
+                            coursesRetr.add(test);
+                }
+                for(int i = 0; i < coursesRetr.size(); i++)
+                    System.out.println("Courses: " + coursesRetr.get(i).courseInfo.get("code"));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
 
     public void getUFCourses() {
         // Instantiate the RequestQueue.
         String url ="https://one.ufl.edu/apix/soc/schedule/?category=RES&term=2211";
         RequestQueue queue = Volley.newRequestQueue(this);
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
         // prepare the Request
         JsonArrayRequest getRequest = new JsonArrayRequest(Request.Method.GET, url, null,
@@ -71,47 +96,69 @@ public class DatabaseUpdater extends Context {
                     @Override
                     public void onResponse(JSONArray response) {
                         // display response
-                        System.out.println("Response JSON" + response.toString());
+                        System.out.println("Response JSON " + response.toString());
                         try {
+                            System.out.println("Response JSON " + response.getJSONObject(0).getJSONArray("COURSES"));
                             for(int c = 0; c < response.getJSONObject(0).getJSONArray("COURSES").length(); c++){
+                                Course courseObj = new Course();
                                 String name = response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c).get("name").toString();
+                                JSONObject courseDir = response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c);
+                                System.out.println("courseDir: " + courseDir.get("code").getClass());
 
-                                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                                mDatabase.child("Courses").child(name).child("code").setValue(response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c).get("code").toString());
-                                mDatabase.child("Courses").child(name).child("courseId").setValue(response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c).get("courseId").toString());
-                                mDatabase.child("Courses").child(name).child("name").setValue(name);
-                                mDatabase.child("Courses").child(name).child("termInd").setValue(response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c).get("termInd").toString());
-                                mDatabase.child("Courses").child(name).child("description").setValue(response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c).get("description").toString());
-                                mDatabase.child("Courses").child(name).child("prerequisites").setValue(response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c).get("prerequisites").toString());
+                                courseObj.courseInfo.put("code", (String) courseDir.get("code"));
+                                courseObj.courseInfo.put("courseId", (String) courseDir.get("courseId"));
+                                courseObj.courseInfo.put("name", name);
+                                courseObj.courseInfo.put("termInd", courseDir.get("termInd").toString());
+                                courseObj.courseInfo.put("description", courseDir.get("description").toString());
+                                String prereq = courseDir.get("prerequisites").toString();
+                                prereq = prereq.replace("Prereq: ", "");
+                                courseObj.courseInfo.put("prerequisites", prereq);
 
                                 //Get Sections
-                                JSONArray sections = response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c).getJSONArray("sections");
+                                JSONArray sections = courseDir.getJSONArray("sections");
 
                                 for(int j = 0; j < sections.length(); j++){
                                     JSONObject section = sections.getJSONObject(j);
-                                    mDatabase.child("Courses").child(name).child("sections").child(section.get("number").toString()).child("number").setValue(section.get("number").toString());
-                                    mDatabase.child("Courses").child(name).child("sections").child(section.get("number").toString()).child("classNumber").setValue(section.get("classNumber").toString());
-                                    mDatabase.child("Courses").child(name).child("sections").child(section.get("number").toString()).child("credits").setValue(section.get("credits").toString());
-                                    mDatabase.child("Courses").child(name).child("sections").child(section.get("number").toString()).child("deptName").setValue(section.get("deptName").toString());
+                                    HashMap<String, String> sectionMap = new HashMap<String, String>();
+
+                                    sectionMap.put("number", section.get("number").toString());
+                                    sectionMap.put("classNumber", section.get("classNumber").toString());
+                                    sectionMap.put("credits", section.get("credits").toString());
+                                    sectionMap.put("deptName", section.get("deptName").toString());
 
                                     //Get Instructor for the section
                                     JSONArray instructors = sections.getJSONObject(j).getJSONArray("instructors");
+                                    StringBuilder instructorStr = new StringBuilder();
+                                    instructorStr.append("[");
                                     for(int k = 0; k < instructors.length(); k++)
-                                        mDatabase.child("Courses").child(name).child("sections").child(section.get("number").toString()).child("instructors").child(instructors.getJSONObject(k).get("name").toString()).setValue(instructors.getJSONObject(k).get("name"));
+                                        instructorStr.append(instructors.getJSONObject(k).get("name").toString()).append(",");
+
+                                    if(!instructorStr.toString().equals("[]"))
+                                        instructorStr.deleteCharAt(instructorStr.length()-1);
+                                    instructorStr.append("]");
+                                    sectionMap.put("Instructors", instructorStr.toString());
 
                                     //Get meeting times for the section
                                     JSONArray meetTimes = sections.getJSONObject(j).getJSONArray("meetTimes");
-                                    for(int i = 0; i < meetTimes.length(); i++){
-                                        mDatabase.child("Courses").child(name).child("sections").child(section.get("number").toString()).child("meetTimes").child(meetTimes.getJSONObject(i).get("meetNo").toString()).child("meetNo").setValue(meetTimes.getJSONObject(i).get("meetNo").toString());
+                                    StringBuilder meetDays = new StringBuilder();
+                                    StringBuilder meetPeriod = new StringBuilder();
+                                    StringBuilder meetTime = new StringBuilder();
 
-                                        //Meet days
-                                        mDatabase.child("Courses").child(name).child("sections").child(section.get("number").toString()).child("meetTimes").child(meetTimes.getJSONObject(i).get("meetNo").toString()).child("meetDays").setValue(meetTimes.getJSONObject(i).get("meetDays").toString());
-                                        mDatabase.child("Courses").child(name).child("sections").child(section.get("number").toString()).child("meetTimes").child(meetTimes.getJSONObject(i).get("meetNo").toString()).child("meetTimeBegin").setValue(meetTimes.getJSONObject(i).get("meetTimeBegin").toString());
-                                        mDatabase.child("Courses").child(name).child("sections").child(section.get("number").toString()).child("meetTimes").child(meetTimes.getJSONObject(i).get("meetNo").toString()).child("meetTimeEnd").setValue(meetTimes.getJSONObject(i).get("meetTimeEnd").toString());
-                                        mDatabase.child("Courses").child(name).child("sections").child(section.get("number").toString()).child("meetTimes").child(meetTimes.getJSONObject(i).get("meetNo").toString()).child("meetPeriodBegin").setValue(meetTimes.getJSONObject(i).get("meetPeriodBegin").toString());
-                                        mDatabase.child("Courses").child(name).child("sections").child(section.get("number").toString()).child("meetTimes").child(meetTimes.getJSONObject(i).get("meetNo").toString()).child("meetPeriodEnd").setValue(meetTimes.getJSONObject(i).get("meetPeriodEnd").toString());
+                                    for(int i = 0; i < meetTimes.length(); i++){
+                                        meetDays.append(meetTimes.getJSONObject(i).get("meetDays").toString());
+                                        meetPeriod.append(meetTimes.getJSONObject(i).get("meetPeriodBegin").toString()).append("-").append(meetTimes.getJSONObject(i).get("meetPeriodEnd").toString());
+                                        meetTime.append("[").append(meetTimes.getJSONObject(i).get("meetTimeBegin").toString()).append("-").append(meetTimes.getJSONObject(i).get("meetTimeEnd").toString()).append("]");
                                     }
+                                    sectionMap.put("meetDays", meetDays.toString());
+                                    sectionMap.put("meetPeriod", meetPeriod.toString());
+                                    sectionMap.put("meetTime", meetTime.toString());
+                                    courseObj.classSections.add(sectionMap);
                                 }
+
+                                System.out.println("CourseObj: " + courseObj.courseInfo.toString());
+                                for(int i = 0; i < courseObj.classSections.size(); i++)
+                                    System.out.println("SectionObj: " + courseObj.classSections.get(i).toString());
+                                mDatabase.child("Courses").child(courseObj.courseInfo.get("code")).setValue(courseObj);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -129,39 +176,6 @@ public class DatabaseUpdater extends Context {
 
         // Access the RequestQueue through your singleton class.
         queue.add(getRequest);
-    }
-
-    public void getUFCourse(String courseName) {
-        DatabaseReference course = FirebaseDatabase.getInstance().getReference().child("Courses").child(courseName);
-
-        ValueEventListener postListener = new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Course courseObj = new Course();
-                courseObj.updateCourseInfo((HashMap<String, String>) dataSnapshot.getValue());
-
-                // Get Post object and use the values to update the UI
-                HashMap<String, String> courseInfo = (HashMap<String, String>) dataSnapshot.getValue();
-                for (DataSnapshot child : dataSnapshot.getChildren()){
-                    if(child.getValue().getClass().equals(courseInfo.getClass())){
-                        //This is the sections
-                        System.out.println("Child Super: " + child.getValue().getClass() + " " + child.getValue());
-                        courseObj.setSections(child.getValue().toString());
-                    }
-                }
-
-                for (Map.Entry<String, String> set : courseObj.getCourseInfo().entrySet()) {
-                    System.out.println(set.getKey() + " = " + set.getValue());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
-            }
-        };
-        course.addValueEventListener(postListener);
     }
 
     @Override
