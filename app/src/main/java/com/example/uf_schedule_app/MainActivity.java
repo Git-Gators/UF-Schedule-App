@@ -25,6 +25,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     //Used in the Spinner
     ArrayList<String> courseNames = new ArrayList<>();
 
+    //Courses grabbed from the spinner
+    ArrayList<Course> coursesRetr = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,25 +82,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if(editText.getText().toString().equals("Course 1")) {
                 editText.setText(parent.getItemAtPosition(pos).toString());
                 courseChosen = true;
+
+                //Add the course to our array
+                coursesRetr.add(dbUpdater.getCourseFromDB(parent.getItemAtPosition(pos).toString()));
             }
 
             editText = (EditText) findViewById(R.id.course2);
             if(editText.getText().toString().equals("Course 2") && !courseChosen) {
                 editText.setText(parent.getItemAtPosition(pos).toString());
                 courseChosen = true;
+
+                //Add the course to our array
+                coursesRetr.add(dbUpdater.getCourseFromDB(parent.getItemAtPosition(pos).toString()));
             }
 
             editText = (EditText) findViewById(R.id.course3);
             if(editText.getText().toString().equals("Course 3") && !courseChosen) {
                 editText.setText(parent.getItemAtPosition(pos).toString());
                 courseChosen = true;
+
+                //Add the course to our array
+                coursesRetr.add(dbUpdater.getCourseFromDB(parent.getItemAtPosition(pos).toString()));
             }
 
             editText = (EditText) findViewById(R.id.course4);
             if(editText.getText().toString().equals("Course 4") && !courseChosen) {
                 editText.setText(parent.getItemAtPosition(pos).toString());
-                courseChosen = true;
+
+                //Add the course to our array
+                coursesRetr.add(dbUpdater.getCourseFromDB(parent.getItemAtPosition(pos).toString()));
             }
+            System.out.println(coursesRetr.toString());
         }
     }
 

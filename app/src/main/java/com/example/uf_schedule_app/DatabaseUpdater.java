@@ -61,14 +61,14 @@ public class DatabaseUpdater extends Context {
     public ArrayList<Course> coursesRetr = new ArrayList<>();
     public ArrayList<String> courseNames = new ArrayList<>();
 
-    public ArrayList<Integer> getCourseFromDB(ArrayList<String> courseCodes) {
-        ArrayList<Integer> coursesToReturn = new ArrayList<>();
+    public Course getCourseFromDB(String courseName) {
         for(int i = 0; i < coursesRetr.size(); i++){
-            if(courseCodes.contains(coursesRetr.get(i).courseInfo.get("name")))
-                coursesToReturn.add(i);
+            if(courseName.equals(coursesRetr.get(i).courseInfo.get("name")))
+                return coursesRetr.get(i);
         }
-        System.out.println("courseIndex: " + coursesToReturn.toString());
-        return coursesToReturn;
+        Course nullCourse = new Course();
+        nullCourse.courseInfo.put("name", "Null Course");
+        return nullCourse;
     }
 
     public void getUFCourses(String semester) {
