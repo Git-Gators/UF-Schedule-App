@@ -59,31 +59,19 @@ import java.util.HashMap;
 public class DatabaseUpdater extends Context {
 
     public ArrayList<Course> coursesRetr = new ArrayList<>();
+    public ArrayList<String> courseNames = new ArrayList<>();
 
-    public void getCourseFromDB(ArrayList<String> courseCodes) {
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("Courses").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Iterable<DataSnapshot> children = snapshot.getChildren();
-                for (DataSnapshot child : children) {
-                    Course test = child.getValue(Course.class);
-                    for(int i = 0; i < courseCodes.size(); i++)
-                        if(courseCodes.get(i).equals(test.courseInfo.get("code")))
-                            coursesRetr.add(test);
-                }
-                for(int i = 0; i < coursesRetr.size(); i++)
-                    System.out.println("Courses: " + coursesRetr.get(i).courseInfo.get("code"));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+    public ArrayList<Integer> getCourseFromDB(ArrayList<String> courseCodes) {
+        ArrayList<Integer> coursesToReturn = new ArrayList<>();
+        for(int i = 0; i < coursesRetr.size(); i++){
+            if(courseCodes.contains(coursesRetr.get(i).courseInfo.get("name")))
+                coursesToReturn.add(i);
+        }
+        System.out.println("courseIndex: " + coursesToReturn.toString());
+        return coursesToReturn;
     }
 
-    public void getUFCourses() {
+    public void getUFCourses(String semester) {
         // Instantiate the RequestQueue.
         String url ="https://one.ufl.edu/apix/soc/schedule/?category=RES&term=2211";
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -158,7 +146,9 @@ public class DatabaseUpdater extends Context {
                                 System.out.println("CourseObj: " + courseObj.courseInfo.toString());
                                 for(int i = 0; i < courseObj.classSections.size(); i++)
                                     System.out.println("SectionObj: " + courseObj.classSections.get(i).toString());
-                                mDatabase.child("Courses").child(courseObj.courseInfo.get("code")).setValue(courseObj);
+                                mDatabase.child(semester).child(courseObj.courseInfo.get("code")).setValue(courseObj);
+                                coursesRetr.add(courseObj);
+                                courseNames.add(courseObj.courseInfo.get("name"));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
