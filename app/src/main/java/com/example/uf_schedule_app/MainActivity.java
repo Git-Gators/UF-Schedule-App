@@ -1,9 +1,12 @@
 package com.example.uf_schedule_app;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -34,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         //Update the database and grab the courses for later
-        dbUpdater.getUFCourses("Spring 2021");
+        dbUpdater.updateDatabse("Spring 2021");
 
         //Update the lists
         spinner = (Spinner) findViewById(R.id.spinner);
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     //When an item is selected in either list
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         // The top spinner
         if (parent.getId() == R.id.spinner && !parent.getItemAtPosition(pos).toString().equals("Select a Course")) {
@@ -75,44 +79,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // The bottom spinner
         if (parent.getId() == R.id.spinnerCourses && !parent.getItemAtPosition(pos).toString().equals("Please Select a Semester First") && !parent.getItemAtPosition(pos).toString().equals("Choose a Course")) {
             System.out.println("Spinner: Course Chosen");
-            boolean courseChosen = false;
 
-            //Change the text one by one
+            //Use the getUFCourse function to get the course values
+            Course course = dbUpdater.getUFCourse(parent.getItemAtPosition(pos).toString());
+
+            //Name of the course
             EditText editText = (EditText) findViewById(R.id.course1);
-            if(editText.getText().toString().equals("Course 1")) {
-                editText.setText(parent.getItemAtPosition(pos).toString());
-                courseChosen = true;
+            String text = "Course Code: " + course.courseInfo.get("code");
+            editText.setText(text);
+            editText.setInputType(InputType.TYPE_NULL);
 
-                //Add the course to our array
-                coursesRetr.add(dbUpdater.getCourseFromDB(parent.getItemAtPosition(pos).toString()));
-            }
-
+            //courseID
             editText = (EditText) findViewById(R.id.course2);
-            if(editText.getText().toString().equals("Course 2") && !courseChosen) {
-                editText.setText(parent.getItemAtPosition(pos).toString());
-                courseChosen = true;
+            text = "CourseID: " + course.courseInfo.get("courseId");
+            editText.setText(text);
+            editText.setInputType(InputType.TYPE_NULL);
 
-                //Add the course to our array
-                coursesRetr.add(dbUpdater.getCourseFromDB(parent.getItemAtPosition(pos).toString()));
-            }
-
+            //Instructors
             editText = (EditText) findViewById(R.id.course3);
-            if(editText.getText().toString().equals("Course 3") && !courseChosen) {
-                editText.setText(parent.getItemAtPosition(pos).toString());
-                courseChosen = true;
+            text = "Instructors: " + course.classSections.get(0).get("Instructors").replace("[", "").replace("]", "");
+            editText.setText(text);
+            editText.setInputType(InputType.TYPE_NULL);
 
-                //Add the course to our array
-                coursesRetr.add(dbUpdater.getCourseFromDB(parent.getItemAtPosition(pos).toString()));
-            }
-
+            //Class Number
             editText = (EditText) findViewById(R.id.course4);
-            if(editText.getText().toString().equals("Course 4") && !courseChosen) {
-                editText.setText(parent.getItemAtPosition(pos).toString());
+            text = "Class Number: " + course.classSections.get(0).get("number");
+            editText.setText(text);
+            editText.setInputType(InputType.TYPE_NULL);
 
-                //Add the course to our array
-                coursesRetr.add(dbUpdater.getCourseFromDB(parent.getItemAtPosition(pos).toString()));
-            }
-            System.out.println(coursesRetr.toString());
+            //Add the course to our array
+            coursesRetr.add(course);
+            System.out.println("INFO: " + coursesRetr.toString());
         }
     }
 

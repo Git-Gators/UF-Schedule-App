@@ -37,6 +37,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -55,27 +56,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DatabaseUpdater extends Context {
-
+    private final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
     public ArrayList<Course> coursesRetr = new ArrayList<>();
     public ArrayList<String> courseNames = new ArrayList<>();
 
-    public Course getCourseFromDB(String courseName) {
-        for(int i = 0; i < coursesRetr.size(); i++){
-            if(courseName.equals(coursesRetr.get(i).courseInfo.get("name")))
-                return coursesRetr.get(i);
-        }
-        Course nullCourse = new Course();
-        nullCourse.courseInfo.put("name", "Null Course");
-        return nullCourse;
-    }
-
-    public void getUFCourses(String semester) {
+    public void updateDatabse(String semester) {
         // Instantiate the RequestQueue.
         String url ="https://one.ufl.edu/apix/soc/schedule/?category=RES&term=2211";
         RequestQueue queue = Volley.newRequestQueue(this);
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
         // prepare the Request
         JsonArrayRequest getRequest = new JsonArrayRequest(Request.Method.GET, url, null,
@@ -166,6 +158,12 @@ public class DatabaseUpdater extends Context {
 
         // Access the RequestQueue through your singleton class.
         queue.add(getRequest);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public Course getUFCourse(String courseName) {
+        List<Course> matches = coursesRetr.stream().filter(it -> it.courseInfo.get("name").contains(courseName)).collect(Collectors.toList());
+        return matches.get(0);
     }
 
     @Override

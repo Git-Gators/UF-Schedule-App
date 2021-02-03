@@ -6,15 +6,4 @@
     <string name="course3">Course 3</string>
     <string name="course4">Course 4</string>
     <string name="button_send">Send</string>
-    <string-array name="planets_array">
-        <item>Mercury</item>
-        <item>Venus</item>
-        <item>Earth</item>
-        <item>Mars</item>
-        <item>Jupiter</item>
-        <item>Saturn</item>
-        <item>Uranus</item>
-        <item>Neptune</item>
-    </string-array>
-
 </resources>
