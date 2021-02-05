@@ -25,7 +25,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.UserHandle;
 import android.view.Display;
-import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,36 +36,49 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Array;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
+
 
 public class DatabaseUpdater extends Context {
+    public ArrayList<Course> retrCourses = new ArrayList<>();
     private final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-    public ArrayList<Course> coursesRetr = new ArrayList<>();
-    public ArrayList<String> courseNames = new ArrayList<>();
 
-    public void updateDatabse(String semester) {
+    public void getDatabase(Context baseContext) {
+        updateDB(baseContext);
+    }
+
+    private void updateDatabase(String url, Context baseContext) {
         // Instantiate the RequestQueue.
-        String url ="https://one.ufl.edu/apix/soc/schedule/?category=RES&term=2211";
         RequestQueue queue = Volley.newRequestQueue(this);
 
         // prepare the Request
@@ -76,20 +88,19 @@ public class DatabaseUpdater extends Context {
                     @Override
                     public void onResponse(JSONArray response) {
                         // display response
-                        System.out.println("Response JSON " + response.toString());
+
                         try {
-                            System.out.println("Response JSON " + response.getJSONObject(0).getJSONArray("COURSES"));
                             for(int c = 0; c < response.getJSONObject(0).getJSONArray("COURSES").length(); c++){
                                 Course courseObj = new Course();
                                 String name = response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c).get("name").toString();
                                 JSONObject courseDir = response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c);
-                                System.out.println("courseDir: " + courseDir.get("code").getClass());
 
                                 courseObj.courseInfo.put("code", (String) courseDir.get("code"));
                                 courseObj.courseInfo.put("courseId", (String) courseDir.get("courseId"));
                                 courseObj.courseInfo.put("name", name);
                                 courseObj.courseInfo.put("termInd", courseDir.get("termInd").toString());
                                 courseObj.courseInfo.put("description", courseDir.get("description").toString());
+
                                 String prereq = courseDir.get("prerequisites").toString();
                                 prereq = prereq.replace("Prereq: ", "");
                                 courseObj.courseInfo.put("prerequisites", prereq);
@@ -104,7 +115,8 @@ public class DatabaseUpdater extends Context {
                                     sectionMap.put("number", section.get("number").toString());
                                     sectionMap.put("classNumber", section.get("classNumber").toString());
                                     sectionMap.put("credits", section.get("credits").toString());
-                                    sectionMap.put("deptName", section.get("deptName").toString());
+
+                                    sectionMap.put("deptName", section.get("deptName").toString().replace("/", "&"));
 
                                     //Get Instructor for the section
                                     JSONArray instructors = sections.getJSONObject(j).getJSONArray("instructors");
@@ -134,15 +146,9 @@ public class DatabaseUpdater extends Context {
                                     sectionMap.put("meetTime", meetTime.toString());
                                     courseObj.classSections.add(sectionMap);
                                 }
-
-                                System.out.println("CourseObj: " + courseObj.courseInfo.toString());
-                                for(int i = 0; i < courseObj.classSections.size(); i++)
-                                    System.out.println("SectionObj: " + courseObj.classSections.get(i).toString());
-                                mDatabase.child(semester).child(courseObj.courseInfo.get("code")).setValue(courseObj);
-                                coursesRetr.add(courseObj);
-                                courseNames.add(courseObj.courseInfo.get("name"));
+                                mDatabase.child(courseObj.classSections.get(0).get("deptName")).child(courseObj.courseInfo.get("code")).setValue(courseObj);
                             }
-                        } catch (JSONException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -160,10 +166,142 @@ public class DatabaseUpdater extends Context {
         queue.add(getRequest);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public Course getUFCourse(String courseName) {
-        List<Course> matches = coursesRetr.stream().filter(it -> it.courseInfo.get("name").contains(courseName)).collect(Collectors.toList());
-        return matches.get(0);
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void getCourseJSON(Context baseContext) throws FileNotFoundException {
+        //Delete the old JSON file
+        baseContext.deleteFile("myfile");
+
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    ArrayList<String> deptCourses = new ArrayList<>();
+                    for (DataSnapshot courseSnapshot : postSnapshot.getChildren()) {
+                        Course course = new Course();
+                        course = courseSnapshot.getValue(Course.class);
+
+                        Gson gson = new Gson();
+                        String courseJSON = gson.toJson(course);
+                        deptCourses.add(courseJSON);
+                    }
+
+                    String filename = postSnapshot.getKey() + ".json";
+                    try (FileOutputStream fos = baseContext.openFileOutput(filename, Context.MODE_PRIVATE)) {
+                        fos.write(deptCourses.toString().getBytes());
+                    } catch (Exception e) {
+                        System.out.println("Files: Didn't Work");
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) { }
+        });
+    }
+
+    private void updateDB(Context baseContext){
+        String url = "https://one.ufl.edu/apix/soc/schedule/?category=RES&term=2211";
+        updateDatabase(url, baseContext);
+        try {
+            int contNum = 0;
+            while(contNum < 4440){
+                contNum += 50;
+                updateDatabase(url + "&last-control-number=" + contNum, baseContext);
+            }
+        } catch (Exception E){
+            System.out.println("Exception caught when updating DB: " + E.toString());
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void readJSON(Context context) throws FileNotFoundException {
+        String[] files = context.fileList();
+        for(int i = 0; i < files.length; i++) {
+            if(!files[i].equals("PersistedInstallation.W0RFRkFVTFRd+MToyNjA0OTg1NTIwMzphbmRyb2lkOjM2NTkzZTMxZjZkNzViZGM2ZjBmZDY.json") || !files[i].equals("generatefid.lock")) {
+                FileInputStream fis = context.openFileInput(files[i]);
+                InputStreamReader inputStreamReader = new InputStreamReader(fis, StandardCharsets.UTF_8);
+                StringBuilder stringBuilder = new StringBuilder();
+
+                try (BufferedReader reader = new BufferedReader(inputStreamReader)) {
+                    String line = reader.readLine();
+                    while (line != null) {
+                        stringBuilder.append(line).append('\n');
+                        line = reader.readLine();
+                    }
+                } catch (IOException e) {
+                    // Error occurred when opening raw file for reading.
+                } finally {
+                    String contents = stringBuilder.toString();
+                }
+            }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public ArrayList<Course> getDepartmentCourses(Context context, String deptName) throws FileNotFoundException, JSONException {
+        ArrayList<Course> toReturn = new ArrayList<>();
+        String[] files = context.fileList();
+        List<String> listFiles = Arrays.asList(files);
+        if(listFiles.contains(deptName + ".json")){
+            FileInputStream fis = context.openFileInput(deptName + ".json");
+            InputStreamReader inputStreamReader = new InputStreamReader(fis, StandardCharsets.UTF_8);
+            StringBuilder stringBuilder = new StringBuilder();
+
+            try (BufferedReader reader = new BufferedReader(inputStreamReader)) {
+                String line = reader.readLine();
+                while (line != null) {
+                    stringBuilder.append(line).append('\n');
+                    line = reader.readLine();
+                }
+            } catch (IOException e) {
+                // Error occurred when opening raw file for reading.
+            } finally {
+                String contents = stringBuilder.toString();
+                JSONArray jsonArray = new JSONArray(contents);
+
+                Gson gson = new Gson();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    Course courseOBJ = gson.fromJson(String.valueOf(jsonArray.getJSONObject(i)), Course.class);
+                    toReturn.add(courseOBJ);
+                }
+            }
+        }
+
+        return toReturn;
+    }
+
+    public void deleteOldFiles(Context context) {
+        String[] files = context.fileList();
+        for(int i = 0; i < files.length; i++) {
+            if(!files[i].equals("PersistedInstallation.W0RFRkFVTFRd+MToyNjA0OTg1NTIwMzphbmRyb2lkOjM2NTkzZTMxZjZkNzViZGM2ZjBmZDY.json") || !files[i].equals("generatefid.lock"))
+                context.deleteFile(files[i]);
+        }
+    }
+
+    public ArrayList<String> getDepNames(Context context){
+        ArrayList<String> deptNames = new ArrayList<>();
+        String[] files = context.fileList();
+        for(int i = 0; i < files.length; i++) {
+            if(!files[i].equals("PersistedInstallation.W0RFRkFVTFRd+MToyNjA0OTg1NTIwMzphbmRyb2lkOjM2NTkzZTMxZjZkNzViZGM2ZjBmZDY.json") || !files[i].equals("generatefid.lock"))
+                deptNames.add(files[i].replace(".json", ""));
+        }
+        deptNames.remove("generatefid.lock");
+        deptNames.remove("PersistedInstallation.W0RFRkFVTFRd+MToyNjA0OTg1NTIwMzphbmRyb2lkOjM2NTkzZTMxZjZkNzViZGM2ZjBmZDY");
+        return deptNames;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public Course getCourse(Context context, String courseName) throws FileNotFoundException, JSONException {
+        ArrayList<String> deptNames = getDepNames(context);
+        for(int i = 0; i < deptNames.size(); i++){
+            ArrayList<Course> depCourses = getDepartmentCourses(context, deptNames.get(i));
+            for(int j = 0; j < depCourses.size(); j++){
+                if(Objects.equals(depCourses.get(i).courseInfo.get("name"), courseName))
+                    return depCourses.get(i);
+            }
+        }
+        return new Course();
     }
 
     @Override
