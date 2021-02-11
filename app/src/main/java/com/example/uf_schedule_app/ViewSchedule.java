@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class ViewSchedule extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     //Create a dbUpdater object
     DatabaseUpdater dbUpdater = new DatabaseUpdater();
 
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.schedule_view);
 
         //Update the database
         //dbUpdater.getDatabase(getBaseContext());
@@ -197,9 +197,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     /** Called when the user taps the Send button */
-    public void goToSchedule(View view) {
+    public void goToCourseFinder(View view) {
         // Do something in response to button
-        Intent intent = new Intent(this, ViewSchedule.class);
-        startActivity(intent);
+        System.out.println("Go to course finder");
     }
 }
