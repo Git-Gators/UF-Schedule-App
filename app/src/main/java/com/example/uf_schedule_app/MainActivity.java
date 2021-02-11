@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         System.out.println("Spinner: onNothingSelected");
     }
 
-    /** Called when the user taps the Send button */
+    /** Called when the user taps the My Schedule button */
     public void goToSchedule(View view) {
         // Do something in response to button
         Intent intent = new Intent(this, ViewSchedule.class);
