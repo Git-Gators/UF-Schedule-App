@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     ListView chosenCourses;
     ArrayList<String> courses = new ArrayList<>();
     ArrayList<String> coursesPicked = new ArrayList<>();
+    ArrayList<String> departmentPicked = new ArrayList<>();
+    String department;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -60,7 +62,9 @@ public class MainActivity extends AppCompatActivity {
                 coursesPicked = b.getStringArrayList("coursesPicked");
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, coursesPicked);
                 chosenCourses.setAdapter(arrayAdapter);
-                System.out.println("coursesPicked from onCreate Main: " + coursesPicked.toString());
+            }
+            if(b.getStringArrayList("departmentPicked") != null){
+                departmentPicked = b.getStringArrayList("departmentPicked");
             }
             if(b.getStringArrayList("courses") != null){
                 courses = b.getStringArrayList("courses");
@@ -72,14 +76,12 @@ public class MainActivity extends AppCompatActivity {
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
                 courseList.setAdapter(arrayAdapter);
             }
-//            if(b.getString("semester") != null){
-//                TextView semester = findViewById(R.id.semesterText);
-//                semester.setText(b.getString("semester"));
-//            }
-//            if(b.getString("department") != null){
-//               TextView department = findViewById(R.id.departmentText);
-//               department.setText(b.getString("department"));
-//            }
+            if(b.getString("semester") != null){
+                //
+            }
+            if(b.getString("department") != null){
+               department = b.getString("department");
+            }
             //if courses == null and department isn't => Grab all department courses and put them into the list
         }
 
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 coursesPicked.add(courses.get(position));
+                departmentPicked.add(department);
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
                 chosenCourses.setAdapter(arrayAdapter);
             }
@@ -98,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, FilterActivity.class);
         Bundle b = new Bundle();
         b.putStringArrayList("coursesPicked", coursesPicked);
-        System.out.println("coursesPicked from goToFilter: " + coursesPicked.toString());
+        b.putStringArrayList("departmentPicked", departmentPicked);
         intent.putExtras(b);
         startActivity(intent);
         finish();
@@ -118,8 +121,13 @@ public class MainActivity extends AppCompatActivity {
                         case R.id.nav_schedule:
                             id = R.id.nav_schedule;
                             in = new Intent(getBaseContext(), ViewSchedule.class);
+                            Bundle b = new Bundle();
+                            b.putStringArrayList("coursesPicked", coursesPicked);
+                            b.putStringArrayList("departmentPicked", departmentPicked);
+                            in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                            finish();
                             break;
                         case R.id.nav_calendar:
                             id = R.id.nav_calendar;

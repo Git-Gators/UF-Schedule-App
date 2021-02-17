@@ -265,6 +265,7 @@ public class DatabaseUpdater extends Context {
         mDatabase.addValueEventListener(postListener);
     }
 
+
     @Override
     public AssetManager getAssets() {
         return null;

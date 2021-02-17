@@ -1,7 +1,6 @@
 package com.example.uf_schedule_app;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Build;
@@ -12,7 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.r0adkll.slidr.Slidr;
 
@@ -39,6 +37,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     ArrayList<String> coursesNames = new ArrayList<>();
     ArrayList<String> courses = new ArrayList<>();
     ArrayList<String> coursesPicked = new ArrayList<>();
+    ArrayList<String> departmentPicked = new ArrayList<>();
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -57,7 +56,9 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         if(b != null){
             if(b.getStringArrayList("coursesPicked") != null){
                 coursesPicked = b.getStringArrayList("coursesPicked");
-                System.out.println("coursesPicked from onCreate Filter: " + coursesPicked.toString());
+            }
+            if(b.getStringArrayList("departmentPicked") != null){
+                departmentPicked = b.getStringArrayList("departmentPicked");
             }
         }
 
@@ -143,7 +144,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             courseName = parent.getItemAtPosition(pos).toString();
 
             //Name of the course
-            EditText course1 = (EditText) findViewById(R.id.course1);
+            EditText course1 = (EditText) findViewById(R.id.courseText1);
 
             //courseID
             EditText course2 = (EditText) findViewById(R.id.course2);
@@ -173,6 +174,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         b.putStringArrayList("courses", courses);
         System.out.println("coursesPicked from goToMain: " + coursesPicked.toString());
         b.putStringArrayList("coursesPicked", coursesPicked);
+        b.putStringArrayList("departmentPicked", departmentPicked);
         b.putString("course", courseName);
         b.putString("department", department);
         b.putString("semester", semester);
