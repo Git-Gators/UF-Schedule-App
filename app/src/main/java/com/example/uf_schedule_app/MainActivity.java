@@ -1,20 +1,25 @@
 package com.example.uf_schedule_app;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Filter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import android.content.Intent;
 import android.widget.TextView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.json.JSONException;
 
@@ -48,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setOnNavigationItemSelectedListener(navListener);
 
         //Update the lists
         spinner = (Spinner) findViewById(R.id.spinner);
@@ -158,4 +166,36 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Intent intent = new Intent(this, ViewSchedule.class);
         startActivity(intent);
     }
+
+    /** Called when the user taps the Filter button */
+    public void goToFilter(View view){
+        Intent intent = new Intent(this, FilterActivity.class);
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+    }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    int id = 0;
+                    Intent in;
+                    switch(item.getItemId()){
+                        case R.id.nav_home:
+                            id = R.id.nav_home;
+                            break;
+                        case R.id.nav_schedule:
+                            id = R.id.nav_schedule;
+                            in = new Intent(getBaseContext(), ViewSchedule.class);
+                            startActivity(in);
+                            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                            break;
+                        case R.id.nav_calendar:
+                            id = R.id.nav_calendar;
+                            break;
+                    }
+                    System.out.println(id);
+                    return false;
+                }
+            };
 }
