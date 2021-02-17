@@ -10,9 +10,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import android.content.Intent;
+import android.widget.TextView;
 
 import org.json.JSONException;
 
@@ -31,6 +33,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Spinner spinnerDept;
     Spinner spinnerCrse;
 
+    //Progress Bars (Spinning load icon)
+    private ProgressBar pSpinner;
+    private ProgressBar pSpinner2;
+    private ProgressBar pSpinner3;
+
     //Used in the Spinner
     ArrayList<String> deptNames = new ArrayList<>();
     ArrayList<String> coursesNames = new ArrayList<>();
@@ -41,46 +48,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //Update the database
-        //dbUpdater.getDatabase(getBaseContext());
-
-        //Delete old files
-        //dbUpdater.deleteOldFiles(getBaseContext());
-
-        //Get JSON files from Database if they're not there
-        String[] files = getBaseContext().fileList();
-        if(files.length < 3){
-            System.out.println(Arrays.asList(files).toString());
-            System.out.println("Getting Courses From Database");
-            try {
-                dbUpdater.getCourseJSON(getBaseContext());
-            } catch (FileNotFoundException e) {
-                System.out.println("Error getting courseJSON " + e);
-            }
-        } else {
-            System.out.println("Courses Found");
-            System.out.println(Arrays.asList(files).toString());
-        }
-
-        //Get a departments courses
-        ArrayList<Course> deptCourses = new ArrayList<>();
-        try {
-            deptCourses = dbUpdater.getDepartmentCourses(getBaseContext(), "Agronomy");
-        } catch (FileNotFoundException | JSONException e) {
-            e.printStackTrace();
-        }
-        System.out.println(deptCourses);
-
-        //Get a specific course
-        Course testCourse = null;
-        try {
-            testCourse = dbUpdater.getCourse(getBaseContext(), "Financial Accounting and Reporting 1");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        assert testCourse != null;
-        System.out.println("testCourse: " + testCourse.courseInfo.get("name"));
 
         //Update the lists
         spinner = (Spinner) findViewById(R.id.spinner);
@@ -108,6 +75,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinner.setAdapter(spinnerArrayAdapter);
         spinnerDept.setAdapter(spinnerArrayAdapter2);
         spinnerCrse.setAdapter(spinnerArrayAdapter1);
+
+        pSpinner = findViewById(R.id.progressBar);
+        pSpinner.setVisibility(View.INVISIBLE);
+        pSpinner2 = findViewById(R.id.progressBar2);
+        pSpinner2.setVisibility(View.INVISIBLE);
+        pSpinner3 = findViewById(R.id.progressBar3);
+        pSpinner3.setVisibility(View.INVISIBLE);
     }
 
     //When an item is selected in either list
@@ -119,8 +93,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             System.out.println("Spinner: " + valueFromSpinner);
 
             //Add the database information to the list and update the spinner
-            deptNames.addAll(dbUpdater.getDepNames(getBaseContext()));
+            dbUpdater.getDepNames(deptNames, pSpinner);
             deptNames.set(0, "Choose a Department");
+
             coursesNames.set(0, "Choose a Department");
 
             ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, deptNames);
@@ -138,13 +113,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             coursesNames.clear();
             coursesNames.add("Choose a Course");
             try {
-                crsRet = dbUpdater.getDepartmentCourses(getBaseContext(), parent.getItemAtPosition(pos).toString());
-                ArrayList<String> courseRet = new ArrayList<>();
-                for(int i = 0; i < crsRet.size(); i++){
-                    courseRet.add(crsRet.get(i).courseInfo.get("name"));
-                }
-                coursesNames.addAll(courseRet);
-
+                dbUpdater.getCourseNames(parent.getItemAtPosition(pos).toString(), coursesNames, pSpinner2);
                 ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, coursesNames);
                 spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                 spinnerCrse.setAdapter(spinnerArrayAdapter1);
@@ -156,38 +125,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // The bottom spinner
         if (parent.getId() == R.id.spinnerCourse && !parent.getItemAtPosition(pos).toString().equals("Please Select a Semester First") && !parent.getItemAtPosition(pos).toString().equals("Choose a Department") && !parent.getItemAtPosition(pos).toString().equals("Choose a Course")) {
             System.out.println("Spinner: Course Chosen");
-
-            //Use the getUFCourse function to get the course values
-            Course course = new Course();
-            for(int i = 0; i < crsRet.size(); i++){
-                if(Objects.equals(crsRet.get(i).courseInfo.get("name"), parent.getItemAtPosition(pos).toString())){
-                    course = crsRet.get(i);
-                }
-            }
+            TextView text = findViewById(R.id.textView2);
+            text.setText(parent.getItemAtPosition(pos).toString());
 
             //Name of the course
-            EditText editText = (EditText) findViewById(R.id.course1);
-            String text = "Course Code: " + course.courseInfo.get("code");
-            editText.setText(text);
-            editText.setInputType(InputType.TYPE_NULL);
+            EditText course1 = (EditText) findViewById(R.id.course1);
 
             //courseID
-            editText = (EditText) findViewById(R.id.course2);
-            text = "CourseID: " + course.courseInfo.get("courseId");
-            editText.setText(text);
-            editText.setInputType(InputType.TYPE_NULL);
+            EditText course2 = (EditText) findViewById(R.id.course2);
 
             //Instructors
-            editText = (EditText) findViewById(R.id.course3);
-            text = "Instructors: " + course.classSections.get(0).get("Instructors").replace("[", "").replace("]", "");
-            editText.setText(text);
-            editText.setInputType(InputType.TYPE_NULL);
+            EditText course3 = (EditText) findViewById(R.id.course3);
 
             //Class Number
-            editText = (EditText) findViewById(R.id.course4);
-            text = "Class Number: " + course.classSections.get(0).get("number");
-            editText.setText(text);
-            editText.setInputType(InputType.TYPE_NULL);
+            EditText course4 = (EditText) findViewById(R.id.course4);
+
+            Spinner depSpin = (Spinner) findViewById(R.id.spinnerDepartments);
+            String deptName = depSpin.getSelectedItem().toString();
+            String courseName = parent.getItemAtPosition(pos).toString();
+            dbUpdater.setTextFields(course1, course2, course3, course4, deptName, courseName, pSpinner3);
         }
     }
 
