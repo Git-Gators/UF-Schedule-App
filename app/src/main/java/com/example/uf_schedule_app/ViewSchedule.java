@@ -57,7 +57,25 @@ public class ViewSchedule extends MainActivity {
                 load.setVisibility(View.VISIBLE);
                 for(int i = 0; i < coursesPicked.size(); i++)
                     getCourse(coursesPicked.get(i), departmentPicked.get(i));
+                if (coursesPicked.size() == 0) {
+                    load.setVisibility(View.VISIBLE);
+                    TextView text = null;
+                    text = findViewById(R.id.courseText1);
+                    text.setText("No courses selected.");
+                }
             }
+            else {
+                load.setVisibility(View.VISIBLE);
+                TextView text = null;
+                text = findViewById(R.id.courseText1);
+                text.setText("No courses selected.");
+            }
+        }
+        else {
+            load.setVisibility(View.VISIBLE);
+            TextView text = null;
+            text = findViewById(R.id.courseText1);
+            text.setText("No courses selected.");
         }
     }
 
@@ -105,7 +123,11 @@ public class ViewSchedule extends MainActivity {
                         } else if(i == 3){
                             text = findViewById(R.id.courseText4);
                         }
-                        if(text != null)
+                        if (text == null && i == 0) {
+                            text = findViewById(R.id.courseText1);
+                            text.setText("No courses selected.");
+                        }
+                        else if(text != null)
                             text.setText(courses.get(i).courseInfo.get("name"));
                     }
                 }
