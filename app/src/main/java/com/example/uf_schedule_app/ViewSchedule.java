@@ -147,6 +147,7 @@ public class ViewSchedule extends MainActivity {
                     for(int i = 0; i < courses.size(); i++){
                         TextView text = null;
 
+
                         if(i == 0){
                             text = findViewById(R.id.courseText1);
                         } else if(i == 1){
