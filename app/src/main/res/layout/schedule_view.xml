@@ -125,6 +125,7 @@
         android:layout_marginTop="200dp"
         android:layout_marginBottom="421dp"
         android:onClick="deleteCourse"
+        android:visibility="invisible"
         android:tag="0"
         android:text="Delete"
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
@@ -143,6 +144,7 @@
         android:onClick="deleteCourse"
         android:tag="1"
         android:text="Delete"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/delete6"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/courseText2"
@@ -156,6 +158,7 @@
         android:onClick="deleteCourse"
         android:tag="2"
         android:text="Delete"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/delete2" />
 
@@ -167,6 +170,7 @@
         android:onClick="deleteCourse"
         android:tag="3"
         android:text="Delete"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/delete6" />
 

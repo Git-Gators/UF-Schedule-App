@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
 import android.content.Intent;
@@ -146,16 +148,20 @@ public class ViewSchedule extends MainActivity {
                     //Edit all the courseTexts
                     for(int i = 0; i < courses.size(); i++){
                         TextView text = null;
-
+                        Button button = null;
 
                         if(i == 0){
                             text = findViewById(R.id.courseText1);
+                            button = findViewById(R.id.delete1);
                         } else if(i == 1){
                             text = findViewById(R.id.courseText2);
+                            button = findViewById(R.id.delete2);
                         } else if(i == 2){
                             text = findViewById(R.id.courseText3);
+                            button = findViewById(R.id.delete6);
                         } else if(i == 3){
                             text = findViewById(R.id.courseText4);
+                            button = findViewById(R.id.delete7);
                         }
                         if (text == null && i == 0) {
                             text = findViewById(R.id.courseText1);
@@ -163,6 +169,7 @@ public class ViewSchedule extends MainActivity {
                         }
                         else if(text != null)
                             text.setText(courses.get(i).courseInfo.get("name"));
+                            button.setVisibility(View.VISIBLE);
                     }
                 }
             }
