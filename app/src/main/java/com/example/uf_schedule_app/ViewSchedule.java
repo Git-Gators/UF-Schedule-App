@@ -58,7 +58,7 @@ public class ViewSchedule extends MainActivity {
                 for(int i = 0; i < coursesPicked.size(); i++)
                     getCourse(coursesPicked.get(i), departmentPicked.get(i));
                 if (coursesPicked.size() == 0) {
-                    load.setVisibility(View.VISIBLE);
+                    load.setVisibility(View.INVISIBLE);
                     TextView text = null;
                     text = findViewById(R.id.courseText1);
                     text.setText("No courses selected.");
@@ -89,6 +89,33 @@ public class ViewSchedule extends MainActivity {
         Intent intent = new Intent(this, MainActivity.class);
         Bundle b = new Bundle();
         b.putStringArrayList("coursesPicked", coursesPicked);
+        intent.putExtras(b);
+        startActivity(intent);
+        finish();
+    }
+    //Delete all courses
+    public void goToDelete(View view) {
+        coursesPicked.clear();
+
+        Intent intent = new Intent(this, CourseDelete.class);
+        Bundle b = new Bundle();
+        b.putStringArrayList("coursesPicked", coursesPicked);
+        intent.putExtras(b);
+        startActivity(intent);
+        finish();
+    }
+    //Delete button next to course
+    public void deleteCourse(View view) {
+        if (coursesPicked.size() != 0) {
+            //int index = (int) view.getTag();
+            coursesPicked.remove(0);
+            departmentPicked.remove(0);
+        }
+
+        Intent intent = new Intent(this, CourseDelete.class);
+        Bundle b = new Bundle();
+        b.putStringArrayList("coursesPicked", coursesPicked);
+        b.putStringArrayList("departmentPicked", departmentPicked);
         intent.putExtras(b);
         startActivity(intent);
         finish();
