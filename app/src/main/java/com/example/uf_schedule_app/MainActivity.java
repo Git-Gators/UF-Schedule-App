@@ -67,14 +67,17 @@ public class MainActivity extends AppCompatActivity {
                 departmentPicked = b.getStringArrayList("departmentPicked");
             }
             if(b.getStringArrayList("courses") != null){
+                courses.remove("");
                 courses = b.getStringArrayList("courses");
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
                 courseList.setAdapter(arrayAdapter);
             }
             if(b.getString("course") != null){
-                courses.add(b.getString("course"));
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
-                courseList.setAdapter(arrayAdapter);
+                if(!b.getString("course").equals("")) {
+                    courses.add(b.getString("course"));
+                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
+                    courseList.setAdapter(arrayAdapter);
+                }
             }
             if(b.getString("semester") != null){
                 //
@@ -87,6 +90,16 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("TRUE");
             }
         }
+
+        chosenCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                coursesPicked.remove(position);
+                departmentPicked.remove(position);
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
+                chosenCourses.setAdapter(arrayAdapter);
+            }
+        });
 
         courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

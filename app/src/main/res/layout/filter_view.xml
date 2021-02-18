@@ -9,13 +9,14 @@
 
     <Spinner
         android:id="@+id/spinner"
-        android:layout_width="match_parent"
-        android:layout_height="24dp"
-        android:layout_marginTop="64dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="68dp"
         android:layout_marginEnd="100dp"
         android:layout_marginRight="100dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,7 +24,7 @@
         android:id="@+id/button3"
         android:layout_width="88dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="16dp"
         android:onClick="goToMain"
         android:text="Filter"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -34,12 +35,13 @@
     <Spinner
         android:id="@+id/spinnerCourse"
         android:layout_width="match_parent"
-        android:layout_height="24dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
         android:layout_marginTop="36dp"
         android:layout_marginEnd="100dp"
         android:layout_marginRight="100dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinnerDepartments" />
 
@@ -48,11 +50,11 @@
         style="?android:attr/progressBarStyle"
         android:layout_width="26dp"
         android:layout_height="29dp"
-        android:layout_marginTop="116dp"
-        android:layout_marginEnd="44dp"
-        android:layout_marginRight="44dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginStart="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="28dp"
+        app:layout_constraintStart_toEndOf="@+id/spinnerDepartments"
+        app:layout_constraintTop_toBottomOf="@+id/spinner" />
 
     <ProgressBar
         android:id="@+id/progressBar2"
@@ -62,84 +64,97 @@
         android:layout_marginStart="28dp"
         android:layout_marginLeft="28dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="44dp"
-        android:layout_marginRight="44dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/spinnerDepartments"
+        app:layout_constraintStart_toEndOf="@+id/spinnerCourse"
         app:layout_constraintTop_toBottomOf="@+id/progressBar" />
-
-    <ProgressBar
-        android:id="@+id/progressBar3"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar2" />
-
-    <EditText
-        android:id="@+id/courseText1"
-        android:layout_width="361dp"
-        android:layout_height="52dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="21dp"
-        android:ems="10"
-        android:inputType="none"
-        android:text="@string/course1"
-        app:layout_constraintBottom_toTopOf="@+id/course2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/course2"
-        android:layout_width="361dp"
-        android:layout_height="45dp"
-        android:layout_marginBottom="16dp"
-        android:ems="10"
-        android:inputType="none"
-        android:text="@string/course2"
-        app:layout_constraintBottom_toTopOf="@+id/course3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/course3"
-        android:layout_width="361dp"
-        android:layout_height="45dp"
-        android:layout_marginBottom="21dp"
-        android:ems="10"
-        android:inputType="none"
-        android:text="@string/course3"
-        app:layout_constraintBottom_toTopOf="@+id/course4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/course4"
-        android:layout_width="361dp"
-        android:layout_height="45dp"
-        android:layout_marginBottom="40dp"
-        android:ems="10"
-        android:inputType="none"
-        android:text="@string/course4"
-        app:layout_constraintBottom_toTopOf="@+id/button3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <Spinner
         android:id="@+id/spinnerDepartments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
         android:layout_marginTop="28dp"
         android:layout_marginEnd="100dp"
         android:layout_marginRight="100dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinner" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="88dp"
+        android:layout_marginLeft="88dp"
+        android:layout_marginTop="24dp"
+        android:text="Choose a Department"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="128dp"
+        android:layout_marginLeft="128dp"
+        android:layout_marginTop="28dp"
+        android:text="Course Filters"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerCourse" />
+
+    <EditText
+        android:id="@+id/courseCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="101dp"
+        android:layout_marginLeft="101dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="101dp"
+        android:layout_marginRight="101dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Course Code"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <EditText
+        android:id="@+id/courseCredits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="101dp"
+        android:layout_marginLeft="101dp"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Course Credits"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/courseCode" />
+
+    <EditText
+        android:id="@+id/courseTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="101dp"
+        android:layout_marginLeft="101dp"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Course Title or Keyword"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/courseCredits" />
+
+    <ProgressBar
+        android:id="@+id/filterLoad"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="invisible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

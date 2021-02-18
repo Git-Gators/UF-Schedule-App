@@ -1,5 +1,6 @@
 package com.example.uf_schedule_app;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import android.content.Intent;
@@ -9,18 +10,25 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.r0adkll.slidr.Slidr;
 
 import java.util.ArrayList;
 
 public class FilterActivity extends MainActivity implements AdapterView.OnItemSelectedListener {
 
-    String department;
-    String courseName;
+    String department = "";
+    String courseName = "";
     String semester;
 
     //Spinner Objects (Drop Down Lists)
@@ -40,6 +48,11 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     ArrayList<String> coursesPicked = new ArrayList<>();
     ArrayList<String> departmentPicked = new ArrayList<>();
 
+    //Used in the filters
+    EditText courseCodeText;
+    EditText courseCreditsText;
+    EditText courseNameText;
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +62,10 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         getSupportActionBar().setTitle("Filters");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //Swipe Right to go back to Main
-        Slidr.attach(this);
+        ProgressBar filterLoad = findViewById(R.id.filterLoad);
+        filterLoad.setVisibility(View.INVISIBLE);
+        Button filterButton = findViewById(R.id.button3);
+        filterButton.setVisibility(View.VISIBLE);
 
         //If we're coming from the filter, we grab the info
         Bundle b = getIntent().getExtras();
@@ -67,8 +82,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         pSpinner.setVisibility(View.INVISIBLE);
         pSpinner2 = findViewById(R.id.progressBar2);
         pSpinner2.setVisibility(View.INVISIBLE);
-        pSpinner3 = findViewById(R.id.progressBar3);
-        pSpinner3.setVisibility(View.INVISIBLE);
 
         //Update the lists
         spinner = (Spinner) findViewById(R.id.spinner);
@@ -96,6 +109,121 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         spinner.setAdapter(spinnerArrayAdapter);
         spinnerDept.setAdapter(spinnerArrayAdapter2);
         spinnerCrse.setAdapter(spinnerArrayAdapter1);
+
+
+        //Text Listeners
+        courseCodeText = (EditText) findViewById(R.id.courseCode);
+        courseCreditsText = (EditText) findViewById(R.id.courseCredits);
+        courseNameText = (EditText) findViewById(R.id.courseTitle);
+        courseCodeText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus) {
+                    filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
+                }
+            }
+        });
+        courseCreditsText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus) {
+                    filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
+                }
+            }
+        });
+        courseNameText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus) {
+                    filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
+                }
+            }
+        });
+    }
+
+    public void filterCourses(String code, String credits, String name){
+        if(!courseName.equals(""))
+            return;
+        //Add to courses
+        courses.clear();
+
+        //Hide the filter button and show the load
+        ProgressBar filterLoad = findViewById(R.id.filterLoad);
+        filterLoad.setVisibility(View.VISIBLE);
+        Button filterButton = findViewById(R.id.button3);
+        filterButton.setVisibility(View.INVISIBLE);
+
+        //is there a department chosen?
+        if(department.equals("")){
+            //No department chosen, filter the whole list
+            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(department);
+            ValueEventListener postListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot dep : dataSnapshot.getChildren()) {
+                        for (DataSnapshot ds : dep.getChildren()) {
+                            boolean match = true;
+                            if (!ds.getValue(Course.class).courseInfo.get("name").contains(name) && !name.equals("Course Title or Keyword")) {
+                                match = false;
+                            }
+                            if (!ds.getValue(Course.class).classSections.get(0).get("credits").equals(credits) && !credits.equals("Course Credits")) {
+                                match = false;
+                            }
+                            if (!ds.getValue(Course.class).courseInfo.get("code").contains(code) && !code.equals("Course Code")) {
+                                match = false;
+                            }
+                            if(match) {
+                                if(!courses.contains(ds.getValue(Course.class).courseInfo.get("name")))
+                                    courses.add(ds.getValue(Course.class).courseInfo.get("name"));
+                            }
+                        }
+                    }
+                    ProgressBar filterLoad = findViewById(R.id.filterLoad);
+                    filterLoad.setVisibility(View.INVISIBLE);
+                    Button filterButton = findViewById(R.id.button3);
+                    filterButton.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            };
+            mDatabase.addValueEventListener(postListener);
+        } else {
+            //Department chosen, look in the department
+            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(department);
+            ValueEventListener postListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        boolean match = true;
+                        if (!ds.getValue(Course.class).courseInfo.get("name").contains(name) && !name.equals("Course Title or Keyword")) {
+                            match = false;
+                        }
+                        if (!ds.getValue(Course.class).classSections.get(0).get("credits").equals(credits) && !credits.equals("Course Credits")) {
+                            match = false;
+                        }
+                        if (!ds.getValue(Course.class).courseInfo.get("code").contains(code) && !code.equals("Course Code")) {
+                            match = false;
+                        }
+                        if(match) {
+                            courses.add(ds.getValue(Course.class).courseInfo.get("name"));
+                        }
+                    }
+                    ProgressBar filterLoad = findViewById(R.id.filterLoad);
+                    filterLoad.setVisibility(View.INVISIBLE);
+                    Button filterButton = findViewById(R.id.filter_button);
+                    filterButton.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            };
+            mDatabase.addValueEventListener(postListener);
+        }
     }
 
     @Override
@@ -167,23 +295,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
             courses.clear();
             courseName = parent.getItemAtPosition(pos).toString();
-
-            //Name of the course
-            EditText course1 = (EditText) findViewById(R.id.courseText1);
-
-            //courseID
-            EditText course2 = (EditText) findViewById(R.id.course2);
-
-            //Instructors
-            EditText course3 = (EditText) findViewById(R.id.course3);
-
-            //Class Number
-            EditText course4 = (EditText) findViewById(R.id.course4);
-
-            Spinner depSpin = (Spinner) findViewById(R.id.spinnerDepartments);
-            String deptName = depSpin.getSelectedItem().toString();
-            String courseName = parent.getItemAtPosition(pos).toString();
-            dbUpdater.setTextFields(course1, course2, course3, course4, deptName, courseName, pSpinner3);
         }
     }
 
@@ -191,6 +302,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         // Another interface callback
         System.out.println("Spinner: onNothingSelected");
     }
+
 
     /** Called when the user taps the GO BACK button */
     public void goToMain(View view){
