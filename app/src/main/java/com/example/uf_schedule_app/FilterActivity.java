@@ -213,7 +213,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                     }
                     ProgressBar filterLoad = findViewById(R.id.filterLoad);
                     filterLoad.setVisibility(View.INVISIBLE);
-                    Button filterButton = findViewById(R.id.filter_button);
+                    Button filterButton = findViewById(R.id.button3);
                     filterButton.setVisibility(View.VISIBLE);
                 }
 
@@ -258,8 +258,11 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             System.out.println("Spinner: " + valueFromSpinner);
             semester = valueFromSpinner;
 
+            spinnerDept.setEnabled(false);
+            spinnerCrse.setEnabled(false);
+
             //Add the database information to the list and update the spinner
-            dbUpdater.getDepNames(deptNames, pSpinner);
+            dbUpdater.getDepNames(deptNames, pSpinner, spinnerDept, spinnerCrse);
             deptNames.set(0, "Choose a Department");
 
             coursesNames.set(0, "Choose a Department");
@@ -267,6 +270,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, deptNames);
             spinnerArrayAdapter2.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
             spinnerDept.setAdapter(spinnerArrayAdapter2);
+
 
             ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, coursesNames);
             spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
@@ -278,9 +282,11 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             System.out.println("Spinner: Department Chosen");
             coursesNames.clear();
             coursesNames.add("Choose a Course");
+            courses.clear();
             department = parent.getItemAtPosition(pos).toString();
             try {
-                dbUpdater.getCourseNames(parent.getItemAtPosition(pos).toString(), coursesNames, pSpinner2, courses);
+                spinnerCrse.setEnabled(false);
+                dbUpdater.getCourseNames(parent.getItemAtPosition(pos).toString(), coursesNames, pSpinner2, courses, spinnerCrse);
                 ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, coursesNames);
                 spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                 spinnerCrse.setAdapter(spinnerArrayAdapter1);
@@ -309,7 +315,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         Intent intent = new Intent(this, MainActivity.class);
         Bundle b = new Bundle();
         b.putStringArrayList("courses", courses);
-        System.out.println("coursesPicked from goToMain: " + coursesPicked.toString());
         b.putStringArrayList("coursesPicked", coursesPicked);
         b.putStringArrayList("departmentPicked", departmentPicked);
         b.putString("course", courseName);

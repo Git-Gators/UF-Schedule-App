@@ -30,6 +30,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -179,7 +180,7 @@ public class DatabaseUpdater extends Context {
         }
     }
 
-    public void getDepNames(ArrayList<String> deptNames, ProgressBar spinner){
+    public void getDepNames(ArrayList<String> deptNames, ProgressBar spinner, Spinner spinnerDept, Spinner spinnerCrse){
         spinner.setVisibility(View.VISIBLE);
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
         ValueEventListener postListener = new ValueEventListener() {
@@ -193,6 +194,8 @@ public class DatabaseUpdater extends Context {
                     deptNames.add(name);
                 }
                 spinner.setVisibility(View.INVISIBLE);
+                spinnerDept.setEnabled(true);
+                spinnerCrse.setEnabled(true);
             }
 
             @Override
@@ -203,7 +206,7 @@ public class DatabaseUpdater extends Context {
         mDatabase.addValueEventListener(postListener);
     }
 
-    public void getCourseNames(String deptName, ArrayList<String> coursesNames, ProgressBar spinner, ArrayList<String> courses){
+    public void getCourseNames(String deptName, ArrayList<String> coursesNames, ProgressBar spinner, ArrayList<String> courses, Spinner spinnerCrse){
         spinner.setVisibility(View.VISIBLE);
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(deptName);
         ValueEventListener postListener = new ValueEventListener() {
@@ -214,6 +217,7 @@ public class DatabaseUpdater extends Context {
                     courses.add(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString());
                 }
                 spinner.setVisibility(View.INVISIBLE);
+                spinnerCrse.setEnabled(true);
             }
 
             @Override

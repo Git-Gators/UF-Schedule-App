@@ -85,10 +85,6 @@ public class MainActivity extends AppCompatActivity {
             if(b.getString("department") != null){
                department = b.getString("department");
             }
-            if(b.getString("department") != null && b.getString("course") == null){
-                department = b.getString("department");
-                System.out.println("TRUE");
-            }
         }
 
         chosenCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
