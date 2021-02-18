@@ -95,22 +95,28 @@ public class ViewSchedule extends MainActivity {
         b.putStringArrayList("coursesPicked", coursesPicked);
         intent.putExtras(b);
         startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         finish();
     }
     //Delete all courses
     public void goToDelete(View view) {
         coursesPicked.clear();
 
-        Intent intent = new Intent(this, CourseDelete.class);
+        Intent intent = new Intent(this, ViewSchedule.class);
         Bundle b = new Bundle();
         b.putStringArrayList("coursesPicked", coursesPicked);
         b.putStringArrayList("departmentPicked", departmentPicked);
         intent.putExtras(b);
         startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         finish();
     }
+
     //Delete button next to course
     public void deleteCourse(View view) {
+        if(view.getTag() == null)
+            return;
+
         //Call tag of delete button and use that as index
         String index = view.getTag().toString();
         if (coursesPicked.size() > Integer.parseInt(index)) {
@@ -167,9 +173,12 @@ public class ViewSchedule extends MainActivity {
                             text = findViewById(R.id.courseText5);
                             text.setText("No courses selected.");
                         }
-                        else if(text != null)
+                        else if(text != null) {
                             text.setText(courses.get(i).courseInfo.get("name"));
-                            button.setVisibility(View.VISIBLE);
+                        }
+                        Button deleteAll = findViewById(R.id.delete);
+                        deleteAll.setVisibility(View.VISIBLE);
+                        button.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -194,6 +203,7 @@ public class ViewSchedule extends MainActivity {
                             b.putStringArrayList("departmentPicked", departmentPicked);
                             in.putExtras(b);
                             startActivity(in);
+                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                             finish();
                             break;
                         case R.id.nav_schedule:

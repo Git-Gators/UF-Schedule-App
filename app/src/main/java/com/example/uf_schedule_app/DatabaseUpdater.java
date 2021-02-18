@@ -203,7 +203,7 @@ public class DatabaseUpdater extends Context {
         mDatabase.addValueEventListener(postListener);
     }
 
-    public void getCourseNames(String deptName, ArrayList<String> coursesNames, ProgressBar spinner){
+    public void getCourseNames(String deptName, ArrayList<String> coursesNames, ProgressBar spinner, ArrayList<String> courses){
         spinner.setVisibility(View.VISIBLE);
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(deptName);
         ValueEventListener postListener = new ValueEventListener() {
@@ -211,6 +211,7 @@ public class DatabaseUpdater extends Context {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
                     coursesNames.add(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString());
+                    courses.add(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString());
                 }
                 spinner.setVisibility(View.INVISIBLE);
             }

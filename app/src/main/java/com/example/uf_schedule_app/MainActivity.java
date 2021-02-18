@@ -82,16 +82,21 @@ public class MainActivity extends AppCompatActivity {
             if(b.getString("department") != null){
                department = b.getString("department");
             }
-            //if courses == null and department isn't => Grab all department courses and put them into the list
+            if(b.getString("department") != null && b.getString("course") == null){
+                department = b.getString("department");
+                System.out.println("TRUE");
+            }
         }
 
         courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                coursesPicked.add(courses.get(position));
-                departmentPicked.add(department);
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
-                chosenCourses.setAdapter(arrayAdapter);
+                if(coursesPicked.size() < 4){
+                    coursesPicked.add(courses.get(position));
+                    departmentPicked.add(department);
+                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
+                    chosenCourses.setAdapter(arrayAdapter);
+                }
             }
         });
     }

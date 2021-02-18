@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -97,6 +98,29 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         spinnerCrse.setAdapter(spinnerArrayAdapter1);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent(this, MainActivity.class);
+                Bundle b = new Bundle();
+                b.putStringArrayList("courses", courses);
+                System.out.println("coursesPicked from goToMain: " + coursesPicked.toString());
+                b.putStringArrayList("coursesPicked", coursesPicked);
+                b.putStringArrayList("departmentPicked", departmentPicked);
+                b.putString("course", courseName);
+                b.putString("department", department);
+                b.putString("semester", semester);
+                intent.putExtras(b);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                finish();
+                return(true);
+        }
+
+        return(super.onOptionsItemSelected(item));
+    }
+
     //When an item is selected in either list
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
@@ -128,7 +152,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             coursesNames.add("Choose a Course");
             department = parent.getItemAtPosition(pos).toString();
             try {
-                dbUpdater.getCourseNames(parent.getItemAtPosition(pos).toString(), coursesNames, pSpinner2);
+                dbUpdater.getCourseNames(parent.getItemAtPosition(pos).toString(), coursesNames, pSpinner2, courses);
                 ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, coursesNames);
                 spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                 spinnerCrse.setAdapter(spinnerArrayAdapter1);
@@ -141,6 +165,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         if (parent.getId() == R.id.spinnerCourse && !parent.getItemAtPosition(pos).toString().equals("Please Select a Semester First") && !parent.getItemAtPosition(pos).toString().equals("Choose a Department") && !parent.getItemAtPosition(pos).toString().equals("Choose a Course")) {
             System.out.println("Spinner: Course Chosen");
 
+            courses.clear();
             courseName = parent.getItemAtPosition(pos).toString();
 
             //Name of the course
