@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:onClick="deleteCourse">
 
     <Button
         android:id="@+id/button"
@@ -76,7 +77,7 @@
         android:layout_height="35dp"
         android:layout_marginStart="174dp"
         android:layout_marginLeft="174dp"
-        android:layout_marginTop="55dp"
+        android:layout_marginTop="46dp"
         android:layout_marginEnd="237dp"
         android:layout_marginRight="237dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -90,7 +91,7 @@
         android:layout_height="35dp"
         android:layout_marginStart="174dp"
         android:layout_marginLeft="174dp"
-        android:layout_marginTop="53dp"
+        android:layout_marginTop="46dp"
         android:layout_marginEnd="237dp"
         android:layout_marginRight="237dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -121,14 +122,52 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="65dp"
         android:layout_marginLeft="65dp"
-        android:layout_marginTop="207dp"
+        android:layout_marginTop="200dp"
         android:layout_marginBottom="421dp"
         android:onClick="deleteCourse"
-
+        android:tag="0"
         android:text="Delete"
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/courseText1"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/delete2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="71dp"
+        android:layout_marginLeft="71dp"
+        android:layout_marginTop="33dp"
+        android:layout_marginBottom="42dp"
+        android:onClick="deleteCourse"
+        android:tag="1"
+        android:text="Delete"
+        app:layout_constraintBottom_toTopOf="@+id/delete6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/courseText2"
+        app:layout_constraintTop_toBottomOf="@+id/delete1" />
+
+    <Button
+        android:id="@+id/delete6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="33dp"
+        android:onClick="deleteCourse"
+        android:tag="2"
+        android:text="Delete"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/delete2" />
+
+    <Button
+        android:id="@+id/delete7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="33dp"
+        android:onClick="deleteCourse"
+        android:tag="3"
+        android:text="Delete"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/delete6" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

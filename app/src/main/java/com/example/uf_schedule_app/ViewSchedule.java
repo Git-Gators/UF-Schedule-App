@@ -43,6 +43,8 @@ public class ViewSchedule extends MainActivity {
         load = findViewById(R.id.progressBarSchedule);
         load.setVisibility(View.INVISIBLE);
 
+
+
         //If we're coming from the main, we grab the info
         Bundle b = getIntent().getExtras();
         if(b != null){
@@ -100,19 +102,22 @@ public class ViewSchedule extends MainActivity {
         Intent intent = new Intent(this, CourseDelete.class);
         Bundle b = new Bundle();
         b.putStringArrayList("coursesPicked", coursesPicked);
+        b.putStringArrayList("departmentPicked", departmentPicked);
         intent.putExtras(b);
         startActivity(intent);
         finish();
     }
     //Delete button next to course
     public void deleteCourse(View view) {
-        if (coursesPicked.size() != 0) {
-            //int index = (int) view.getTag();
-            coursesPicked.remove(0);
-            departmentPicked.remove(0);
+        //Call tag of delete button and use that as index
+        String index = view.getTag().toString();
+        if (coursesPicked.size() > Integer.parseInt(index)) {
+
+            coursesPicked.remove(Integer.parseInt(index));
+            departmentPicked.remove(Integer.parseInt(index));
         }
 
-        Intent intent = new Intent(this, CourseDelete.class);
+        Intent intent = new Intent(this, ViewSchedule.class);
         Bundle b = new Bundle();
         b.putStringArrayList("coursesPicked", coursesPicked);
         b.putStringArrayList("departmentPicked", departmentPicked);
@@ -141,6 +146,7 @@ public class ViewSchedule extends MainActivity {
                     //Edit all the courseTexts
                     for(int i = 0; i < courses.size(); i++){
                         TextView text = null;
+
                         if(i == 0){
                             text = findViewById(R.id.courseText1);
                         } else if(i == 1){
