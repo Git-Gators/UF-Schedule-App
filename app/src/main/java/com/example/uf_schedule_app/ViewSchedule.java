@@ -64,21 +64,21 @@ public class ViewSchedule extends MainActivity {
                 if (coursesPicked.size() == 0) {
                     load.setVisibility(View.INVISIBLE);
                     TextView text = null;
-                    text = findViewById(R.id.courseText1);
+                    text = findViewById(R.id.courseText5);
                     text.setText("No courses selected.");
                 }
             }
             else {
                 load.setVisibility(View.VISIBLE);
                 TextView text = null;
-                text = findViewById(R.id.courseText1);
+                text = findViewById(R.id.courseText5);
                 text.setText("No courses selected.");
             }
         }
         else {
             load.setVisibility(View.VISIBLE);
             TextView text = null;
-            text = findViewById(R.id.courseText1);
+            text = findViewById(R.id.courseText5);
             text.setText("No courses selected.");
         }
     }
@@ -164,7 +164,7 @@ public class ViewSchedule extends MainActivity {
                             button = findViewById(R.id.delete7);
                         }
                         if (text == null && i == 0) {
-                            text = findViewById(R.id.courseText1);
+                            text = findViewById(R.id.courseText5);
                             text.setText("No courses selected.");
                         }
                         else if(text != null)
