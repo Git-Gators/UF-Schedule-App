@@ -43,6 +43,8 @@ public class ViewSchedule extends MainActivity {
     private TextView courseInfopopup_courseID, courseInfopopup_Course_ID;
     private TextView courseInfopopup_Title;
     private TextView courseInfopopup_Instructor, courseInfopopup_Instructor_box;
+    private TextView courseInfopopup_section_number, courseInfopopup_section_number_box;
+    private TextView courseInfopopup_num_credits, courseInfopopup_num_credits_box;
     private Button courseInfopopup_Back2Sched;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -220,6 +222,10 @@ public class ViewSchedule extends MainActivity {
         courseInfopopup_Title = (TextView) CourseInfoPopupView.findViewById(R.id.Title);
         courseInfopopup_Instructor = (TextView) CourseInfoPopupView.findViewById(R.id.course_Instructor);
         courseInfopopup_Instructor_box = (TextView)  CourseInfoPopupView.findViewById(R.id.course_Instructor_box);
+        courseInfopopup_section_number = (TextView)  CourseInfoPopupView.findViewById(R.id.course_section_number);
+        courseInfopopup_section_number_box = (TextView)  CourseInfoPopupView.findViewById(R.id.course_section_number_box);
+        courseInfopopup_num_credits = (TextView)  CourseInfoPopupView.findViewById(R.id.num_credits);
+        courseInfopopup_num_credits_box = (TextView)  CourseInfoPopupView.findViewById(R.id.num_credits_box);
 
         courseInfopopup_Back2Sched = (Button) CourseInfoPopupView.findViewById(R.id.Back2Sched);
 
@@ -235,6 +241,8 @@ public class ViewSchedule extends MainActivity {
         courseInfopopup_courseID.setText(courses.get(index).courseInfo.get("courseId"));
         courseInfopopup_courseCode_box.setText(courses.get(index).courseInfo.get("code"));
         courseInfopopup_Instructor_box.setText(courses.get(index).classSections.get(0).get("Instructors"));
+        courseInfopopup_section_number_box.setText(courses.get(index).classSections.get(0).get("classNumber"));
+        courseInfopopup_num_credits_box.setText(courses.get(index).classSections.get(0).get("credits"));
 
 
         //Create popup
