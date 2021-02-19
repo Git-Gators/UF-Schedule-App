@@ -114,8 +114,8 @@
         android:layout_marginEnd="101dp"
         android:layout_marginRight="101dp"
         android:ems="10"
+        android:hint="Course Code"
         android:inputType="textPersonName"
-        android:text="Course Code"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
@@ -128,8 +128,8 @@
         android:layout_marginLeft="101dp"
         android:layout_marginTop="20dp"
         android:ems="10"
+        android:hint="# of Credits"
         android:inputType="textPersonName"
-        android:text="Course Credits"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/courseCode" />
 
@@ -141,8 +141,8 @@
         android:layout_marginLeft="101dp"
         android:layout_marginTop="20dp"
         android:ems="10"
+        android:hint="Course Title or Keywords "
         android:inputType="textPersonName"
-        android:text="Course Title or Keyword"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/courseCredits" />
 
