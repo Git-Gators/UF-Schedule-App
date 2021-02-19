@@ -8,9 +8,12 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.PopupWindow;
+import android.app.AlertDialog;
 
 import android.content.Intent;
 import android.widget.TextView;
@@ -31,6 +34,11 @@ public class ViewSchedule extends MainActivity {
     ArrayList<Course> courses = new ArrayList<>();
 
     ProgressBar load;
+
+    private AlertDialog.Builder dialogBuilder;
+    private AlertDialog dialog;
+    private TextView courseInfopopup_Name, courseInfopopup_nameBox, courseInfopopup_Course_Description, courseInfopopup_courseDescriptionBox, courseInfopopup_courseCode_box, courseInfopopup_CourseCode, courseInfopopup_courseID, courseInfopopup_Course_ID, courseInfopopup_Title;
+    private Button courseInfopopup_Back2Sched;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -81,6 +89,7 @@ public class ViewSchedule extends MainActivity {
             text = findViewById(R.id.courseText5);
             text.setText("No courses selected.");
         }
+
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
@@ -187,6 +196,34 @@ public class ViewSchedule extends MainActivity {
             public void onCancelled(DatabaseError databaseError) { }
         };
         mDatabase.addValueEventListener(postListener);
+    }
+    //Bruh
+    public void createPopup(View view) {
+        //System.out.println("item click success");
+        dialogBuilder = new AlertDialog.Builder(this);
+        final View CourseInfoPopupView = getLayoutInflater().inflate(R.layout.popup_course, null);
+        courseInfopopup_Name = (TextView) CourseInfoPopupView.findViewById(R.id.Name);
+        courseInfopopup_nameBox = (TextView) CourseInfoPopupView.findViewById(R.id.nameBox);
+        courseInfopopup_Course_Description = (TextView) CourseInfoPopupView.findViewById(R.id.Course_Description);
+        courseInfopopup_courseDescriptionBox = (TextView) CourseInfoPopupView.findViewById(R.id.courseDescription_box);
+        courseInfopopup_courseCode_box = (TextView) CourseInfoPopupView.findViewById(R.id.courseCode_box);
+        courseInfopopup_CourseCode = (TextView) CourseInfoPopupView.findViewById(R.id.Course_Code);
+        courseInfopopup_courseID = (TextView) CourseInfoPopupView.findViewById(R.id.courseID);
+        courseInfopopup_Course_ID = (TextView) CourseInfoPopupView.findViewById(R.id.Course_ID);
+        courseInfopopup_Title = (TextView) CourseInfoPopupView.findViewById(R.id.Title);
+
+        courseInfopopup_Back2Sched = (Button) CourseInfoPopupView.findViewById(R.id.Back2Sched);
+
+        dialogBuilder.setView(CourseInfoPopupView);
+        dialog = dialogBuilder.create();
+        dialog.show();
+
+        courseInfopopup_Back2Sched.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
