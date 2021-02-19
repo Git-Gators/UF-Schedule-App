@@ -183,8 +183,10 @@ public class ViewSchedule extends MainActivity {
                             text.setText("No courses selected.");
                         }
                         else if(text != null) {
+                            text.setVisibility(View.VISIBLE);
                             text.setText(courses.get(i).courseInfo.get("name"));
                         }
+                        //If index exists, enable delete button
                         Button deleteAll = findViewById(R.id.delete);
                         deleteAll.setVisibility(View.VISIBLE);
                         button.setVisibility(View.VISIBLE);
@@ -199,7 +201,7 @@ public class ViewSchedule extends MainActivity {
     }
     //Bruh
     public void createPopup(View view) {
-        //System.out.println("item click success");
+        //Define elements within popup
         dialogBuilder = new AlertDialog.Builder(this);
         final View CourseInfoPopupView = getLayoutInflater().inflate(R.layout.popup_course, null);
         courseInfopopup_Name = (TextView) CourseInfoPopupView.findViewById(R.id.Name);
@@ -214,9 +216,25 @@ public class ViewSchedule extends MainActivity {
 
         courseInfopopup_Back2Sched = (Button) CourseInfoPopupView.findViewById(R.id.Back2Sched);
 
+        //Find course info from database
+        if(view.getTag() == null)
+            return;
+
+        //Call tag of delete button and use that as index
+        String index_num = view.getTag().toString();
+        int index = Integer.parseInt(index_num);
+        courseInfopopup_nameBox.setText(courses.get(index).courseInfo.get("name"));
+        courseInfopopup_courseDescriptionBox.setText(courses.get(index).courseInfo.get("description"));
+        courseInfopopup_courseID.setText(courses.get(index).courseInfo.get("courseId"));
+        courseInfopopup_courseCode_box.setText(courses.get(index).courseInfo.get("code"));
+
+
+        //Create popup
         dialogBuilder.setView(CourseInfoPopupView);
         dialog = dialogBuilder.create();
         dialog.show();
+
+
 
         courseInfopopup_Back2Sched.setOnClickListener(new View.OnClickListener() {
             @Override

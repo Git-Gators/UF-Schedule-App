@@ -61,6 +61,8 @@
         android:layout_marginLeft="75dp"
         android:layout_marginTop="83dp"
         android:onClick="createPopup"
+        android:visibility="invisible"
+        android:tag="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button" />
 
@@ -72,6 +74,8 @@
         android:layout_marginLeft="75dp"
         android:layout_marginTop="45dp"
         android:onClick="createPopup"
+        android:visibility="invisible"
+        android:tag="1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/courseText1" />
 
@@ -83,6 +87,8 @@
         android:layout_marginLeft="75dp"
         android:layout_marginTop="45dp"
         android:onClick="createPopup"
+        android:visibility="invisible"
+        android:tag="2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/courseText2" />
 
@@ -94,6 +100,8 @@
         android:layout_marginLeft="75dp"
         android:layout_marginTop="45dp"
         android:onClick="createPopup"
+        android:visibility="invisible"
+        android:tag="3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/courseText3" />
 
