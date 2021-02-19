@@ -37,7 +37,12 @@ public class ViewSchedule extends MainActivity {
 
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
-    private TextView courseInfopopup_Name, courseInfopopup_nameBox, courseInfopopup_Course_Description, courseInfopopup_courseDescriptionBox, courseInfopopup_courseCode_box, courseInfopopup_CourseCode, courseInfopopup_courseID, courseInfopopup_Course_ID, courseInfopopup_Title;
+    private TextView courseInfopopup_Name, courseInfopopup_nameBox;
+    private TextView courseInfopopup_Course_Description, courseInfopopup_courseDescriptionBox;
+    private TextView courseInfopopup_courseCode_box, courseInfopopup_CourseCode;
+    private TextView courseInfopopup_courseID, courseInfopopup_Course_ID;
+    private TextView courseInfopopup_Title;
+    private TextView courseInfopopup_Instructor, courseInfopopup_Instructor_box;
     private Button courseInfopopup_Back2Sched;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -199,7 +204,7 @@ public class ViewSchedule extends MainActivity {
         };
         mDatabase.addValueEventListener(postListener);
     }
-    //Bruh
+
     public void createPopup(View view) {
         //Define elements within popup
         dialogBuilder = new AlertDialog.Builder(this);
@@ -213,6 +218,8 @@ public class ViewSchedule extends MainActivity {
         courseInfopopup_courseID = (TextView) CourseInfoPopupView.findViewById(R.id.courseID);
         courseInfopopup_Course_ID = (TextView) CourseInfoPopupView.findViewById(R.id.Course_ID);
         courseInfopopup_Title = (TextView) CourseInfoPopupView.findViewById(R.id.Title);
+        courseInfopopup_Instructor = (TextView) CourseInfoPopupView.findViewById(R.id.course_Instructor);
+        courseInfopopup_Instructor_box = (TextView)  CourseInfoPopupView.findViewById(R.id.course_Instructor_box);
 
         courseInfopopup_Back2Sched = (Button) CourseInfoPopupView.findViewById(R.id.Back2Sched);
 
@@ -227,6 +234,7 @@ public class ViewSchedule extends MainActivity {
         courseInfopopup_courseDescriptionBox.setText(courses.get(index).courseInfo.get("description"));
         courseInfopopup_courseID.setText(courses.get(index).courseInfo.get("courseId"));
         courseInfopopup_courseCode_box.setText(courses.get(index).courseInfo.get("code"));
+        courseInfopopup_Instructor_box.setText(courses.get(index).classSections.get(0).get("Instructors"));
 
 
         //Create popup
