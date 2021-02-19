@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     ListView chosenCourses;
     ArrayList<String> courses = new ArrayList<>();
     ArrayList<String> coursesPicked = new ArrayList<>();
-    ArrayList<String> departmentPicked = new ArrayList<>();
     String department;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -62,9 +61,6 @@ public class MainActivity extends AppCompatActivity {
                 coursesPicked = b.getStringArrayList("coursesPicked");
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, coursesPicked);
                 chosenCourses.setAdapter(arrayAdapter);
-            }
-            if(b.getStringArrayList("departmentPicked") != null){
-                departmentPicked = b.getStringArrayList("departmentPicked");
             }
             if(b.getStringArrayList("courses") != null){
                 courses.remove("");
@@ -91,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 coursesPicked.remove(position);
-                departmentPicked.remove(position);
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
                 chosenCourses.setAdapter(arrayAdapter);
             }
@@ -102,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(coursesPicked.size() < 4){
                     coursesPicked.add(courses.get(position));
-                    departmentPicked.add(department);
                     ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
                     chosenCourses.setAdapter(arrayAdapter);
                 }
@@ -115,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, FilterActivity.class);
         Bundle b = new Bundle();
         b.putStringArrayList("coursesPicked", coursesPicked);
-        b.putStringArrayList("departmentPicked", departmentPicked);
         intent.putExtras(b);
         startActivity(intent);
         finish();
@@ -137,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
                             in = new Intent(getBaseContext(), ViewSchedule.class);
                             Bundle b = new Bundle();
                             b.putStringArrayList("coursesPicked", coursesPicked);
-                            b.putStringArrayList("departmentPicked", departmentPicked);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);

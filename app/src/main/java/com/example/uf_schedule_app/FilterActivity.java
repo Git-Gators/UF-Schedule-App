@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.r0adkll.slidr.Slidr;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class FilterActivity extends MainActivity implements AdapterView.OnItemSelectedListener {
 
@@ -46,7 +47,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     ArrayList<String> coursesNames = new ArrayList<>();
     ArrayList<String> courses = new ArrayList<>();
     ArrayList<String> coursesPicked = new ArrayList<>();
-    ArrayList<String> departmentPicked = new ArrayList<>();
 
     //Used in the filters
     EditText courseCodeText;
@@ -72,9 +72,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         if(b != null){
             if(b.getStringArrayList("coursesPicked") != null){
                 coursesPicked = b.getStringArrayList("coursesPicked");
-            }
-            if(b.getStringArrayList("departmentPicked") != null){
-                departmentPicked = b.getStringArrayList("departmentPicked");
             }
         }
 
@@ -142,8 +139,11 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     }
 
     public void filterCourses(String code, String credits, String name){
-        if(!courseName.equals(""))
+        System.out.println(code + " " + credits + " "  + name);
+        if(!courseName.equals("")) {
+            System.out.println("returning");
             return;
+        }
         //Add to courses
         courses.clear();
 
@@ -153,77 +153,65 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         Button filterButton = findViewById(R.id.button3);
         filterButton.setVisibility(View.INVISIBLE);
 
-        //is there a department chosen?
-        if(department.equals("")){
-            //No department chosen, filter the whole list
-            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(department);
-            ValueEventListener postListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot dep : dataSnapshot.getChildren()) {
-                        for (DataSnapshot ds : dep.getChildren()) {
-                            boolean match = true;
-                            if (!ds.getValue(Course.class).courseInfo.get("name").contains(name) && !name.equals("Course Title or Keyword")) {
-                                match = false;
-                            }
-                            if (!ds.getValue(Course.class).classSections.get(0).get("credits").equals(credits) && !credits.equals("Course Credits")) {
-                                match = false;
-                            }
-                            if (!ds.getValue(Course.class).courseInfo.get("code").contains(code) && !code.equals("Course Code")) {
-                                match = false;
-                            }
-                            if(match) {
-                                if(!courses.contains(ds.getValue(Course.class).courseInfo.get("name")))
-                                    courses.add(ds.getValue(Course.class).courseInfo.get("name"));
-                            }
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        ValueEventListener postListener = new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean match;
+                for (DataSnapshot dep : dataSnapshot.getChildren()) {
+                    for (DataSnapshot ds : dep.getChildren()) {
+                        if(!department.equals(dep.getKey()) && !department.equals("Choose a Department"))
+                            continue;
+                        match = false;
+                        //Only one field entered
+                        if (Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && credits.equals("") && code.equals("")) {
+                            match = true;
+                            System.out.println("Matched on only name");
+                        } else if (Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits) && name.equals("") && code.equals("")) {
+                            match = true;
+                            System.out.println("Matched on only credits");
+                        } else if (Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code) && name.equals("") && credits.equals("")) {
+                            match = true;
+                            System.out.println("Matched on only code");
+                        } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits)
+                                 && code.equals("")){
+                            match = true;
+                            System.out.println("Matched on name and credits");
+                        } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code)
+                                && credits.equals("")){
+                            match = true;
+                            System.out.println("Matched on name and code");
+                        } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits)
+                                && name.equals("")){
+                            match = true;
+                            System.out.println("Matched on code and credits");
+                        }  else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits) &&
+                                Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code)){
+                            match = true;
+                            System.out.println("Matched on all fields");
                         }
-                    }
-                    ProgressBar filterLoad = findViewById(R.id.filterLoad);
-                    filterLoad.setVisibility(View.INVISIBLE);
-                    Button filterButton = findViewById(R.id.button3);
-                    filterButton.setVisibility(View.VISIBLE);
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            };
-            mDatabase.addValueEventListener(postListener);
-        } else {
-            //Department chosen, look in the department
-            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(department);
-            ValueEventListener postListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        boolean match = true;
-                        if (!ds.getValue(Course.class).courseInfo.get("name").contains(name) && !name.equals("Course Title or Keyword")) {
-                            match = false;
-                        }
-                        if (!ds.getValue(Course.class).classSections.get(0).get("credits").equals(credits) && !credits.equals("Course Credits")) {
-                            match = false;
-                        }
-                        if (!ds.getValue(Course.class).courseInfo.get("code").contains(code) && !code.equals("Course Code")) {
-                            match = false;
-                        }
                         if(match) {
-                            courses.add(ds.getValue(Course.class).courseInfo.get("name"));
+                            if(!courses.contains(ds.getValue(Course.class).courseInfo.get("name"))) {
+                                courses.add(ds.getValue(Course.class).courseInfo.get("name"));
+                                System.out.println("Added course");
+                            }
                         }
                     }
-                    ProgressBar filterLoad = findViewById(R.id.filterLoad);
-                    filterLoad.setVisibility(View.INVISIBLE);
-                    Button filterButton = findViewById(R.id.button3);
-                    filterButton.setVisibility(View.VISIBLE);
                 }
+                ProgressBar filterLoad = findViewById(R.id.filterLoad);
+                filterLoad.setVisibility(View.INVISIBLE);
+                Button filterButton = findViewById(R.id.button3);
+                filterButton.setVisibility(View.VISIBLE);
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            };
-            mDatabase.addValueEventListener(postListener);
-        }
+            }
+        };
+        mDatabase.addValueEventListener(postListener);
     }
 
     @Override
@@ -235,7 +223,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                 b.putStringArrayList("courses", courses);
                 System.out.println("coursesPicked from goToMain: " + coursesPicked.toString());
                 b.putStringArrayList("coursesPicked", coursesPicked);
-                b.putStringArrayList("departmentPicked", departmentPicked);
                 b.putString("course", courseName);
                 b.putString("department", department);
                 b.putString("semester", semester);
@@ -316,7 +303,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         Bundle b = new Bundle();
         b.putStringArrayList("courses", courses);
         b.putStringArrayList("coursesPicked", coursesPicked);
-        b.putStringArrayList("departmentPicked", departmentPicked);
         b.putString("course", courseName);
         b.putString("department", department);
         b.putString("semester", semester);
