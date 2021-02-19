@@ -136,7 +136,7 @@
     <TextView
         android:id="@+id/Course_Description"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="19dp"
         android:layout_marginStart="45dp"
         android:layout_marginLeft="45dp"
         android:layout_marginTop="29dp"
@@ -155,7 +155,6 @@
         android:layout_marginRight="40dp"
         android:layout_marginBottom="5dp"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/Back2Sched"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"

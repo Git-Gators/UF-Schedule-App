@@ -26,11 +26,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class ViewSchedule extends MainActivity {
     ArrayList<String> coursesPicked = new ArrayList<>();
-    ArrayList<String> departmentPicked = new ArrayList<>();
     ArrayList<Course> courses = new ArrayList<>();
 
     ProgressBar load;
@@ -65,17 +65,15 @@ public class ViewSchedule extends MainActivity {
         //If we're coming from the main, we grab the info
         Bundle b = getIntent().getExtras();
         if(b != null){
-            if(b.getStringArrayList("coursesPicked") != null && b.getStringArrayList("departmentPicked") != null){
+            if(b.getStringArrayList("coursesPicked") != null){
                 coursesPicked = b.getStringArrayList("coursesPicked");
-                departmentPicked = b.getStringArrayList("departmentPicked");
 
                 System.out.println(coursesPicked.toString());
-                System.out.println(departmentPicked.toString());
 
                 //Gets the courses added after a short delay.
                 load.setVisibility(View.VISIBLE);
                 for(int i = 0; i < coursesPicked.size(); i++)
-                    getCourse(coursesPicked.get(i), departmentPicked.get(i));
+                    getCourse(coursesPicked.get(i));
                 if (coursesPicked.size() == 0) {
                     load.setVisibility(View.INVISIBLE);
                     TextView text = null;
@@ -121,7 +119,6 @@ public class ViewSchedule extends MainActivity {
         Intent intent = new Intent(this, ViewSchedule.class);
         Bundle b = new Bundle();
         b.putStringArrayList("coursesPicked", coursesPicked);
-        b.putStringArrayList("departmentPicked", departmentPicked);
         intent.putExtras(b);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -138,30 +135,37 @@ public class ViewSchedule extends MainActivity {
         if (coursesPicked.size() > Integer.parseInt(index)) {
 
             coursesPicked.remove(Integer.parseInt(index));
-            departmentPicked.remove(Integer.parseInt(index));
         }
 
         Intent intent = new Intent(this, ViewSchedule.class);
         Bundle b = new Bundle();
         b.putStringArrayList("coursesPicked", coursesPicked);
-        b.putStringArrayList("departmentPicked", departmentPicked);
         intent.putExtras(b);
         startActivity(intent);
         finish();
     }
 
-    public void getCourse(String course, String department){
+    public void getCourse(String course){
         //Get the course objects from that
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(department);
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
         ValueEventListener postListener = new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    if(ds.getValue(Course.class).courseInfo.get("name").equals(course)){
-                        courses.add(ds.getValue(Course.class));
+                boolean found = false;
+                for (DataSnapshot dep : dataSnapshot.getChildren()) {
+                    for (DataSnapshot ds : dep.getChildren()) {
+                        if(Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name"), course)){
+                            courses.add(ds.getValue(Course.class));
+                            found = true;
+                            break;
+                        }
                     }
+                    if(found)
+                        break;
                 }
-                System.out.println(courses.toString());
+                System.out.println(courses.get(courses.size()-1).courseInfo.get("name"));
+                System.out.println(courses.size() + " " + coursesPicked.size());
 
                 //We have all the courses
                 if(courses.size() == coursesPicked.size()){
@@ -240,9 +244,10 @@ public class ViewSchedule extends MainActivity {
         courseInfopopup_courseDescriptionBox.setText(courses.get(index).courseInfo.get("description"));
         courseInfopopup_courseID.setText(courses.get(index).courseInfo.get("courseId"));
         courseInfopopup_courseCode_box.setText(courses.get(index).courseInfo.get("code"));
-        courseInfopopup_Instructor_box.setText(courses.get(index).classSections.get(0).get("Instructors"));
+        courseInfopopup_Instructor_box.setText(Objects.requireNonNull(courses.get(index).classSections.get(0).get("Instructors")).replace("[", "").replace("]",""));
         courseInfopopup_section_number_box.setText(courses.get(index).classSections.get(0).get("classNumber"));
         courseInfopopup_num_credits_box.setText(courses.get(index).classSections.get(0).get("credits"));
+        
 
 
         //Create popup
@@ -271,7 +276,6 @@ public class ViewSchedule extends MainActivity {
                             in = new Intent(getBaseContext(), MainActivity.class);
                             Bundle b = new Bundle();
                             b.putStringArrayList("coursesPicked", coursesPicked);
-                            b.putStringArrayList("departmentPicked", departmentPicked);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);

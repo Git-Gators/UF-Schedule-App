@@ -189,7 +189,6 @@ public class DatabaseUpdater extends Context {
                 deptNames.clear();
                 deptNames.add("Choose a Department");
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    System.out.println(ds.getKey());
                     String name = ds.getKey();
                     deptNames.add(name);
                 }
