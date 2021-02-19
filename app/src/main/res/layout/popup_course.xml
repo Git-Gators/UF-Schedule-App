@@ -7,17 +7,66 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/num_credits_box"
+        android:layout_width="201dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="62dp"
+        android:layout_marginLeft="62dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.55"
+        app:layout_constraintStart_toEndOf="@+id/course_Instructor"
+        app:layout_constraintTop_toBottomOf="@+id/course_section_number_box" />
+
+    <TextView
+        android:id="@+id/num_credits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:layout_marginLeft="44dp"
+        android:layout_marginTop="29dp"
+        android:text="Credit Hours:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/course_section_number" />
+
+    <TextView
+        android:id="@+id/course_section_number_box"
+        android:layout_width="201dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="22dp"
+        android:layout_marginLeft="22dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/course_section_number"
+        app:layout_constraintTop_toBottomOf="@+id/courseID" />
+
+    <TextView
+        android:id="@+id/course_section_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="45dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="29dp"
+        android:text="Section Number:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Course_ID" />
+
+    <TextView
         android:id="@+id/course_Instructor_box"
         android:layout_width="201dp"
         android:layout_height="18dp"
-        android:layout_marginStart="60dp"
-        android:layout_marginLeft="60dp"
+        android:layout_marginStart="66dp"
+        android:layout_marginLeft="66dp"
         android:layout_marginTop="30dp"
-        android:layout_marginEnd="42dp"
-        android:layout_marginRight="42dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/course_Instructor"
-        app:layout_constraintTop_toBottomOf="@+id/courseID" />
+        app:layout_constraintTop_toBottomOf="@+id/num_credits_box" />
 
     <TextView
         android:id="@+id/course_Instructor"
@@ -28,7 +77,7 @@
         android:layout_marginTop="29dp"
         android:text="Instructor:"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Course_ID" />
+        app:layout_constraintTop_toBottomOf="@+id/num_credits" />
 
     <TextView
         android:id="@+id/Name"
@@ -90,34 +139,37 @@
         android:layout_height="19dp"
         android:layout_marginStart="45dp"
         android:layout_marginLeft="45dp"
-        android:layout_marginTop="27dp"
+        android:layout_marginTop="29dp"
         android:text="Course Description:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/course_Instructor" />
 
     <TextView
         android:id="@+id/courseDescription_box"
-        android:layout_width="259dp"
-        android:layout_height="202dp"
+        android:layout_width="300dp"
+        android:layout_height="200dp"
         android:layout_marginStart="45dp"
         android:layout_marginLeft="45dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="45dp"
-        android:layout_marginRight="45dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="5dp"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Course_Description" />
+        app:layout_constraintTop_toBottomOf="@+id/Course_Description"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/nameBox"
         android:layout_width="201dp"
         android:layout_height="18dp"
-        android:layout_marginStart="82dp"
-        android:layout_marginLeft="82dp"
+        android:layout_marginStart="84dp"
+        android:layout_marginLeft="84dp"
         android:layout_marginTop="153dp"
-        android:layout_marginEnd="42dp"
-        android:layout_marginRight="42dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/Name"
         app:layout_constraintTop_toTopOf="parent" />
@@ -126,11 +178,11 @@
         android:id="@+id/courseCode_box"
         android:layout_width="201dp"
         android:layout_height="18dp"
-        android:layout_marginStart="39dp"
-        android:layout_marginLeft="39dp"
+        android:layout_marginStart="41dp"
+        android:layout_marginLeft="41dp"
         android:layout_marginTop="30dp"
-        android:layout_marginEnd="42dp"
-        android:layout_marginRight="42dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/Course_Code"
         app:layout_constraintTop_toBottomOf="@+id/nameBox" />
@@ -139,11 +191,11 @@
         android:id="@+id/courseID"
         android:layout_width="201dp"
         android:layout_height="18dp"
-        android:layout_marginStart="59dp"
-        android:layout_marginLeft="59dp"
+        android:layout_marginStart="61dp"
+        android:layout_marginLeft="61dp"
         android:layout_marginTop="30dp"
-        android:layout_marginEnd="42dp"
-        android:layout_marginRight="42dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/Course_ID"
         app:layout_constraintTop_toBottomOf="@+id/courseCode_box" />
