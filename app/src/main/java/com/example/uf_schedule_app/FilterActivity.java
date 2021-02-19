@@ -159,10 +159,13 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 boolean match;
+                System.out.println(department);
                 for (DataSnapshot dep : dataSnapshot.getChildren()) {
                     for (DataSnapshot ds : dep.getChildren()) {
-                        if(!department.equals(dep.getKey()) && !department.equals("Choose a Department"))
-                            continue;
+                        if(!dep.getKey().equals(department) && !department.equals("")) {
+                            if(!department.equals("Choose a Department"))
+                                continue;
+                        }
                         match = false;
                         //Only one field entered
                         if (Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && credits.equals("") && code.equals("")) {
@@ -265,20 +268,24 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         }
 
         // The middle spinner
-        if (parent.getId() == R.id.spinnerDepartments && !parent.getItemAtPosition(pos).toString().equals("Please Select a Semester First") && !parent.getItemAtPosition(pos).toString().equals("Choose a Department")) {
-            System.out.println("Spinner: Department Chosen");
-            coursesNames.clear();
-            coursesNames.add("Choose a Course");
-            courses.clear();
-            department = parent.getItemAtPosition(pos).toString();
-            try {
-                spinnerCrse.setEnabled(false);
-                dbUpdater.getCourseNames(parent.getItemAtPosition(pos).toString(), coursesNames, pSpinner2, courses, spinnerCrse);
-                ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, coursesNames);
-                spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-                spinnerCrse.setAdapter(spinnerArrayAdapter1);
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (parent.getId() == R.id.spinnerDepartments && !parent.getItemAtPosition(pos).toString().equals("Please Select a Semester First")) {
+            if(!parent.getItemAtPosition(pos).toString().equals("Choose a Department")) {
+                System.out.println("Spinner: Department Chosen");
+                coursesNames.clear();
+                coursesNames.add("Choose a Course");
+                courses.clear();
+                department = parent.getItemAtPosition(pos).toString();
+                try {
+                    spinnerCrse.setEnabled(false);
+                    dbUpdater.getCourseNames(parent.getItemAtPosition(pos).toString(), coursesNames, pSpinner2, courses, spinnerCrse);
+                    ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, coursesNames);
+                    spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+                    spinnerCrse.setAdapter(spinnerArrayAdapter1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                department = "";
             }
         }
 
