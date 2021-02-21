@@ -5,8 +5,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.text.InputType;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +19,8 @@ import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Button;
+import android.app.AlertDialog;
 
 import android.content.Intent;
 import android.widget.TextView;
@@ -40,6 +44,12 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> courses = new ArrayList<>();
     ArrayList<String> coursesPicked = new ArrayList<>();
     String department;
+
+    private AlertDialog.Builder dialogBuilder;
+    private AlertDialog dialog;
+    private TextView loginPopup_title;
+    private Button loginPopup_SignIn;
+    private EditText loginPopup_email, loginPopup_password;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -113,6 +123,26 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+    }
+    public void createPopup(View view) {
+        //Define elements within popup
+        dialogBuilder = new AlertDialog.Builder(this);
+        final View LoginPopupView = getLayoutInflater().inflate(R.layout.login_popup, null);
+        loginPopup_title = (TextView) LoginPopupView.findViewById(R.id.sign_in_button);
+        loginPopup_email = (EditText) LoginPopupView.findViewById(R.id.input_email);
+        loginPopup_password = (EditText) LoginPopupView.findViewById(R.id.input_password);
+        loginPopup_SignIn = (Button) LoginPopupView.findViewById(R.id.sign_in_button);
+
+        dialogBuilder.setView(LoginPopupView);
+        dialog = dialogBuilder.create();
+        dialog.show();
+
+        loginPopup_SignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
