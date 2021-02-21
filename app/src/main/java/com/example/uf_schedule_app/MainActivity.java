@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
     public void createPopup(View view) {
-        //Define elements within popup
+        //*Define elements within popup
         dialogBuilder = new AlertDialog.Builder(this);
         final View LoginPopupView = getLayoutInflater().inflate(R.layout.login_popup, null);
         loginPopup_title = (TextView) LoginPopupView.findViewById(R.id.sign_in_button);
