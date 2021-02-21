@@ -140,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         loginPopup_SignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //TODO
                 /**Add sign-in functionality here*/
                 dialog.dismiss();
             }
