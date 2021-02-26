@@ -112,40 +112,10 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         courseCodeText = (EditText) findViewById(R.id.courseCode);
         courseCreditsText = (EditText) findViewById(R.id.courseCredits);
         courseNameText = (EditText) findViewById(R.id.courseTitle);
-        courseCodeText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus) {
-                    filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
-                }
-            }
-        });
-        courseCreditsText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus) {
-                    filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
-                }
-            }
-        });
-        courseNameText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus) {
-                    filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
-                }
-            }
-        });
     }
 
     public void filterCourses(String code, String credits, String name){
         System.out.println(code + " " + credits + " "  + name);
-        if(!courseName.equals("")) {
-            System.out.println("returning");
-            return;
-        }
-        //Add to courses
-        courses.clear();
 
         //Hide the filter button and show the load
         ProgressBar filterLoad = findViewById(R.id.filterLoad);
@@ -160,53 +130,69 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             public void onDataChange(DataSnapshot dataSnapshot) {
                 boolean match;
                 System.out.println(department);
-                for (DataSnapshot dep : dataSnapshot.getChildren()) {
-                    for (DataSnapshot ds : dep.getChildren()) {
-                        if(!dep.getKey().equals(department) && !department.equals("")) {
-                            if(!department.equals("Choose a Department"))
-                                continue;
-                        }
-                        match = false;
-                        //Only one field entered
-                        if (Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && credits.equals("") && code.equals("")) {
-                            match = true;
-                            System.out.println("Matched on only name");
-                        } else if (Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits) && name.equals("") && code.equals("")) {
-                            match = true;
-                            System.out.println("Matched on only credits");
-                        } else if (Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code) && name.equals("") && credits.equals("")) {
-                            match = true;
-                            System.out.println("Matched on only code");
-                        } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits)
-                                 && code.equals("")){
-                            match = true;
-                            System.out.println("Matched on name and credits");
-                        } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code)
-                                && credits.equals("")){
-                            match = true;
-                            System.out.println("Matched on name and code");
-                        } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits)
-                                && name.equals("")){
-                            match = true;
-                            System.out.println("Matched on code and credits");
-                        }  else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits) &&
-                                Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code)){
-                            match = true;
-                            System.out.println("Matched on all fields");
-                        }
+                courses.clear();
 
-                        if(match) {
-                            if(!courses.contains(ds.getValue(Course.class).courseInfo.get("name"))) {
-                                courses.add(ds.getValue(Course.class).courseInfo.get("name"));
-                                System.out.println("Added course");
+                for (DataSnapshot dep : dataSnapshot.getChildren()) {
+                        for (DataSnapshot ds : dep.getChildren()) {
+                            if(!dep.getKey().equals(department) && !department.equals("")) {
+                                if(!department.equals("Choose a Department"))
+                                    continue;
+                            }
+                            match = false;
+                            //Only one field entered
+                            if (ds.getValue(Course.class).courseInfo.get("name").contains(name) && credits.equals("") && code.equals("")) {
+                                match = true;
+                                System.out.println("MATCH: " + name + " " + ds.getValue(Course.class).courseInfo.get("name") + ";");
+                                System.out.println("Matched on only name");
+                            } else if (Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits) && name.equals("") && code.equals("")) {
+                                match = true;
+                                System.out.println("Matched on only credits");
+                            } else if (Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code) && name.equals("") && credits.equals("")) {
+                                match = true;
+                                System.out.println("Matched on only code");
+                            } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits)
+                                    && code.equals("")){
+                                match = true;
+                                System.out.println("Matched on name and credits");
+                            } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code)
+                                    && credits.equals("")){
+                                match = true;
+                                System.out.println("Matched on name and code");
+                            } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits)
+                                    && name.equals("")){
+                                match = true;
+                                System.out.println("Matched on code and credits");
+                            }  else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits) &&
+                                    Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code)){
+                                match = true;
+                                System.out.println("Matched on all fields");
+                            }
+
+                            if(match) {
+                                if(!courses.contains(ds.getValue(Course.class).courseInfo.get("name"))) {
+                                    courses.add(ds.getValue(Course.class).courseInfo.get("name"));
+                                    System.out.println("Added course");
+                                }
                             }
                         }
                     }
-                }
+
                 ProgressBar filterLoad = findViewById(R.id.filterLoad);
                 filterLoad.setVisibility(View.INVISIBLE);
                 Button filterButton = findViewById(R.id.button3);
                 filterButton.setVisibility(View.VISIBLE);
+
+                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                Bundle b = new Bundle();
+                b.putStringArrayList("courses", courses);
+                b.putStringArrayList("coursesPicked", coursesPicked);
+                b.putString("course", courseName);
+                b.putString("department", department);
+                b.putString("semester", semester);
+                intent.putExtras(b);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                finish();
             }
 
             @Override
@@ -295,6 +281,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
             courses.clear();
             courseName = parent.getItemAtPosition(pos).toString();
+            System.out.println("Set courseName: " + courseName);
         }
     }
 
@@ -304,18 +291,14 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     }
 
 
-    /** Called when the user taps the GO BACK button */
+    /** Called when the user taps the FILTER button */
     public void goToMain(View view){
-        Intent intent = new Intent(this, MainActivity.class);
-        Bundle b = new Bundle();
-        b.putStringArrayList("courses", courses);
-        b.putStringArrayList("coursesPicked", coursesPicked);
-        b.putString("course", courseName);
-        b.putString("department", department);
-        b.putString("semester", semester);
-        intent.putExtras(b);
-        startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-        finish();
+        if(!courseName.equals("Please Select a Semester First") && !courseName.equals("Choose a Department") && !courseName.equals("Choose a Course") && !courseName.equals("")) {
+            System.out.println("USING SPINNER TEXT");
+            filterCourses("", "", courseName);
+        } else {
+            System.out.println("Filtering with code: " + courseCodeText + " credits: " + courseCreditsText + " name: " + courseNameText);
+            filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
+        }
     }
 }
