@@ -92,13 +92,6 @@ public class MainActivity extends AppCompatActivity {
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
                 courseList.setAdapter(arrayAdapter);
             }
-            if(b.getString("course") != null){
-                if(!b.getString("course").equals("")) {
-                    courses.add(b.getString("course"));
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
-                    courseList.setAdapter(arrayAdapter);
-                }
-            }
             if(b.getString("semester") != null){
                 //
             }
