@@ -83,14 +83,22 @@ public class Register extends AppCompatActivity {
                         userId = fAuth.getCurrentUser().getUid();
                         DocumentReference documentReference = userdb.collection("users").document(userId);
 
+                        //Create a map with the user's information
                         Map<String, Object> user = new HashMap<>();
                         user.put("Full Name", fullName);
                         user.put("Email", email);
 
+                        //Store the user's information (name and email for now) in the database
                         documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Log.d(TAG, "onSucess: user profile is created for " + userId);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d(TAG, "An error occurred, courses not uploaded to database");
+
                             }
                         });
 
@@ -104,10 +112,6 @@ public class Register extends AppCompatActivity {
                         Toast.makeText(Register.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-
-                Map<String, Object> user = new HashMap<>();
-                user.put("fullname", fullName);
-                user.put("email", email);
             }
         });
     }
