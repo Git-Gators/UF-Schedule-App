@@ -130,6 +130,17 @@ public class MainActivity extends AppCompatActivity {
                 coursesPicked.remove(position);
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
                 chosenCourses.setAdapter(arrayAdapter);
+
+                //Change data in database to reflect deleted course.
+
+                user.put("Courses", coursesPicked);
+                //Store the user's information (name, email, and list of course names for now) in the database
+                documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "onSucess: user profile is created for " + userId);
+                    }
+                });
             }
         });
 
@@ -144,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                     //Add user's updated course information to the database
 
                     user.put("Courses", coursesPicked);
-                    //Store the user's information (name and email for now) in the database
+                    //Store the user's information (name, email, and list of course names for now) in the database
                     documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
