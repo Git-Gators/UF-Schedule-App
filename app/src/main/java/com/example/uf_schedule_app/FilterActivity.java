@@ -210,11 +210,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                 Intent intent = new Intent(this, MainActivity.class);
                 Bundle b = new Bundle();
                 b.putStringArrayList("courses", courses);
-                System.out.println("coursesPicked from goToMain: " + coursesPicked.toString());
                 b.putStringArrayList("coursesPicked", coursesPicked);
-                b.putString("course", courseName);
-                b.putString("department", department);
-                b.putString("semester", semester);
                 intent.putExtras(b);
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);

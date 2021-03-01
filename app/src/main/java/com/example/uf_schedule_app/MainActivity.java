@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     ListView chosenCourses;
     ArrayList<String> courses = new ArrayList<>();
     ArrayList<String> coursesPicked = new ArrayList<>();
-    String department;
 
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
@@ -92,12 +91,6 @@ public class MainActivity extends AppCompatActivity {
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
                 courseList.setAdapter(arrayAdapter);
             }
-            if(b.getString("semester") != null){
-                //
-            }
-            if(b.getString("department") != null){
-               department = b.getString("department");
-            }
         }
 
         chosenCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -120,9 +113,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
 
         /** Called when the user taps the Filter button */
         public void goToFilter (View view){
@@ -223,12 +213,8 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-
-
             loginBtnHomePage.setVisibility(View.GONE);
             logoutBtnHomePage.setVisibility(View.VISIBLE);
-
-
         } else {
             loginBtnHomePage.setVisibility(View.VISIBLE);
             logoutBtnHomePage.setVisibility(View.GONE);
