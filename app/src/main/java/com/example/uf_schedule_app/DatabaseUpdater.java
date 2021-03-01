@@ -19,7 +19,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,15 +26,14 @@ import android.os.UserHandle;
 import android.text.InputType;
 import android.view.Display;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -47,10 +45,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -61,11 +57,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
 
@@ -151,6 +144,7 @@ public class DatabaseUpdater extends Context {
 
                                     courseObj.classSection = sectionMap;
                                     mDatabase.child(deptName).child(section.get("classNumber").toString()).setValue(courseObj);
+                                    System.out.println("C: "+ c + " " + deptName + " url: " + url);
                                 }
                             }
                         } catch (Exception e) {
@@ -162,24 +156,46 @@ public class DatabaseUpdater extends Context {
                 {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        System.out.println("Error.Response" + error.toString());
+                        System.out.println("Error.Response: " + error.toString());
                     }
                 }
         );
 
         // Access the RequestQueue through your singleton class.
+        getRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(getRequest);
     }
 
-    public void updateDB(){
-        String url = "https://one.ufl.edu/apix/soc/schedule/?category=RES&term=2211";
-        updateDatabase(url);
+    public void updateDB(Context context) throws IOException {
+        ArrayList<String> depCodes = new ArrayList<>();
+
+        String string = "";
+        StringBuilder stringBuilder = new StringBuilder();
+        InputStream is = context.getAssets().open("departments.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        while (true) {
+            try {
+                if ((string = reader.readLine()) == null) break;
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            depCodes.add(string);
+        }
+        is.close();
+
+        System.out.println("depCodes: " + depCodes);
+
         try {
-            int contNum = 0;
-            while(contNum < 4440){
-                contNum += 50;
-                System.out.println("CALLING " + url + "&last-control-number=" + contNum);
-                updateDatabase(url + "&last-control-number=" + contNum);
+            int i = 0;
+            while(i < depCodes.size()){
+                String url = "https://one.ufl.edu/apix/soc/schedule/?category=CWSP&term=2211&dept=" + depCodes.get(i).replace("\"", "");
+                System.out.println("CALLING " + url);
+                updateDatabase(url);
+                i++;
             }
         } catch (Exception E){
             System.out.println("Exception caught when updating DB: " + E.toString());

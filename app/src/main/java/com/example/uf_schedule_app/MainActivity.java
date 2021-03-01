@@ -43,6 +43,7 @@ import com.google.firebase.firestore.Source;
 import org.json.JSONException;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -84,7 +85,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //dbUpdater.updateDB();
+        try {
+            dbUpdater.updateDB(getBaseContext());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
@@ -143,7 +148,10 @@ public class MainActivity extends AppCompatActivity {
 
                     //Add user's updated course information to the database
 
+                    System.out.println("COURSES PICKED: " + coursesPicked);
                     user.put("Courses", coursesPicked);
+                    System.out.println("USER: " + user);
+                    System.out.println("docRef: " + documentReference);
                     //Store the user's information (name, email, and list of course names for now) in the database
                     documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -151,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
                             Log.d(TAG, "onSucess: user profile is created for " + userId);
                         }
                     });
-
                 }
             }
         });
