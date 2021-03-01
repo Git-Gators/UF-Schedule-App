@@ -144,13 +144,13 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                                 match = true;
                                 System.out.println("MATCH: " + name + " " + ds.getValue(Course.class).courseInfo.get("name") + ";");
                                 System.out.println("Matched on only name");
-                            } else if (Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits) && name.equals("") && code.equals("")) {
+                            } else if (Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSection.get("credits"), credits) && name.equals("") && code.equals("")) {
                                 match = true;
                                 System.out.println("Matched on only credits");
                             } else if (Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code) && name.equals("") && credits.equals("")) {
                                 match = true;
                                 System.out.println("Matched on only code");
-                            } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits)
+                            } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSection.get("credits"), credits)
                                     && code.equals("")){
                                 match = true;
                                 System.out.println("Matched on name and credits");
@@ -158,11 +158,11 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                                     && credits.equals("")){
                                 match = true;
                                 System.out.println("Matched on name and code");
-                            } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits)
+                            } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSection.get("credits"), credits)
                                     && name.equals("")){
                                 match = true;
                                 System.out.println("Matched on code and credits");
-                            }  else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSections.get(0).get("credits"), credits) &&
+                            }  else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSection.get("credits"), credits) &&
                                     Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code)){
                                 match = true;
                                 System.out.println("Matched on all fields");
