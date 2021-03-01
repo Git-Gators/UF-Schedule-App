@@ -234,8 +234,10 @@ public class DatabaseUpdater extends Context {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    coursesNames.add(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString());
-                    courses.add(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString());
+                    if(!coursesNames.contains(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString())) {
+                        coursesNames.add(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString());
+                        courses.add(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString());
+                    }
                 }
                 spinner.setVisibility(View.INVISIBLE);
                 spinnerCrse.setEnabled(true);

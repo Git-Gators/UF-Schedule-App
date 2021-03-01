@@ -85,11 +85,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        try {
-            dbUpdater.updateDB(getBaseContext());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            dbUpdater.updateDB(getBaseContext());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
