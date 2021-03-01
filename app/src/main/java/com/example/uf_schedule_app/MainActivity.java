@@ -84,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //dbUpdater.updateDB();
+
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
 
@@ -108,19 +110,6 @@ public class MainActivity extends AppCompatActivity {
                 courses = b.getStringArrayList("courses");
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
                 courseList.setAdapter(arrayAdapter);
-            }
-            if(b.getString("course") != null){
-                if(!b.getString("course").equals("")) {
-                    courses.add(b.getString("course"));
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
-                    courseList.setAdapter(arrayAdapter);
-                }
-            }
-            if(b.getString("semester") != null){
-                //
-            }
-            if(b.getString("department") != null){
-               department = b.getString("department");
             }
         }
 
@@ -167,9 +156,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
 
         /** Called when the user taps the Filter button */
         public void goToFilter (View view){
@@ -303,12 +289,8 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-
-
             loginBtnHomePage.setVisibility(View.GONE);
             logoutBtnHomePage.setVisibility(View.VISIBLE);
-
-
         } else {
             loginBtnHomePage.setVisibility(View.VISIBLE);
             logoutBtnHomePage.setVisibility(View.GONE);

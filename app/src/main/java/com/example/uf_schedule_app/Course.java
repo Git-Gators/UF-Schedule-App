@@ -10,5 +10,5 @@ import java.util.Map;
 
 public class Course {
     public HashMap<String, String> courseInfo = new HashMap<String, String>();
-    public ArrayList<HashMap<String, String>> classSections = new ArrayList<HashMap<String, String>>();
+    public HashMap<String, String> classSection = new HashMap<String, String>();
 }
