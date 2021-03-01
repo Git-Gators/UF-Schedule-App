@@ -35,6 +35,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -268,20 +273,13 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         int id = 0;
-                        Intent in;
                         switch (item.getItemId()) {
                             case R.id.nav_home:
                                 id = R.id.nav_home;
                                 break;
                             case R.id.nav_schedule:
                                 id = R.id.nav_schedule;
-                                in = new Intent(getBaseContext(), ViewSchedule.class);
-                                Bundle b = new Bundle();
-                                b.putStringArrayList("coursesPicked", coursesPicked);
-                                in.putExtras(b);
-                                startActivity(in);
-                                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                                finish();
+                                getCourse();
                                 break;
                             case R.id.nav_calendar:
                                 id = R.id.nav_calendar;
@@ -313,6 +311,52 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+
+    public void getCourse(){
+        ArrayList<Course> courseList = new ArrayList<>();
+        //Get the course objects from that
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        ValueEventListener postListener = new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(int i = 0; i < coursesPicked.size(); i++){
+                    boolean found = false;
+                    for (DataSnapshot dep : dataSnapshot.getChildren()) {
+                        for (DataSnapshot ds : dep.getChildren()) {
+                            if(Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name"), coursesPicked.get(i))){
+                                courseList.add(ds.getValue(Course.class));
+                                found = true;
+                                break;
+                            }
+                        }
+                        if(found)
+                            break;
+                    }
+                }
+
+                //We have all the courses
+                if(courseList.size() == coursesPicked.size()){
+                    System.out.println("Course List: " + courseList);
+                    Intent in;
+                    in = new Intent(getBaseContext(), ViewSchedule.class);
+                    Bundle b = new Bundle();
+                    b.putStringArrayList("coursesPicked", coursesPicked);
+                    in.putExtra("courses", courseList);
+                    in.putExtras(b);
+                    startActivity(in);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        };
+        mDatabase.addValueEventListener(postListener);
     }
 
 
