@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.InputType;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,11 +27,18 @@ import android.content.Intent;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import org.json.JSONException;
 
@@ -38,10 +46,13 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "Tag:";
     //Create a dbUpdater object
     DatabaseUpdater dbUpdater = new DatabaseUpdater();
     ListView courseList;
@@ -49,6 +60,11 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> courses = new ArrayList<>();
     ArrayList<String> coursesPicked = new ArrayList<>();
     String department;
+    String userId;
+    static FirebaseUser firebaseUser;
+    static DocumentReference documentReference;
+    static Map<String, Object> user = new HashMap<>();
+
 
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
@@ -59,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     FirebaseAuth fAuth;
+    FirebaseFirestore userdb = FirebaseFirestore.getInstance();
 
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -106,6 +123,17 @@ public class MainActivity extends AppCompatActivity {
                 coursesPicked.remove(position);
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
                 chosenCourses.setAdapter(arrayAdapter);
+
+                //Change data in database to reflect deleted course.
+
+                user.put("Courses", coursesPicked);
+                //Store the user's information (name, email, and list of course names for now) in the database
+                documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "onSucess: user profile is created for " + userId);
+                    }
+                });
             }
         });
 
@@ -116,6 +144,18 @@ public class MainActivity extends AppCompatActivity {
                     coursesPicked.add(courses.get(position));
                     ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
                     chosenCourses.setAdapter(arrayAdapter);
+
+                    //Add user's updated course information to the database
+
+                    user.put("Courses", coursesPicked);
+                    //Store the user's information (name, email, and list of course names for now) in the database
+                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "onSucess: user profile is created for " + userId);
+                        }
+                    });
+
                 }
             }
         });
@@ -167,6 +207,39 @@ public class MainActivity extends AppCompatActivity {
                     fAuth.signInWithEmailAndPassword(loginPopup_email.getText().toString(), loginPopup_password.getText().toString()).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                         @Override
                         public void onSuccess(AuthResult authResult) {
+
+                            //Find the current user
+                            firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+                            if (firebaseUser != null)
+                            {
+                                //Get the userId and find their data in Firestore
+                                userId = firebaseUser.getUid();
+                                documentReference = userdb.collection("users").document(userId);
+                                documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                        if (documentSnapshot.exists())
+                                        {
+                                            //If the document snapshot exists, load the data into the user map
+                                            user = documentSnapshot.getData();
+                                        }else
+                                        {
+                                            //Otherwise print an error message
+                                            Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                            Log.d(TAG, e.toString());
+                                    }
+                                });
+
+                            }
+
+
                             dialog.dismiss();
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
                             finish();
@@ -237,6 +310,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
+                userId = "";
+                documentReference = null;
+                firebaseUser = null;
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 finish();
             }
