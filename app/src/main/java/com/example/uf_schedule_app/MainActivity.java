@@ -77,6 +77,41 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth fAuth;
     FirebaseFirestore userdb = FirebaseFirestore.getInstance();
 
+    //Loads data from database to a hashmap
+    public void loadData()
+    {
+        //Find the current user
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (firebaseUser != null)
+        {
+            //Get the userId and find their data in Firestore
+            this.userId = firebaseUser.getUid();
+            documentReference = userdb.collection("users").document(userId);
+            documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if (documentSnapshot.exists())
+                    {
+                        //If the document snapshot exists, load the data into the user map
+                        user = documentSnapshot.getData();
+                    }else
+                    {
+                        //Otherwise print an error message
+                        Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, e.toString());
+                }
+            });
+
+        }
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -201,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(AuthResult authResult) {
 
-                            //Find the current user
+                            /*//Find the current user
                             firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
                             if (firebaseUser != null)
@@ -230,8 +265,9 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
 
-                            }
+                            }*/
 
+                            loadData();
 
                             dialog.dismiss();
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
@@ -291,6 +327,8 @@ public class MainActivity extends AppCompatActivity {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             loginBtnHomePage.setVisibility(View.GONE);
             logoutBtnHomePage.setVisibility(View.VISIBLE);
+            loadData();
+
         } else {
             loginBtnHomePage.setVisibility(View.VISIBLE);
             logoutBtnHomePage.setVisibility(View.GONE);
