@@ -35,6 +35,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -58,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
     ListView courseList;
     ListView chosenCourses;
     ArrayList<String> courses = new ArrayList<>();
+    //This variable contains everything anyone could possibly want to know about the user's courses
+    ArrayList<Course> courseObjects = new ArrayList<>();
     ArrayList<String> coursesPicked = new ArrayList<>();
     String department;
     String userId;
@@ -77,7 +84,47 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth fAuth;
     FirebaseFirestore userdb = FirebaseFirestore.getInstance();
 
-    //Loads data from database to a hashmap
+
+    public void addCourseToDatabase(String course) {
+        //Some code I "borrowed" from Jason to set the course objects
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        ValueEventListener postListener = new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean found = false;
+                for (DataSnapshot dep : dataSnapshot.getChildren()) {
+                    for (DataSnapshot ds : dep.getChildren()) {
+                        if (Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name"), course)) {
+                            courseObjects.add(ds.getValue(Course.class));
+                            found = true;
+                            break;
+                        }
+                    }
+                    //We want to make sure the course has actually been loaded before we push it to
+                    //the database or we'll get a bunch of nullptrexceptions
+                    if (found) {
+                        //Add user's updated course information to the user's map
+                        user.put("Courses", courseObjects);
+
+                        //Push the map named user to the database
+                        documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "Course Successfully Added" + userId);
+                            }
+                        });
+                        break;
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        };
+        mDatabase.addValueEventListener(postListener);
+    }
+
+    //Loads data from database to a hashmap named user
     public void loadData()
     {
         //Find the current user
@@ -95,6 +142,13 @@ public class MainActivity extends AppCompatActivity {
                     {
                         //If the document snapshot exists, load the data into the user map
                         user = documentSnapshot.getData();
+                        //If there's course data in the database try to load it
+                        if (user.get("courses") != null)
+                        {
+                            //Typecasting the object from the course to a database should be fine
+                            //assuming we store it correctly in the first place
+                            courseObjects = (ArrayList<Course>) user.get("courses");
+                        }
                     }else
                     {
                         //Otherwise print an error message
@@ -152,17 +206,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 coursesPicked.remove(position);
+                courseObjects.remove(position);
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
                 chosenCourses.setAdapter(arrayAdapter);
 
                 //Change data in database to reflect deleted course.
 
-                user.put("Courses", coursesPicked);
+                user.put("Courses", courseObjects);
                 //Store the user's information (name, email, and list of course names for now) in the database
                 documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "onSucess: user profile is created for " + userId);
+                        Log.d(TAG, "Course Successfully deleted" + userId);
                     }
                 });
             }
@@ -176,17 +231,8 @@ public class MainActivity extends AppCompatActivity {
                     ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
                     chosenCourses.setAdapter(arrayAdapter);
 
-                    //Add user's updated course information to the database
-
-                    user.put("Courses", coursesPicked);
-                    //Store the user's information (name, email, and list of course names for now) in the database
-                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "onSucess: user profile is created for " + userId);
-                        }
-                    });
-
+                    //Add the course to the database
+                    addCourseToDatabase(coursesPicked.get(coursesPicked.size()-1));
                 }
             }
         });
