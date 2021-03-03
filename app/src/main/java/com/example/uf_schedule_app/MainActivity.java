@@ -251,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, FilterActivity.class);
             Bundle b = new Bundle();
             b.putStringArrayList("coursesPicked", coursesPicked);
+            intent.putExtra("courseList", courseObjects);
             intent.putExtras(b);
             startActivity(intent);
             finish();

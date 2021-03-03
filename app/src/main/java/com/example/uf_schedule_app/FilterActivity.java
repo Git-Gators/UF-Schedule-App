@@ -32,6 +32,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     String department = "";
     String courseName = "";
     String semester;
+    ArrayList<Course> courseObjects = new ArrayList<>();
 
     //Spinner Objects (Drop Down Lists)
     Spinner spinner;
@@ -48,6 +49,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     ArrayList<String> coursesNames = new ArrayList<>();
     ArrayList<String> courses = new ArrayList<>();
     ArrayList<String> coursesPicked = new ArrayList<>();
+
 
     //Used in the filters
     EditText courseCodeText;
@@ -69,10 +71,14 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         filterButton.setVisibility(View.VISIBLE);
 
         //If we're coming from the filter, we grab the info
+        Intent intent = getIntent();
         Bundle b = getIntent().getExtras();
         if(b != null){
             if(b.getStringArrayList("coursesPicked") != null){
                 coursesPicked = b.getStringArrayList("coursesPicked");
+            }
+            if(b.getSerializable("courseList") != null) {
+                courseObjects = (ArrayList<Course>) intent.getSerializableExtra("courseList");
             }
         }
 
@@ -187,6 +193,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                 Bundle b = new Bundle();
                 b.putStringArrayList("courses", courses);
                 b.putStringArrayList("coursesPicked", coursesPicked);
+                intent.putExtra("courseList", courseObjects);
                 b.putString("course", courseName);
                 b.putString("department", department);
                 b.putString("semester", semester);
@@ -212,6 +219,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                 Bundle b = new Bundle();
                 b.putStringArrayList("courses", courses);
                 b.putStringArrayList("coursesPicked", coursesPicked);
+                intent.putExtra("courseList", courseObjects);
                 intent.putExtras(b);
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
