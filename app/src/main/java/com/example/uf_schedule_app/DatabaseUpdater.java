@@ -220,7 +220,6 @@ public class DatabaseUpdater extends Context {
         }
         is.close();
 
-        System.out.println("deptNames: " + deptNames);
         spinner.setVisibility(View.INVISIBLE);
         spinnerDept.setEnabled(true);
         spinnerCrse.setEnabled(true);
