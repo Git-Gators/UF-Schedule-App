@@ -64,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
     ListView courseList;
     ListView chosenCourses;
     ArrayList<String> courses = new ArrayList<>();
+    //This variable contains everything anyone could possibly want to know about the user's courses
+    ArrayList<Course> courseObjects = new ArrayList<>();
     ArrayList<String> coursesPicked = new ArrayList<>();
     String department;
     String userId;
@@ -82,6 +84,88 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth fAuth;
     FirebaseFirestore userdb = FirebaseFirestore.getInstance();
+
+
+    public void addCourseToDatabase(String course) {
+        //Some code I "borrowed" from Jason to set the course objects
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        ValueEventListener postListener = new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean found = false;
+                for (DataSnapshot dep : dataSnapshot.getChildren()) {
+                    for (DataSnapshot ds : dep.getChildren()) {
+                        if (Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name"), course)) {
+                            courseObjects.add(ds.getValue(Course.class));
+                            found = true;
+                            break;
+                        }
+                    }
+                    //We want to make sure the course has actually been loaded before we push it to
+                    //the database or we'll get a bunch of nullptrexceptions
+                    if (found) {
+                        //Add user's updated course information to the user's map
+                        user.put("Courses", courseObjects);
+
+                        //Push the map named user to the database
+                        documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "Course Successfully Added" + userId);
+                            }
+                        });
+                        break;
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        };
+        mDatabase.addValueEventListener(postListener);
+    }
+
+    //Loads data from database to a hashmap named user
+    public void loadData()
+    {
+        //Find the current user
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (firebaseUser != null)
+        {
+            //Get the userId and find their data in Firestore
+            this.userId = firebaseUser.getUid();
+            documentReference = userdb.collection("users").document(userId);
+            documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if (documentSnapshot.exists())
+                    {
+                        //If the document snapshot exists, load the data into the user map
+                        user = documentSnapshot.getData();
+                        //If there's course data in the database try to load it
+                        if (user.get("courses") != null)
+                        {
+                            //Typecasting the object from the course to a database should be fine
+                            //assuming we store it correctly in the first place
+                            courseObjects = (ArrayList<Course>) user.get("courses");
+                        }
+                    }else
+                    {
+                        //Otherwise print an error message
+                        Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, e.toString());
+                }
+            });
+
+        }
+    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -127,17 +211,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 coursesPicked.remove(position);
+                courseObjects.remove(position);
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
                 chosenCourses.setAdapter(arrayAdapter);
 
                 //Change data in database to reflect deleted course.
 
-                user.put("Courses", coursesPicked);
+                user.put("Courses", courseObjects);
                 //Store the user's information (name, email, and list of course names for now) in the database
                 documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "onSucess: user profile is created for " + userId);
+                        Log.d(TAG, "Course Successfully deleted" + userId);
                     }
                 });
             }
@@ -150,20 +235,8 @@ public class MainActivity extends AppCompatActivity {
                     coursesPicked.add(courses.get(position));
                     ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
                     chosenCourses.setAdapter(arrayAdapter);
-
-                    //Add user's updated course information to the database
-
-                    System.out.println("COURSES PICKED: " + coursesPicked);
-                    user.put("Courses", coursesPicked);
-                    System.out.println("USER: " + user);
-                    System.out.println("docRef: " + documentReference);
-                    //Store the user's information (name, email, and list of course names for now) in the database
-                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "onSucess: user profile is created for " + userId);
-                        }
-                    });
+                    //Add the course to the database
+                    addCourseToDatabase(coursesPicked.get(coursesPicked.size()-1));
                 }
             }
         });
@@ -213,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(AuthResult authResult) {
 
-                            //Find the current user
+                            /*//Find the current user
                             firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
                             if (firebaseUser != null)
@@ -242,8 +315,9 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
 
-                            }
+                            }*/
 
+                            loadData();
 
                             dialog.dismiss();
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
@@ -296,6 +370,8 @@ public class MainActivity extends AppCompatActivity {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             loginBtnHomePage.setVisibility(View.GONE);
             logoutBtnHomePage.setVisibility(View.VISIBLE);
+            loadData();
+
         } else {
             loginBtnHomePage.setVisibility(View.VISIBLE);
             logoutBtnHomePage.setVisibility(View.GONE);
