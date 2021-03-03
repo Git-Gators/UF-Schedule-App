@@ -173,7 +173,6 @@ public class DatabaseUpdater extends Context {
         ArrayList<String> depCodes = new ArrayList<>();
 
         String string = "";
-        StringBuilder stringBuilder = new StringBuilder();
         InputStream is = context.getAssets().open("departments.txt");
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         while (true) {
@@ -202,29 +201,29 @@ public class DatabaseUpdater extends Context {
         }
     }
 
-    public void getDepNames(ArrayList<String> deptNames, ProgressBar spinner, Spinner spinnerDept, Spinner spinnerCrse){
+    public void getDepNames(ArrayList<String> deptNames, ProgressBar spinner, Spinner spinnerDept, Spinner spinnerCrse, Context context) throws IOException {
         spinner.setVisibility(View.VISIBLE);
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                deptNames.clear();
-                deptNames.add("Choose a Department");
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    String name = ds.getKey();
-                    deptNames.add(name);
-                }
-                spinner.setVisibility(View.INVISIBLE);
-                spinnerDept.setEnabled(true);
-                spinnerCrse.setEnabled(true);
-            }
+        deptNames.clear();
+        deptNames.add("Choose a Department");
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+        String string = "";
+        InputStream is = context.getAssets().open("depNames.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        while (true) {
+            try {
+                if ((string = reader.readLine()) == null) break;
             }
-        };
-        mDatabase.addValueEventListener(postListener);
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            deptNames.add(string);
+        }
+        is.close();
+
+        System.out.println("deptNames: " + deptNames);
+        spinner.setVisibility(View.INVISIBLE);
+        spinnerDept.setEnabled(true);
+        spinnerCrse.setEnabled(true);
     }
 
     public void getCourseNames(String deptName, ArrayList<String> coursesNames, ProgressBar spinner, ArrayList<String> courses, Spinner spinnerCrse){

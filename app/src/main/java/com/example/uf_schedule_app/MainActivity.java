@@ -192,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //If we're coming from the filter, we grab the info
+        Intent intent = getIntent();
         Bundle b = getIntent().getExtras();
         if(b != null){
             if(b.getStringArrayList("coursesPicked") != null){
@@ -204,6 +205,9 @@ public class MainActivity extends AppCompatActivity {
                 courses = b.getStringArrayList("courses");
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
                 courseList.setAdapter(arrayAdapter);
+            }
+            if(b.getSerializable("courseList") != null) {
+                courseObjects = (ArrayList<Course>) intent.getSerializableExtra("courseList");
             }
         }
 

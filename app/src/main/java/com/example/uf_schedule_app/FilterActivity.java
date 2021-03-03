@@ -23,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.r0adkll.slidr.Slidr;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -234,7 +235,11 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             spinnerCrse.setEnabled(false);
 
             //Add the database information to the list and update the spinner
-            dbUpdater.getDepNames(deptNames, pSpinner, spinnerDept, spinnerCrse);
+            try {
+                dbUpdater.getDepNames(deptNames, pSpinner, spinnerDept, spinnerCrse, getBaseContext());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             deptNames.set(0, "Choose a Department");
 
             coursesNames.set(0, "Choose a Department");
