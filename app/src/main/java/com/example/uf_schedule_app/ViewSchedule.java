@@ -237,6 +237,7 @@ public class ViewSchedule extends MainActivity {
                             in = new Intent(getBaseContext(), MainActivity.class);
                             Bundle b = new Bundle();
                             b.putStringArrayList("coursesPicked", coursesPicked);
+                            in.putExtra("courseList", courses);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
