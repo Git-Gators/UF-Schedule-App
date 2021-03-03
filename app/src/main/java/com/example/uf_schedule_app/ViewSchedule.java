@@ -63,23 +63,46 @@ public class ViewSchedule extends MainActivity {
 
 
         //If we're coming from the main, we grab the info
+        Intent intent = getIntent();
         Bundle b = getIntent().getExtras();
         if(b != null){
+            if(b.getSerializable("courses") != null){
+                courses = (ArrayList<Course>) intent.getSerializableExtra("courses");
+
+                //Edit all the courseTexts
+                for(int i = 0; i < courses.size(); i++){
+                    TextView text = null;
+                    Button button = null;
+
+                    if(i == 0){
+                        text = findViewById(R.id.courseText1);
+                        button = findViewById(R.id.delete1);
+                    } else if(i == 1){
+                        text = findViewById(R.id.courseText2);
+                        button = findViewById(R.id.delete2);
+                    } else if(i == 2){
+                        text = findViewById(R.id.courseText3);
+                        button = findViewById(R.id.delete6);
+                    } else if(i == 3){
+                        text = findViewById(R.id.courseText4);
+                        button = findViewById(R.id.delete7);
+                    }
+                    if (text == null && i == 0) {
+                        text = findViewById(R.id.courseText5);
+                        text.setText("No courses selected.");
+                    }
+                    else if(text != null) {
+                        text.setVisibility(View.VISIBLE);
+                        text.setText(courses.get(i).courseInfo.get("name"));
+                    }
+                    //If index exists, enable delete button
+                    Button deleteAll = findViewById(R.id.delete);
+                    deleteAll.setVisibility(View.VISIBLE);
+                    button.setVisibility(View.VISIBLE);
+                }
+            }
             if(b.getStringArrayList("coursesPicked") != null){
                 coursesPicked = b.getStringArrayList("coursesPicked");
-
-                System.out.println(coursesPicked.toString());
-
-                //Gets the courses added after a short delay.
-                load.setVisibility(View.VISIBLE);
-                for(int i = 0; i < coursesPicked.size(); i++)
-                    getCourse(coursesPicked.get(i));
-                if (coursesPicked.size() == 0) {
-                    load.setVisibility(View.INVISIBLE);
-                    TextView text = null;
-                    text = findViewById(R.id.courseText5);
-                    text.setText("No courses selected.");
-                }
             }
             else {
                 load.setVisibility(View.VISIBLE);
@@ -115,10 +138,12 @@ public class ViewSchedule extends MainActivity {
     //Delete all courses
     public void goToDelete(View view) {
         coursesPicked.clear();
+        courses.clear();
 
         Intent intent = new Intent(this, ViewSchedule.class);
         Bundle b = new Bundle();
         b.putStringArrayList("coursesPicked", coursesPicked);
+        intent.putExtra("courses", courses);
         intent.putExtras(b);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -132,84 +157,20 @@ public class ViewSchedule extends MainActivity {
 
         //Call tag of delete button and use that as index
         String index = view.getTag().toString();
-        if (coursesPicked.size() > Integer.parseInt(index)) {
-
+        if (courses.size() > Integer.parseInt(index)) {
+            courses.remove(Integer.parseInt(index));
             coursesPicked.remove(Integer.parseInt(index));
         }
 
         Intent intent = new Intent(this, ViewSchedule.class);
         Bundle b = new Bundle();
         b.putStringArrayList("coursesPicked", coursesPicked);
+        intent.putExtra("courses", courses);
         intent.putExtras(b);
         startActivity(intent);
         finish();
     }
 
-    public void getCourse(String course){
-        //Get the course objects from that
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        ValueEventListener postListener = new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean found = false;
-                for (DataSnapshot dep : dataSnapshot.getChildren()) {
-                    for (DataSnapshot ds : dep.getChildren()) {
-                        if(Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name"), course)){
-                            courses.add(ds.getValue(Course.class));
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(found)
-                        break;
-                }
-                System.out.println(courses.get(courses.size()-1).courseInfo.get("name"));
-                System.out.println(courses.size() + " " + coursesPicked.size());
-
-                //We have all the courses
-                if(courses.size() == coursesPicked.size()){
-                    load.setVisibility(View.INVISIBLE);
-
-                    //Edit all the courseTexts
-                    for(int i = 0; i < courses.size(); i++){
-                        TextView text = null;
-                        Button button = null;
-
-                        if(i == 0){
-                            text = findViewById(R.id.courseText1);
-                            button = findViewById(R.id.delete1);
-                        } else if(i == 1){
-                            text = findViewById(R.id.courseText2);
-                            button = findViewById(R.id.delete2);
-                        } else if(i == 2){
-                            text = findViewById(R.id.courseText3);
-                            button = findViewById(R.id.delete6);
-                        } else if(i == 3){
-                            text = findViewById(R.id.courseText4);
-                            button = findViewById(R.id.delete7);
-                        }
-                        if (text == null && i == 0) {
-                            text = findViewById(R.id.courseText5);
-                            text.setText("No courses selected.");
-                        }
-                        else if(text != null) {
-                            text.setVisibility(View.VISIBLE);
-                            text.setText(courses.get(i).courseInfo.get("name"));
-                        }
-                        //If index exists, enable delete button
-                        Button deleteAll = findViewById(R.id.delete);
-                        deleteAll.setVisibility(View.VISIBLE);
-                        button.setVisibility(View.VISIBLE);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) { }
-        };
-        mDatabase.addValueEventListener(postListener);
-    }
 
     public void createPopup(View view) {
         //Define elements within popup

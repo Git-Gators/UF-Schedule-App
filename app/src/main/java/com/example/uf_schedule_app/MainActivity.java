@@ -48,6 +48,7 @@ import com.google.firebase.firestore.Source;
 import org.json.JSONException;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -173,7 +174,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //dbUpdater.updateDB();
+//        try {
+//            dbUpdater.updateDB(getBaseContext());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
@@ -230,7 +235,6 @@ public class MainActivity extends AppCompatActivity {
                     coursesPicked.add(courses.get(position));
                     ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
                     chosenCourses.setAdapter(arrayAdapter);
-
                     //Add the course to the database
                     addCourseToDatabase(coursesPicked.get(coursesPicked.size()-1));
                 }
@@ -343,20 +347,13 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         int id = 0;
-                        Intent in;
                         switch (item.getItemId()) {
                             case R.id.nav_home:
                                 id = R.id.nav_home;
                                 break;
                             case R.id.nav_schedule:
                                 id = R.id.nav_schedule;
-                                in = new Intent(getBaseContext(), ViewSchedule.class);
-                                Bundle b = new Bundle();
-                                b.putStringArrayList("coursesPicked", coursesPicked);
-                                in.putExtras(b);
-                                startActivity(in);
-                                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                                finish();
+                                getCourse();
                                 break;
                             case R.id.nav_calendar:
                                 id = R.id.nav_calendar;
@@ -390,6 +387,52 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+
+    public void getCourse(){
+        ArrayList<Course> courseList = new ArrayList<>();
+        //Get the course objects from that
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        ValueEventListener postListener = new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(int i = 0; i < coursesPicked.size(); i++){
+                    boolean found = false;
+                    for (DataSnapshot dep : dataSnapshot.getChildren()) {
+                        for (DataSnapshot ds : dep.getChildren()) {
+                            if(Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name"), coursesPicked.get(i))){
+                                courseList.add(ds.getValue(Course.class));
+                                found = true;
+                                break;
+                            }
+                        }
+                        if(found)
+                            break;
+                    }
+                }
+
+                //We have all the courses
+                if(courseList.size() == coursesPicked.size()){
+                    System.out.println("Course List: " + courseList);
+                    Intent in;
+                    in = new Intent(getBaseContext(), ViewSchedule.class);
+                    Bundle b = new Bundle();
+                    b.putStringArrayList("coursesPicked", coursesPicked);
+                    in.putExtra("courses", courseList);
+                    in.putExtras(b);
+                    startActivity(in);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        };
+        mDatabase.addValueEventListener(postListener);
     }
 
 

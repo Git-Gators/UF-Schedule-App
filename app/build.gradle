@@ -47,7 +47,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.3.2'
     implementation 'com.r0adkll:slidableactivity:2.0.6'
     implementation 'com.google.firebase:firebase-auth:20.0.2'
-    implementation 'com.google.firebase:firebase-firestore:22.1.0'
+    implementation 'com.google.firebase:firebase-firestore:21.4.0'
     implementation 'com.android.support:multidex:1.0.3'
 
     testImplementation 'junit:junit:4.13.1'
