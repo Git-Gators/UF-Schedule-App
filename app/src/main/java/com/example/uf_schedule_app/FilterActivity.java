@@ -186,6 +186,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                             System.out.println("Matched on all fields");
                         }
 
+                        //TODO This doesn't take into account courses with the same name
                         if(match) {
                             if(!courses.contains(ds.getValue(Course.class).courseInfo.get("name"))) {
                                 courses.add(ds.getValue(Course.class).courseInfo.get("name"));
@@ -214,7 +215,17 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
             }
         };
-        mDatabase.addValueEventListener(postListener);
+
+        //If the spinner for department was chosen, we already have the courses
+        if(coursesNames.size() > 0 && name.equals("") && credits.equals("") && code.equals("")){
+            //If we don't have any other filter to apply => we can return the courses inside the spinner
+            coursesNames.remove(0);
+            courses.addAll(coursesNames);
+            startMain();
+        } else {
+            //We have filters to apply to the course list
+            mDatabase.addValueEventListener(postListener);
+        }
     }
 
     /** When The Back Button In The Top Right Is Pressed **/
