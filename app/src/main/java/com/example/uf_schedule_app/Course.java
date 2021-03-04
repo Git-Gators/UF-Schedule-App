@@ -49,6 +49,9 @@ public class Course implements java.io.Serializable{
     }
 
     public String getMeetDays(){
+        if(this.classSection.get("meetTime").equals(""))
+            return "Online";
+        
         String[] days = this.classSection.get("meetDays").split("]");
         String[] meetTimes = this.classSection.get("meetTime").split("]");
 
