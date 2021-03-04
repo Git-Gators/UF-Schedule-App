@@ -144,14 +144,18 @@ public class MainActivity extends AppCompatActivity {
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     if (documentSnapshot.exists())
                     {
+                        
                         //If the document snapshot exists, load the data into the user map
-
                         user = documentSnapshot.getData();
                         if (documentSnapshot.get("Courses") != null)
                         {
                             //This has to be like the single worst piece of code that I have ever written
-                            //
+
+                            //For some reason the courses load as a Hashmap of a Hashmap of strings as opposed to course objects.
+                            //So to fix this we need to load the Hashmap of a Hashmap of strings into a Map, which I called wierd map because nothing here makes sense
                             ArrayList<HashMap<String, HashMap<String, String>>> wierdMap = (ArrayList<HashMap<String, HashMap<String, String>>>) documentSnapshot.get("Courses");
+
+                            //This part is just to make sure we have enough space in the arraylist to store data on our courses
                             int courseObjectsSize = courseObjects.size();
                             if (courseObjectsSize < wierdMap.size())
                             {
@@ -162,6 +166,9 @@ public class MainActivity extends AppCompatActivity {
                                     coursesPicked.add("");
                                 }
                             }
+
+                            //So since wierdmap has a hashmap containing two hashmaps, courseInfo and classSection,
+                            //we copy our data from wierdmap into courseObjects for each course.
                             for (int i = 0; i < wierdMap.size(); i++)
                             {
                                 courseObjects.get(i).courseInfo = wierdMap.get(i).get("courseInfo");
