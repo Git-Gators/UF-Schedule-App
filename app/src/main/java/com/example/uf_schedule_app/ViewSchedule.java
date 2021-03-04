@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,6 +19,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,6 +28,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -140,6 +144,19 @@ public class ViewSchedule extends MainActivity {
         coursesPicked.clear();
         courses.clear();
 
+        user.put("Courses", courses);
+
+        //Push the map named user to the database
+        if (firebaseUser != null)
+        {
+            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "Course Successfully Added" + userId);
+                }
+            });
+        }
+
         Intent intent = new Intent(this, ViewSchedule.class);
         Bundle b = new Bundle();
         b.putStringArrayList("coursesPicked", coursesPicked);
@@ -160,6 +177,18 @@ public class ViewSchedule extends MainActivity {
         if (courses.size() > Integer.parseInt(index)) {
             courses.remove(Integer.parseInt(index));
             coursesPicked.remove(Integer.parseInt(index));
+        }
+        user.put("Courses", courses);
+
+        //Push the map named user to the database
+        if (firebaseUser != null)
+        {
+            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "Course Successfully Added" + userId);
+                }
+            });
         }
 
         Intent intent = new Intent(this, ViewSchedule.class);
