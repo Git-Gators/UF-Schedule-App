@@ -109,12 +109,15 @@ public class MainActivity extends AppCompatActivity {
                         user.put("Courses", courseObjects);
 
                         //Push the map named user to the database
-                        documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "Course Successfully Added" + userId);
-                            }
-                        });
+                        if (firebaseUser != null)
+                        {
+                            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "Course Successfully Added" + userId);
+                                }
+                            });
+                        }
                         break;
                     }
                 }
@@ -147,10 +150,12 @@ public class MainActivity extends AppCompatActivity {
                         if (documentSnapshot.get("Courses") != null)
                         {
                             //This has to be like the single worst piece of code that I have ever written
+                            //
                             ArrayList<HashMap<String, HashMap<String, String>>> wierdMap = (ArrayList<HashMap<String, HashMap<String, String>>>) documentSnapshot.get("Courses");
-                            if (courseObjects.size() < wierdMap.size())
+                            int courseObjectsSize = courseObjects.size();
+                            if (courseObjectsSize < wierdMap.size())
                             {
-                                for (int i = 0; i < wierdMap.size() - courseObjects.size(); i++)
+                                for (int i = 0; i < wierdMap.size() - courseObjectsSize; i++)
                                 {
                                     Course course = new Course();
                                     courseObjects.add(course);
@@ -178,6 +183,8 @@ public class MainActivity extends AppCompatActivity {
                                 String name = info.get("name");
                                 coursesPicked.set(i, name);
                             }
+                            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
+                            chosenCourses.setAdapter(arrayAdapter);
                         }
                     }else
                     {
@@ -323,9 +330,8 @@ public class MainActivity extends AppCompatActivity {
                             //Load the data from the database
                             loadData();
                             dialog.dismiss();
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            startActivity(new Intent(getBaseContext(), MainActivity.class));
                             finish();
-
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
