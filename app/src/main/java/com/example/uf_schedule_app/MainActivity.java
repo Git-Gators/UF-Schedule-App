@@ -109,12 +109,15 @@ public class MainActivity extends AppCompatActivity {
                         user.put("Courses", courseObjects);
 
                         //Push the map named user to the database
-                        documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "Course Successfully Added" + userId);
-                            }
-                        });
+                        if (firebaseUser != null)
+                        {
+                            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "Course Successfully Added" + userId);
+                                }
+                            });
+                        }
                         break;
                     }
                 }
@@ -141,14 +144,54 @@ public class MainActivity extends AppCompatActivity {
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     if (documentSnapshot.exists())
                     {
+                        
                         //If the document snapshot exists, load the data into the user map
                         user = documentSnapshot.getData();
+                        if (documentSnapshot.get("Courses") != null)
+                        {
+                            //This has to be like the single worst piece of code that I have ever written
+
+                            //For some reason the courses load as a Hashmap of a Hashmap of strings as opposed to course objects.
+                            //So to fix this we need to load the Hashmap of a Hashmap of strings into a Map, which I called wierd map because nothing here makes sense
+                            ArrayList<HashMap<String, HashMap<String, String>>> wierdMap = (ArrayList<HashMap<String, HashMap<String, String>>>) documentSnapshot.get("Courses");
+
+                            //This part is just to make sure we have enough space in the arraylist to store data on our courses
+                            int courseObjectsSize = courseObjects.size();
+                            if (courseObjectsSize < wierdMap.size())
+                            {
+                                for (int i = 0; i < wierdMap.size() - courseObjectsSize; i++)
+                                {
+                                    Course course = new Course();
+                                    courseObjects.add(course);
+                                    coursesPicked.add("");
+                                }
+                            }
+
+                            //So since wierdmap has a hashmap containing two hashmaps, courseInfo and classSection,
+                            //we copy our data from wierdmap into courseObjects for each course.
+                            for (int i = 0; i < wierdMap.size(); i++)
+                            {
+                                courseObjects.get(i).courseInfo = wierdMap.get(i).get("courseInfo");
+                                courseObjects.get(i).classSection = wierdMap.get(i).get("classSection");
+                            }
+
+                        }
+                        user.put("Courses", courseObjects);
                         //If there's course data in the database try to load it
-                        if (user.get("courses") != null)
+                        if (user.get("Courses") != null)
                         {
                             //Typecasting the object from the course to a database should be fine
                             //assuming we store it correctly in the first place
-                            courseObjects = (ArrayList<Course>) user.get("courses");
+
+                            for (int i = 0; i < courseObjects.size(); i++)
+                            {
+                                Course course = (Course) courseObjects.get(i);
+                                Map <String, String> info = course.courseInfo;
+                                String name = info.get("name");
+                                coursesPicked.set(i, name);
+                            }
+                            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
+                            chosenCourses.setAdapter(arrayAdapter);
                         }
                     }else
                     {
@@ -291,43 +334,11 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(AuthResult authResult) {
 
-                            /*//Find the current user
-                            firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-                            if (firebaseUser != null)
-                            {
-                                //Get the userId and find their data in Firestore
-                                userId = firebaseUser.getUid();
-                                documentReference = userdb.collection("users").document(userId);
-                                documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                        if (documentSnapshot.exists())
-                                        {
-                                            //If the document snapshot exists, load the data into the user map
-                                            user = documentSnapshot.getData();
-                                        }else
-                                        {
-                                            //Otherwise print an error message
-                                            Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-                                            Log.d(TAG, e.toString());
-                                    }
-                                });
-
-                            }*/
-
+                            //Load the data from the database
                             loadData();
-
                             dialog.dismiss();
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            startActivity(new Intent(getBaseContext(), MainActivity.class));
                             finish();
-
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -376,7 +387,6 @@ public class MainActivity extends AppCompatActivity {
             loginBtnHomePage.setVisibility(View.GONE);
             logoutBtnHomePage.setVisibility(View.VISIBLE);
             loadData();
-
         } else {
             loginBtnHomePage.setVisibility(View.VISIBLE);
             logoutBtnHomePage.setVisibility(View.GONE);
