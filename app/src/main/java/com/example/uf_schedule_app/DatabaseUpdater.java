@@ -225,17 +225,15 @@ public class DatabaseUpdater extends Context {
         spinnerCrse.setEnabled(true);
     }
 
-    public void getCourseNames(String deptName, ArrayList<String> coursesNames, ProgressBar spinner, ArrayList<String> courses, Spinner spinnerCrse){
+    public void getCourseNames(String deptName, ArrayList<String> coursesNames, ProgressBar spinner, Spinner spinnerCrse, ArrayList<Course> crses){
         spinner.setVisibility(View.VISIBLE);
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(deptName);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    if(!coursesNames.contains(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString())) {
-                        coursesNames.add(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString());
-                        courses.add(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString());
-                    }
+                    coursesNames.add(Objects.requireNonNull(ds.getValue(Course.class).toString()));
+                    crses.add(ds.getValue(Course.class));
                 }
                 spinner.setVisibility(View.INVISIBLE);
                 spinnerCrse.setEnabled(true);

@@ -49,6 +49,7 @@ import org.json.JSONException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -63,15 +64,18 @@ public class MainActivity extends AppCompatActivity {
     DatabaseUpdater dbUpdater = new DatabaseUpdater();
     ListView courseList;
     ListView chosenCourses;
-    ArrayList<String> courses = new ArrayList<>();
-    //This variable contains everything anyone could possibly want to know about the user's courses
-    ArrayList<Course> courseObjects = new ArrayList<>();
-    ArrayList<String> coursesPicked = new ArrayList<>();
+
     String department;
     String userId;
     static FirebaseUser firebaseUser;
     static DocumentReference documentReference;
     static Map<String, Object> user = new HashMap<>();
+
+    // Courses retrieved from the DB for the user to choose
+    ArrayList<Course> crses = new ArrayList<>();
+
+    //Courses the user has already chosen
+    ArrayList<Course> coursesPicked = new ArrayList<>();
 
 
     private AlertDialog.Builder dialogBuilder;
@@ -86,46 +90,19 @@ public class MainActivity extends AppCompatActivity {
     FirebaseFirestore userdb = FirebaseFirestore.getInstance();
 
 
-    public void addCourseToDatabase(String course) {
-        //Some code I "borrowed" from Jason to set the course objects
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        ValueEventListener postListener = new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean found = false;
-                for (DataSnapshot dep : dataSnapshot.getChildren()) {
-                    for (DataSnapshot ds : dep.getChildren()) {
-                        if (Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name"), course)) {
-                            courseObjects.add(ds.getValue(Course.class));
-                            found = true;
-                            break;
-                        }
-                    }
-                    //We want to make sure the course has actually been loaded before we push it to
-                    //the database or we'll get a bunch of nullptrexceptions
-                    if (found) {
-                        //Add user's updated course information to the user's map
-                        user.put("Courses", courseObjects);
+    public void addCourseToDatabase(ArrayList<Course> course) {
+        user.put("Courses", coursesPicked);
 
-                        //Push the map named user to the database
-                        if (firebaseUser != null)
-                        {
-                            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "Course Successfully Added" + userId);
-                                }
-                            });
-                        }
-                        break;
-                    }
+        //Push the map named user to the database
+        if (firebaseUser != null)
+        {
+            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "Course Successfully Added" + userId);
                 }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) { }
-        };
-        mDatabase.addValueEventListener(postListener);
+            });
+        }
     }
 
     //Loads data from database to a hashmap named user
@@ -134,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
         //Find the current user
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        //TODO fix loading
         if (firebaseUser != null)
         {
             //Get the userId and find their data in Firestore
@@ -144,11 +122,11 @@ public class MainActivity extends AppCompatActivity {
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     if (documentSnapshot.exists())
                     {
-                        
                         //If the document snapshot exists, load the data into the user map
                         user = documentSnapshot.getData();
                         if (documentSnapshot.get("Courses") != null)
                         {
+                            System.out.println(documentSnapshot.get("Courses"));
                             //This has to be like the single worst piece of code that I have ever written
 
                             //For some reason the courses load as a Hashmap of a Hashmap of strings as opposed to course objects.
@@ -156,14 +134,13 @@ public class MainActivity extends AppCompatActivity {
                             ArrayList<HashMap<String, HashMap<String, String>>> wierdMap = (ArrayList<HashMap<String, HashMap<String, String>>>) documentSnapshot.get("Courses");
 
                             //This part is just to make sure we have enough space in the arraylist to store data on our courses
-                            int courseObjectsSize = courseObjects.size();
+                            int courseObjectsSize = coursesPicked.size();
                             if (courseObjectsSize < wierdMap.size())
                             {
                                 for (int i = 0; i < wierdMap.size() - courseObjectsSize; i++)
                                 {
                                     Course course = new Course();
-                                    courseObjects.add(course);
-                                    coursesPicked.add("");
+                                    coursesPicked.add(course);
                                 }
                             }
 
@@ -171,26 +148,24 @@ public class MainActivity extends AppCompatActivity {
                             //we copy our data from wierdmap into courseObjects for each course.
                             for (int i = 0; i < wierdMap.size(); i++)
                             {
-                                courseObjects.get(i).courseInfo = wierdMap.get(i).get("courseInfo");
-                                courseObjects.get(i).classSection = wierdMap.get(i).get("classSection");
+                                coursesPicked.get(i).courseInfo = wierdMap.get(i).get("courseInfo");
+                                coursesPicked.get(i).classSection = wierdMap.get(i).get("classSection");
                             }
 
                         }
-                        user.put("Courses", courseObjects);
+                        user.put("Courses", coursesPicked);
                         //If there's course data in the database try to load it
                         if (user.get("Courses") != null)
                         {
                             //Typecasting the object from the course to a database should be fine
                             //assuming we store it correctly in the first place
 
-                            for (int i = 0; i < courseObjects.size(); i++)
+                            for (int i = 0; i < coursesPicked.size(); i++)
                             {
-                                Course course = (Course) courseObjects.get(i);
-                                Map <String, String> info = course.courseInfo;
-                                String name = info.get("name");
-                                coursesPicked.set(i, name);
+                                Course course = (Course) coursesPicked.get(i);
+                                coursesPicked.set(i, course);
                             }
-                            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
+                            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
                             chosenCourses.setAdapter(arrayAdapter);
                         }
                     }else
@@ -238,19 +213,17 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle b = getIntent().getExtras();
         if(b != null){
-            if(b.getStringArrayList("coursesPicked") != null){
-                coursesPicked = b.getStringArrayList("coursesPicked");
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, coursesPicked);
+            if(b.getSerializable("coursesPicked") != null) {
+                coursesPicked = (ArrayList<Course>) intent.getSerializableExtra("coursesPicked");
+
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
                 chosenCourses.setAdapter(arrayAdapter);
             }
-            if(b.getStringArrayList("courses") != null){
-                courses.remove("");
-                courses = b.getStringArrayList("courses");
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
+            if(b.getSerializable("crses") != null) {
+                crses = (ArrayList<Course>) intent.getSerializableExtra("crses");
+
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getNames(crses));
                 courseList.setAdapter(arrayAdapter);
-            }
-            if(b.getSerializable("courseList") != null) {
-                courseObjects = (ArrayList<Course>) intent.getSerializableExtra("courseList");
             }
         }
 
@@ -258,13 +231,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 coursesPicked.remove(position);
-                courseObjects.remove(position);
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
                 chosenCourses.setAdapter(arrayAdapter);
 
                 //Change data in database to reflect deleted course.
-
-                user.put("Courses", courseObjects);
+                user.put("Courses", coursesPicked);
                 //Store the user's information (name, email, and list of course names for now) in the database
                 documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -279,11 +250,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(coursesPicked.size() < 4){
-                    coursesPicked.add(courses.get(position));
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
+                    coursesPicked.add(crses.get(position));
+                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
                     chosenCourses.setAdapter(arrayAdapter);
                     //Add the course to the database
-                    addCourseToDatabase(coursesPicked.get(coursesPicked.size()-1));
+                    addCourseToDatabase(coursesPicked);
                 }
             }
         });
@@ -293,8 +264,8 @@ public class MainActivity extends AppCompatActivity {
         public void goToFilter (View view){
             Intent intent = new Intent(this, FilterActivity.class);
             Bundle b = new Bundle();
-            b.putStringArrayList("coursesPicked", coursesPicked);
-            intent.putExtra("courseList", courseObjects);
+            intent.putExtra("coursesPicked", coursesPicked);
+            intent.putExtra("crses", crses);
             intent.putExtras(b);
             startActivity(intent);
             finish();
@@ -369,7 +340,16 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case R.id.nav_schedule:
                                 id = R.id.nav_schedule;
-                                getCourse();
+                                //We have all the courses
+                                Intent in;
+                                in = new Intent(getBaseContext(), ViewSchedule.class);
+                                Bundle b = new Bundle();
+                                in.putExtra("coursesPicked", coursesPicked);
+                                in.putExtra("crses", crses);
+                                in.putExtras(b);
+                                startActivity(in);
+                                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                                finish();
                                 break;
                             case R.id.nav_calendar:
                                 id = R.id.nav_calendar;
@@ -404,51 +384,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private ArrayList<String> getNames(ArrayList<Course> courses){
+        ArrayList<String> coursesSTR = new ArrayList<>();
+        for(int i = 0; i < courses.size(); i++)
+            coursesSTR.add(courses.get(i).toString());
 
-    public void getCourse(){
-        ArrayList<Course> courseList = new ArrayList<>();
-        //Get the course objects from that
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        ValueEventListener postListener = new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                for(int i = 0; i < coursesPicked.size(); i++){
-                    boolean found = false;
-                    for (DataSnapshot dep : dataSnapshot.getChildren()) {
-                        for (DataSnapshot ds : dep.getChildren()) {
-                            if(Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name"), coursesPicked.get(i))){
-                                courseList.add(ds.getValue(Course.class));
-                                found = true;
-                                break;
-                            }
-                        }
-                        if(found)
-                            break;
-                    }
-                }
-
-                //We have all the courses
-                if(courseList.size() == coursesPicked.size()){
-                    System.out.println("Course List: " + courseList);
-                    Intent in;
-                    in = new Intent(getBaseContext(), ViewSchedule.class);
-                    Bundle b = new Bundle();
-                    b.putStringArrayList("coursesPicked", coursesPicked);
-                    in.putExtra("courses", courseList);
-                    in.putExtras(b);
-                    startActivity(in);
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                    finish();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) { }
-        };
-        mDatabase.addValueEventListener(postListener);
+        return coursesSTR;
     }
-
 
 }
