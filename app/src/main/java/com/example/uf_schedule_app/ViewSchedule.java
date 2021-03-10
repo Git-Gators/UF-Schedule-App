@@ -271,10 +271,10 @@ public class ViewSchedule extends MainActivity {
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     int id = 0;
                     Intent in;
+                    Bundle b = new Bundle();
                     switch(item.getItemId()){
                         case R.id.nav_home:
                             in = new Intent(getBaseContext(), MainActivity.class);
-                            Bundle b = new Bundle();
                             b.putStringArrayList("coursesPicked", coursesPicked);
                             in.putExtras(b);
                             startActivity(in);
@@ -282,9 +282,16 @@ public class ViewSchedule extends MainActivity {
                             finish();
                             break;
                         case R.id.nav_schedule:
+                            id = R.id.nav_schedule;
                             break;
                         case R.id.nav_calendar:
                             id = R.id.nav_calendar;
+                            in = new Intent(getBaseContext(), CalendarView.class);
+                            b.putStringArrayList("coursesPicked", coursesPicked);
+                            in.putExtras(b);
+                            startActivity(in);
+                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                            finish();
                             break;
                     }
                     System.out.println(id);
