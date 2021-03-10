@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
         courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(coursesPicked.size() < 4){
+                if(coursesPicked.size() < 5){
                     coursesPicked.add(crses.get(position));
                     ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
                     chosenCourses.setAdapter(arrayAdapter);

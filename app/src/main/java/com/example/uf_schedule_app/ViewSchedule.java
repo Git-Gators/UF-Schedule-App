@@ -9,11 +9,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.PopupWindow;
 import android.app.AlertDialog;
 
 import android.content.Intent;
@@ -21,15 +18,8 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 
@@ -79,23 +69,33 @@ public class ViewSchedule extends MainActivity {
                 //Edit all the courseTexts
                 for(int i = 0; i < coursesPicked.size(); i++){
                     TextView text = null;
-                    Button button = null;
+                    Button delete = null;
+                    Button info = null;
 
                     if(i == 0){
                         text = findViewById(R.id.courseText1);
-                        button = findViewById(R.id.delete1);
+                        delete = findViewById(R.id.delete1);
+                        info = findViewById(R.id.details1);
                     } else if(i == 1){
                         text = findViewById(R.id.courseText2);
-                        button = findViewById(R.id.delete2);
+                        delete = findViewById(R.id.delete2);
+                        info = findViewById(R.id.details2);
                     } else if(i == 2){
                         text = findViewById(R.id.courseText3);
-                        button = findViewById(R.id.delete6);
+                        delete = findViewById(R.id.delete3);
+                        info = findViewById(R.id.details3);
                     } else if(i == 3){
                         text = findViewById(R.id.courseText4);
-                        button = findViewById(R.id.delete7);
-                    }
-                    if (text == null && i == 0) {
+                        delete = findViewById(R.id.delete4);
+                        info = findViewById(R.id.details4);
+                    } else if(i == 4) {
                         text = findViewById(R.id.courseText5);
+                        delete = findViewById(R.id.delete5);
+                        info = findViewById(R.id.details5);
+                    }
+
+                    if (text == null && i == 0) {
+                        text = findViewById(R.id.courseText6);
                         text.setText("No courses selected.");
                     }
                     else if(text != null) {
@@ -105,12 +105,13 @@ public class ViewSchedule extends MainActivity {
                     //If index exists, enable delete button
                     Button deleteAll = findViewById(R.id.delete);
                     deleteAll.setVisibility(View.VISIBLE);
-                    button.setVisibility(View.VISIBLE);
+                    delete.setVisibility(View.VISIBLE);
+                    info.setVisibility(View.VISIBLE);
                 }
             } else {
                 load.setVisibility(View.VISIBLE);
                 TextView text = null;
-                text = findViewById(R.id.courseText5);
+                text = findViewById(R.id.courseText6);
                 text.setText("No courses selected.");
             }
             if(b.getSerializable("crses") != null) {
@@ -120,7 +121,7 @@ public class ViewSchedule extends MainActivity {
         else {
             load.setVisibility(View.VISIBLE);
             TextView text = null;
-            text = findViewById(R.id.courseText5);
+            text = findViewById(R.id.courseText6);
             text.setText("No courses selected.");
         }
 
