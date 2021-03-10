@@ -47,7 +47,9 @@ public class CalendarView extends MainActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_view);
-
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setOnNavigationItemSelectedListener(navListener);
+        bottomNav.setSelectedItemId(R.id.nav_calendar);
         recyclerView = findViewById(R.id.recyclerView);
 
         s1 = getResources().getStringArray(R.array.programming_languages);
@@ -58,4 +60,37 @@ public class CalendarView extends MainActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
     }
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    int id = 0;
+                    Intent in;
+                    Bundle b = new Bundle();
+                    switch(item.getItemId()){
+                        case R.id.nav_home:
+                            in = new Intent(getBaseContext(), MainActivity.class);
+                            b.putStringArrayList("coursesPicked", coursesPicked);
+                            in.putExtras(b);
+                            startActivity(in);
+                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                            finish();
+                            break;
+                        case R.id.nav_schedule:
+                            id = R.id.nav_schedule;
+                            in = new Intent(getBaseContext(), ViewSchedule.class);
+                            b.putStringArrayList("coursesPicked", coursesPicked);
+                            in.putExtras(b);
+                            startActivity(in);
+                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                            finish();
+                            break;
+                        case R.id.nav_calendar:
+                            id = R.id.nav_calendar;
+                            break;
+                    }
+                    System.out.println(id);
+                    return true;
+                }
+            };
 }
