@@ -16,29 +16,42 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
-    <string-array name = "programming_languages">
-        <item>C++</item>
-        <item>C#</item>
-        <item>Java</item>
-        <item>Javascript</item>
-        <item>Kotlin</item>
-        <item>Python</item>
-        <item>Ruby</item>
-        <item>Swift</item>
-        <item>Typescript</item>
-        <item>Visual Studio</item>
+    <string-array name = "periods">
+        <item>Periods</item>
+        <item>7:25AM-8:15AM</item>
+        <item>8:30AM-9:20AM</item>
+        <item>9:35AM-10:25AM</item>
+        <item>10:40AM-11:30AM</item>
+        <item>11:45AM-12:35PM</item>
+        <item>12:50PM-1:40PM</item>
+        <item>1:55PM-2:45PM</item>
+        <item>3:00PM-3:50PM</item>
+        <item>4:05PM-4:55PM</item>
+        <item>5:10PM-6:00PM</item>
+        <item>6:15PM-7:05PM</item>
+        <item>7:20PM-8:10PM</item>
+        <item>8:25PM-9:15PM</item>
+        <item>9:30PM-10:20PM</item>
+        <item>Online</item>
     </string-array>
 
-    <string-array name = "description">
-        <item>This is a random description</item>
-        <item>This is a random description</item>
-        <item>This is a random description</item>
-        <item>This is a random description</item>
-        <item>This is a random description</item>
-        <item>This is a random description</item>
-        <item>This is a random description</item>
-        <item>This is a random description</item>
-        <item>This is a random description</item>
-        <item>This is a random description</item>
+    <string-array name = "daysOfWeek">
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
     </string-array>
+
+    <string-array name = "dayInitials">
+        <item>M</item>
+        <item>T</item>
+        <item>W</item>
+        <item>R</item>
+        <item>F</item>
+    </string-array>
+
+    <integer name = "numPeriods">16</integer>
 </resources>
