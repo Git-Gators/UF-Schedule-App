@@ -344,9 +344,8 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.nav_schedule:
                                 id = R.id.nav_schedule;
                                 //We have all the courses
-                                Intent in;
                                 in = new Intent(getBaseContext(), ViewSchedule.class);
-                                b.putStringArrayList("coursesPicked", coursesPicked);
+                                in.putExtra("coursesPicked", coursesPicked);
                                 in.putExtras(b);
                                 startActivity(in);
                                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -355,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.nav_calendar:
                                 id = R.id.nav_calendar;
                                 in = new Intent(getBaseContext(), CalendarView.class);
-                                b.putStringArrayList("coursesPicked", coursesPicked);
+                                in.putExtra("coursesPicked", coursesPicked);
                                 in.putExtras(b);
                                 startActivity(in);
                                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);

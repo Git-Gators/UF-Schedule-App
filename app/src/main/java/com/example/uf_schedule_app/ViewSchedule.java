@@ -265,7 +265,7 @@ public class ViewSchedule extends MainActivity {
                     switch(item.getItemId()){
                         case R.id.nav_home:
                             in = new Intent(getBaseContext(), MainActivity.class);
-                            b.putStringArrayList("coursesPicked", coursesPicked);
+                            in.putExtra("coursesPicked", coursesPicked);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -277,7 +277,7 @@ public class ViewSchedule extends MainActivity {
                         case R.id.nav_calendar:
                             id = R.id.nav_calendar;
                             in = new Intent(getBaseContext(), CalendarView.class);
-                            b.putStringArrayList("coursesPicked", coursesPicked);
+                            in.putExtra("coursesPicked", coursesPicked);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
