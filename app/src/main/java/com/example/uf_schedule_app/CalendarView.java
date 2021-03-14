@@ -70,7 +70,7 @@ public class CalendarView extends MainActivity {
                     switch(item.getItemId()){
                         case R.id.nav_home:
                             in = new Intent(getBaseContext(), MainActivity.class);
-                            b.putStringArrayList("coursesPicked", coursesPicked);
+                            in.putExtra("coursesPicked", coursesPicked);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -79,7 +79,7 @@ public class CalendarView extends MainActivity {
                         case R.id.nav_schedule:
                             id = R.id.nav_schedule;
                             in = new Intent(getBaseContext(), ViewSchedule.class);
-                            b.putStringArrayList("coursesPicked", coursesPicked);
+                            in.putExtra("coursesPicked", coursesPicked);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
