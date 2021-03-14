@@ -334,6 +334,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         int id = 0;
+                        Intent in;
+                        Bundle b = new Bundle();
+
                         switch (item.getItemId()) {
                             case R.id.nav_home:
                                 id = R.id.nav_home;
@@ -341,11 +344,8 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.nav_schedule:
                                 id = R.id.nav_schedule;
                                 //We have all the courses
-                                Intent in;
                                 in = new Intent(getBaseContext(), ViewSchedule.class);
-                                Bundle b = new Bundle();
                                 in.putExtra("coursesPicked", coursesPicked);
-                                in.putExtra("crses", crses);
                                 in.putExtras(b);
                                 startActivity(in);
                                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -353,6 +353,12 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case R.id.nav_calendar:
                                 id = R.id.nav_calendar;
+                                in = new Intent(getBaseContext(), CalendarView.class);
+                                in.putExtra("coursesPicked", coursesPicked);
+                                in.putExtras(b);
+                                startActivity(in);
+                                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                                finish();
                                 break;
                         }
                         System.out.println(id);
