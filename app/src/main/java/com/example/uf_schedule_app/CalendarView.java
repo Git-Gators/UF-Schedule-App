@@ -76,13 +76,12 @@ public class CalendarView extends MainActivity {
         //each day (Monday, Tuesday, Wednesday, Thursday, Friday), and store them in a map whose
         //key is the day, and whose value is a list of all the events taking place that day
 
-        //Start by initializing arrays for every day of the week (I'm sure this could be made
-        //less ugly, but I'm not worried about that right now.)
-        ArrayList<CourseEvent> mondayCourses = new ArrayList<>();
-        ArrayList<CourseEvent> tuesdayCourses = new ArrayList<>();
-        ArrayList<CourseEvent> wednesdayCourses = new ArrayList<>();
-        ArrayList<CourseEvent> thursdayCourses = new ArrayList<>();
-        ArrayList<CourseEvent> fridayCourses = new ArrayList<>();
+        //Start by initializing arrays for every day of the week
+        courseTimes.put("Monday", new ArrayList<>());
+        courseTimes.put("Tuesday", new ArrayList<>());
+        courseTimes.put("Wednesday", new ArrayList<>());
+        courseTimes.put("Thursday", new ArrayList<>());
+        courseTimes.put("Friday", new ArrayList<>());
 
         for (int i = 0; i < coursesPicked.size(); i++)
         {
@@ -96,11 +95,11 @@ public class CalendarView extends MainActivity {
                 //online, so we add the course to every day's list under the time online
                 String time = "Online";
                 CourseEvent event = new CourseEvent(time, courseCode);
-                mondayCourses.add(event);
-                tuesdayCourses.add(event);
-                wednesdayCourses.add(event);
-                thursdayCourses.add(event);
-                fridayCourses.add(event);
+                courseTimes.get("Monday").add(event);
+                courseTimes.get("Tuesday").add(event);
+                courseTimes.get("Wednesday").add(event);
+                courseTimes.get("Thursday").add(event);
+                courseTimes.get("Friday").add(event);
             }
             else
             {
@@ -144,37 +143,43 @@ public class CalendarView extends MainActivity {
                     if (daySection.contains("M"))
                     {
                         CourseEvent event = new CourseEvent(timesSection, courseCode);
-                        mondayCourses.add(event);
+                        courseTimes.get("Monday").add(event);
                     }
                     if (daySection.contains("T"))
                     {
                         CourseEvent event = new CourseEvent(timesSection, courseCode);
-                        tuesdayCourses.add(event);
+                        courseTimes.get("Tuesday").add(event);
                     }
                     if (daySection.contains("W"))
                     {
                         CourseEvent event = new CourseEvent(timesSection, courseCode);
-                        wednesdayCourses.add(event);
+                        courseTimes.get("Wednesday").add(event);
                     }
                     if (daySection.contains("R"))
                     {
                         CourseEvent event = new CourseEvent(timesSection, courseCode);
-                        thursdayCourses.add(event);
+                        courseTimes.get("Thursday").add(event);
                     }
                     if (daySection.contains("F"))
                     {
                         CourseEvent event = new CourseEvent(timesSection, courseCode);
-                        fridayCourses.add(event);
+                        courseTimes.get("Friday").add(event);
+                    }
+
+                    //If we are at the end of the days string or times string, we're done for this
+                    //course
+                    if (endDay == daysParser.length() || endTime == timesParser.length())
+                    {
+                        break;
+                    }
+                    //Otherwise, go to the next section/discussion/lab
+                    else
+                    {
+                        daysParser = daysParser.substring(endDay + 1);
+                        timesParser = timesParser.substring(endTime + 1);
                     }
                 }
             }
-
-            //We now
-            courseTimes.put("Monday", mondayCourses);
-            courseTimes.put("Tuesday", tuesdayCourses);
-            courseTimes.put("Wednesday", wednesdayCourses);
-            courseTimes.put("Thursday", thursdayCourses);
-            courseTimes.put("Friday", fridayCourses);
 
             //courseTimes[coursesPicked.get("")]
         }
