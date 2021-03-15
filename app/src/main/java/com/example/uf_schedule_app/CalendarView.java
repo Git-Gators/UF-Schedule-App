@@ -82,6 +82,7 @@ public class CalendarView extends MainActivity {
         courseTimes.put("Wednesday", new ArrayList<>());
         courseTimes.put("Thursday", new ArrayList<>());
         courseTimes.put("Friday", new ArrayList<>());
+        courseTimes.put("Saturday", new ArrayList<>());
 
         for (int i = 0; i < coursesPicked.size(); i++)
         {
@@ -100,6 +101,7 @@ public class CalendarView extends MainActivity {
                 courseTimes.get("Wednesday").add(event);
                 courseTimes.get("Thursday").add(event);
                 courseTimes.get("Friday").add(event);
+                courseTimes.get("Saturday").add(event);
             }
             else
             {
@@ -165,6 +167,11 @@ public class CalendarView extends MainActivity {
                         CourseEvent event = new CourseEvent(timesSection, courseCode);
                         courseTimes.get("Friday").add(event);
                     }
+                    if (daySection.contains("S"))
+                    {
+                        CourseEvent event = new CourseEvent(timesSection, courseCode);
+                        courseTimes.get("Saturday").add(event);
+                    }
 
                     //If we are at the end of the days string or times string, we're done for this
                     //course
@@ -193,6 +200,35 @@ public class CalendarView extends MainActivity {
         for (int i = 1; i < numPeriods; i++)
         {
             courseViews[i] = "";
+        }
+
+        ArrayList<CourseEvent> events = courseTimes.get("Monday");
+        for (int i = 0; i < events.size(); i++)
+        {
+            for (int j = 1; j < numPeriods - 1; j++)
+            {
+                String times = events.get(i).time;
+                String beginningTime = "";
+                String endTime = "";
+                if (times.indexOf('-') != -1)
+                {
+                    beginningTime = times.substring(0, times.indexOf('-'));
+                    endTime = times.substring(times.indexOf('-') + 1);
+                }
+
+
+                String periodStart = periods[j].substring(0, periods[j].indexOf('-'));
+                String periodEnd = periods[j].substring(periods[j].indexOf('-') + 1);
+
+                if (beginningTime.equals(periodStart) || endTime.equals(periodEnd))
+                {
+                    courseViews[j] = courseTimes.get("Monday").get(i).courseCode;
+                }
+            }
+            if (events.get(i).time.equals("Online"))
+            {
+                courseViews[numPeriods - 1] = courseTimes.get("Monday").get(i).courseCode;
+            }
         }
 
         Calendar_Adapter calendarAdapter = new Calendar_Adapter(this, periods, courseViews);
