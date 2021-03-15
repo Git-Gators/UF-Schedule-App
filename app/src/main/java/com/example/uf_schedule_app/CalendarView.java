@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 
 public class CalendarView extends MainActivity {
     RecyclerView recyclerView;
-    Map<String, ArrayList<CourseEvent>> courseTimes = new HashMap<>();
+    Map<String, ArrayList<CourseEvent>> courseSections = loadCourseEvents(coursesPicked);
 
     int numPeriods = 16;
     String periods[], courseViews[], daysOfWeek[];
@@ -53,7 +53,7 @@ public class CalendarView extends MainActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_view);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
@@ -64,9 +64,13 @@ public class CalendarView extends MainActivity {
         dayNav.setSelectedItemId(R.id.monday);
         recyclerView = findViewById(R.id.recyclerView);
 
+        courseSections = loadCourseEvents(coursesPicked);
+
+
         //Load the default day as Monday
-        dayUpdate("Monday");
+        dayUpdate("Monday", courseSections);
     }
+
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -74,7 +78,7 @@ public class CalendarView extends MainActivity {
                     int id = 0;
                     Intent in;
                     Bundle b = new Bundle();
-                    switch(item.getItemId()){
+                    switch (item.getItemId()) {
                         case R.id.nav_home:
                             in = new Intent(getBaseContext(), MainActivity.class);
                             in.putExtra("coursesPicked", coursesPicked);
@@ -100,13 +104,9 @@ public class CalendarView extends MainActivity {
                     return true;
                 }
             };
-    //@Override
-    private void dayUpdate(String day) {
-        recyclerView = findViewById(R.id.recyclerView);
 
-        List<String> dayInitials = Arrays.asList(getResources().getStringArray(R.array.dayInitials));
-
-
+    public Map<String, ArrayList<CourseEvent>> loadCourseEvents(ArrayList<Course> coursesPicked) {
+        Map<String, ArrayList<CourseEvent>> courseTimes = new HashMap<>();
 
         //If you're reading this, it was every bit as painful to write as it is to read
 
@@ -127,14 +127,12 @@ public class CalendarView extends MainActivity {
         courseTimes.put("Friday", new ArrayList<>());
         courseTimes.put("Saturday", new ArrayList<>());
 
-        for (int i = 0; i < coursesPicked.size(); i++)
-        {
+        for (int i = 0; i < coursesPicked.size(); i++) {
             String courseCode = coursesPicked.get(i).courseInfo.get("code");
 
             //If a course is an online course, it won't have meetDays.  So if the meetDays variable
             //is empty, then the course must be online.
-            if (coursesPicked.get(i).classSection.get("meetDays").equals(""))
-            {
+            if (coursesPicked.get(i).classSection.get("meetDays").equals("")) {
                 //Online courses are counted as taking place every day, at a time section labeled
                 //online, so we add the course to every day's list under the time online
                 String time = "Online";
@@ -145,9 +143,7 @@ public class CalendarView extends MainActivity {
                 courseTimes.get("Thursday").add(event);
                 courseTimes.get("Friday").add(event);
                 courseTimes.get("Saturday").add(event);
-            }
-            else
-            {
+            } else {
                 //So if a course isn't online, we want to get the times and days each course takes
                 //place.  Courses can have a regular course meeting, a lab, and a discussion, which
                 //is something we're going to have to parse manually.
@@ -171,8 +167,7 @@ public class CalendarView extends MainActivity {
                 //with each starting and ending time having a corresponding day
 
                 //So, to find each group of days and times, we search for the closing brackets
-                while (daysParser.indexOf(']') != -1 && timesParser.indexOf(']') != -1)
-                {
+                while (daysParser.indexOf(']') != -1 && timesParser.indexOf(']') != -1) {
                     endDay = daysParser.indexOf(']');
                     endTime = timesParser.indexOf(']');
 
@@ -181,50 +176,42 @@ public class CalendarView extends MainActivity {
                     String daySection = daysParser.substring(startDay, endDay);
 
                     //Re-formating the timesSection makes storing and using the data a little easier
-                    String timesSection = timesParser.substring(startTime, endTime).replace("[", "").replace("]","").replace(" ","");
+                    String timesSection = timesParser.substring(startTime, endTime).replace("[", "").replace("]", "").replace(" ", "");
 
                     //Now that we have the days each section/discussion/lab takes place, we check
                     //each day of the week, and add the times to our event list for each day
-                    if (daySection.contains("M"))
-                    {
+                    if (daySection.contains("M")) {
                         CourseEvent event = new CourseEvent(timesSection, courseCode);
                         courseTimes.get("Monday").add(event);
                     }
-                    if (daySection.contains("T"))
-                    {
+                    if (daySection.contains("T")) {
                         CourseEvent event = new CourseEvent(timesSection, courseCode);
                         courseTimes.get("Tuesday").add(event);
                     }
-                    if (daySection.contains("W"))
-                    {
+                    if (daySection.contains("W")) {
                         CourseEvent event = new CourseEvent(timesSection, courseCode);
                         courseTimes.get("Wednesday").add(event);
                     }
-                    if (daySection.contains("R"))
-                    {
+                    if (daySection.contains("R")) {
                         CourseEvent event = new CourseEvent(timesSection, courseCode);
                         courseTimes.get("Thursday").add(event);
                     }
-                    if (daySection.contains("F"))
-                    {
+                    if (daySection.contains("F")) {
                         CourseEvent event = new CourseEvent(timesSection, courseCode);
                         courseTimes.get("Friday").add(event);
                     }
-                    if (daySection.contains("S"))
-                    {
+                    if (daySection.contains("S")) {
                         CourseEvent event = new CourseEvent(timesSection, courseCode);
                         courseTimes.get("Saturday").add(event);
                     }
 
                     //If we are at the end of the days string or times string, we're done for this
                     //course
-                    if (endDay == daysParser.length() || endTime == timesParser.length())
-                    {
+                    if (endDay == daysParser.length() || endTime == timesParser.length()) {
                         break;
                     }
                     //Otherwise, go to the next section/discussion/lab
-                    else
-                    {
+                    else {
                         daysParser = daysParser.substring(endDay + 1);
                         timesParser = timesParser.substring(endTime + 1);
                     }
@@ -233,6 +220,14 @@ public class CalendarView extends MainActivity {
 
             //courseTimes[coursesPicked.get("")]
         }
+        return courseTimes;
+    }
+
+
+
+    //@Override
+    private void dayUpdate(String day, Map<String, ArrayList<CourseEvent>> courseTimes) {
+        recyclerView = findViewById(R.id.recyclerView);
 
         periods = getResources().getStringArray(R.array.periods);
         daysOfWeek = getResources().getStringArray(R.array.daysOfWeek);
@@ -288,23 +283,23 @@ public class CalendarView extends MainActivity {
                     switch(item.getItemId()){
                         case R.id.monday:
                             id = R.id.monday;
-                            dayUpdate("Monday");
+                            dayUpdate("Monday", courseSections);
                             break;
                         case R.id.tuesday:
                             id = R.id.tuesday;
-                            dayUpdate("Tuesday");
+                            dayUpdate("Tuesday", courseSections);
                             break;
                         case R.id.wednesday:
                             id = R.id.wednesday;
-                            dayUpdate("Wednesday");
+                            dayUpdate("Wednesday", courseSections);
                             break;
                         case R.id.thursday:
                             id = R.id.thursday;
-                            dayUpdate("Thursday");
+                            dayUpdate("Thursday", courseSections);
                             break;
                         case R.id.friday:
                             id = R.id.friday;
-                            dayUpdate("Friday");
+                            dayUpdate("Friday", courseSections);
                             break;
                     }
                     System.out.println(id);
