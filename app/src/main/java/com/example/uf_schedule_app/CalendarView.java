@@ -243,6 +243,7 @@ public class CalendarView extends MainActivity {
         ArrayList<CourseEvent> events = courseTimes.get(day);
         for (int i = 0; i < events.size(); i++)
         {
+            boolean isNow = false;
             for (int j = 1; j < numPeriods - 1; j++)
             {
                 String times = events.get(i).time;
@@ -258,8 +259,19 @@ public class CalendarView extends MainActivity {
                 String periodStart = periods[j].substring(0, periods[j].indexOf('-'));
                 String periodEnd = periods[j].substring(periods[j].indexOf('-') + 1);
 
-                if (beginningTime.equals(periodStart) || endTime.equals(periodEnd))
+                if (beginningTime.equals(periodStart) && endTime.equals(periodEnd))
                 {
+                    courseViews[j] = courseTimes.get(day).get(i).courseCode;
+                }
+                else if (beginningTime.equals(periodStart) && !endTime.equals(periodEnd)) {
+                    isNow = true;
+                    courseViews[j] = courseTimes.get(day).get(i).courseCode;
+                }
+                else if(isNow && !endTime.equals(periodEnd)) {
+                    courseViews[j] = courseTimes.get(day).get(i).courseCode;
+                }
+                else if(isNow && endTime.equals(periodEnd)) {
+                    isNow = false;
                     courseViews[j] = courseTimes.get(day).get(i).courseCode;
                 }
             }
