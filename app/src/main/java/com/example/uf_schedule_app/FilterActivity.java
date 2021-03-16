@@ -2,6 +2,7 @@ package com.example.uf_schedule_app;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.os.Build;
@@ -31,7 +32,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
     String department = "";
     Course courseName = null;
-    String semester;
+    String semester = "Spring 2021";
     ArrayList<Course> coursesInSchedule = new ArrayList<>();
 
     // Courses retrieved from the DB
@@ -47,9 +48,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     Spinner spinnerCrse;
 
     //Progress Bars (Spinning load icon)
-    private ProgressBar pSpinner;
     private ProgressBar pSpinner2;
-    private ProgressBar pSpinner3;
 
     //Used in the Spinner
     ArrayList<String> deptNames = new ArrayList<>();
@@ -89,37 +88,35 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         }
 
         //Set the progress bars for spinners to be invisible
-        pSpinner = findViewById(R.id.progressBar);
-        pSpinner.setVisibility(View.INVISIBLE);
         pSpinner2 = findViewById(R.id.progressBar2);
         pSpinner2.setVisibility(View.INVISIBLE);
 
         //Update the lists
-        spinner = (Spinner) findViewById(R.id.spinner);
         spinnerDept = (Spinner) findViewById(R.id.spinnerDepartments);
         spinnerCrse = (Spinner) findViewById(R.id.spinnerCourse);
 
-        spinner.setOnItemSelectedListener(this);
         spinnerDept.setOnItemSelectedListener(this);
         spinnerCrse.setOnItemSelectedListener(this);
 
-        //Going to have to change this if we ever want more semesters //TODO
-        String[] semesters = new String[]{"Select a Semester", "Spring 2021"};
-        deptNames.add("Please Select a Semester First");
-        String[] courses = new String[]{"Please Select a Semester First"};
+        //Add the database information to the list and update the spinner
+        try {
+            dbUpdater.getDepNames(deptNames, spinnerDept, spinnerCrse, getBaseContext());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        deptNames.set(0, " -- ");
+        String[] courses = {" -- "};
+        spinnerCrse.setEnabled(false);
 
         // Create an ArrayAdapter using the string array and a default spinner layout
-        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, semesters);
         final ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, deptNames);
         final ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, courses);
 
         // Specify the layout to use when the list of choices appears
-        spinnerArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         spinnerArrayAdapter2.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
 
         // Apply the adapter to the spinner
-        spinner.setAdapter(spinnerArrayAdapter);
         spinnerDept.setAdapter(spinnerArrayAdapter2);
         spinnerCrse.setAdapter(spinnerArrayAdapter1);
 
@@ -234,44 +231,15 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         return(super.onOptionsItemSelected(item));
     }
 
-    //When an item is selected in either list
+    //When an item is selected in any list
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        // The top spinner
-        if (parent.getId() == R.id.spinner && !parent.getItemAtPosition(pos).toString().equals("Select a Semester")) {
-            String valueFromSpinner = parent.getItemAtPosition(pos).toString();
-            System.out.println("Spinner: " + valueFromSpinner);
-            semester = valueFromSpinner;
-
-            spinnerDept.setEnabled(false);
-            spinnerCrse.setEnabled(false);
-
-            //Add the database information to the list and update the spinner
-            try {
-                dbUpdater.getDepNames(deptNames, pSpinner, spinnerDept, spinnerCrse, getBaseContext());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            deptNames.set(0, "Choose a Department");
-
-            String[] courses = {"Choose a Department"};
-
-            ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, deptNames);
-            spinnerArrayAdapter2.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-            spinnerDept.setAdapter(spinnerArrayAdapter2);
-
-
-            ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, courses);
-            spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-            spinnerCrse.setAdapter(spinnerArrayAdapter1);
-        }
-
         // The middle spinner
         if (parent.getId() == R.id.spinnerDepartments && !parent.getItemAtPosition(pos).toString().equals("Please Select a Semester First")) {
             if(!parent.getItemAtPosition(pos).toString().equals("Choose a Department")) {
                 System.out.println("Spinner: Department Chosen");
                 ArrayList<String> coursesNames = new ArrayList<>();
-                coursesNames.add("Choose a Course");
+                coursesNames.add(" -- ");
                 crses.clear();
                 department = parent.getItemAtPosition(pos).toString();
                 try {
@@ -292,7 +260,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         if (parent.getId() == R.id.spinnerCourse) {
             System.out.println("Spinner: Course Chosen");
 
-            if(parent.getItemAtPosition(pos).toString().equals("Please Select a Semester First") || parent.getItemAtPosition(pos).toString().equals("Choose a Department") || parent.getItemAtPosition(pos).toString().equals("Choose a Course")) {
+            if(parent.getItemAtPosition(pos).toString().equals(" -- ")) {
                 courseName = null;
                 System.out.println("Set courseName: null");
             } else {
@@ -331,5 +299,31 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         finish();
+    }
+
+    public void nextFilter(View view){
+        ConstraintLayout top = findViewById(R.id.top);
+        ConstraintLayout middle = findViewById(R.id.middle);
+        ConstraintLayout bottom = findViewById(R.id.bottom);
+
+        if(view.getId() == R.id.topBar){
+            if(top.getVisibility() == View.VISIBLE){
+                top.setVisibility(View.GONE);
+            } else {
+                top.setVisibility(View.VISIBLE);
+            }
+        } else if(view.getId() == R.id.middleBar){
+            if(middle.getVisibility() == View.VISIBLE){
+                middle.setVisibility(View.GONE);
+            } else {
+                middle.setVisibility(View.VISIBLE);
+            }
+        } else if(view.getId() == R.id.bottomBar){
+            if(bottom.getVisibility() == View.VISIBLE){
+                bottom.setVisibility(View.GONE);
+            } else {
+                bottom.setVisibility(View.VISIBLE);
+            }
+        }
     }
 }
