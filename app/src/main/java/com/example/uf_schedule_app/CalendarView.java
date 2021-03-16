@@ -44,16 +44,16 @@ public class CalendarView extends MainActivity {
 
     int numPeriods = 16;
     int[] colors = {
-            (R.color.black),
-            (R.color.purple_200),
-            (R.color.purple_500),
-            (R.color.purple_700),
-            (R.color.teal_200),
-            (R.color.teal_700),
-            (R.color.white),
-            (R.color.gray),
-            (R.color.light_gray),
-            (R.color.orange)
+            R.drawable.border2,
+            R.drawable.border3,
+            R.drawable.border4,
+            R.drawable.border5,
+            R.drawable.border6,
+            R.drawable.border7,
+            R.drawable.border8,
+            R.drawable.border9,
+            R.drawable.border10,
+            R.drawable.border11
     };
     String periods[], courseViews[], daysOfWeek[];
     int images[] = {R.drawable.ic_baseline_calendar_view_day_24,
@@ -258,7 +258,7 @@ public class CalendarView extends MainActivity {
         courseViews[0] = daysOfWeek[0];
         int[] color = new int[numPeriods];
         for (int x = 0; x < numPeriods; x++) {
-            color[x] = this.getResources().getColor(R.color.light_gray);
+            color[x] = R.drawable.border;
         }
 
         for (int i = 1; i < numPeriods; i++)

@@ -2,6 +2,7 @@ package com.example.uf_schedule_app;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,7 @@ public class Calendar_Adapter extends RecyclerView.Adapter<Calendar_Adapter.Cale
     public void onBindViewHolder(@NonNull CalendarViewHolder holder, int position) {
         holder.calendarText1.setText(data1[position]);
         holder.calendarText2.setText(data2[position]);
-        holder.constraintLayout.setBackgroundColor(colorVal[position]);
+        holder.constraintLayout.setBackground(context.getResources().getDrawable(colorVal[position]));
         //holder.calendarText2.setTextColor(context.getResources().getColor(R.color.white));
         //holder.calendarImage.setImageResource(images[position]);
 
