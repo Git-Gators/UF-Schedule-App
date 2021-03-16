@@ -296,12 +296,10 @@ public class CalendarView extends MainActivity {
                     color[j] = colors[courseTimes.get(day).get(i).position%10];
                 }
                 else if(isNow && !endTime.equals(periodEnd)) {
-                    courseViews[j] = courseTimes.get(day).get(i).courseCode;
                     color[j] = colors[courseTimes.get(day).get(i).position%10];
                 }
                 else if(isNow && endTime.equals(periodEnd)) {
                     isNow = false;
-                    courseViews[j] = courseTimes.get(day).get(i).courseCode;
                     color[j] = colors[courseTimes.get(day).get(i).position%10];
                 }
             }
