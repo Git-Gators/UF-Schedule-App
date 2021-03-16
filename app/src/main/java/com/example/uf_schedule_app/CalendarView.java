@@ -43,6 +43,18 @@ public class CalendarView extends MainActivity {
     Map<String, ArrayList<CourseEvent>> courseSections = loadCourseEvents(coursesPicked);
 
     int numPeriods = 16;
+    int[] colors = {
+            (R.color.black),
+            (R.color.purple_200),
+            (R.color.purple_500),
+            (R.color.purple_700),
+            (R.color.teal_200),
+            (R.color.teal_700),
+            (R.color.white),
+            (R.color.gray),
+            (R.color.light_gray),
+            (R.color.orange)
+    };
     String periods[], courseViews[], daysOfWeek[];
     int images[] = {R.drawable.ic_baseline_calendar_view_day_24,
             R.drawable.ic_baseline_calendar_view_day_24, R.drawable.ic_baseline_calendar_view_day_24,
@@ -63,9 +75,19 @@ public class CalendarView extends MainActivity {
         dayNav.setOnNavigationItemSelectedListener(dayListener);
         dayNav.setSelectedItemId(R.id.monday);
         recyclerView = findViewById(R.id.recyclerView);
-
         courseSections = loadCourseEvents(coursesPicked);
-
+/**
+ *     <color name="purple_200">#FFBB86FC</color>
+ *     <color name="purple_500">#FF6200EE</color>
+ *     <color name="purple_700">#FF3700B3</color>
+ *     <color name="teal_200">#FF03DAC5</color>
+ *     <color name="teal_700">#FF018786</color>
+ *     <color name="black">#FF000000</color>
+ *     <color name="white">#FFFFFFFF</color>
+ *     <color name="gray">#373636</color>
+ *     <color name="light_gray">#E4FCFF</color>
+ *     <color name="orange">#FF5722</color>
+ */
 
         //Load the default day as Monday
         dayUpdate("Monday", courseSections);
@@ -234,16 +256,21 @@ public class CalendarView extends MainActivity {
         courseViews = new String[numPeriods];
 
         courseViews[0] = daysOfWeek[0];
+        int[] color = new int[numPeriods];
+        for (int x = 0; x < numPeriods; x++) {
+            color[x] = this.getResources().getColor(R.color.light_gray);
+        }
 
         for (int i = 1; i < numPeriods; i++)
         {
             courseViews[i] = "";
         }
-
+        int counter = 0;
         ArrayList<CourseEvent> events = courseTimes.get(day);
         for (int i = 0; i < events.size(); i++)
         {
             boolean isNow = false;
+            //j is numPeriods - 1 because the first time slot and final time slot don't contain dashes
             for (int j = 1; j < numPeriods - 1; j++)
             {
                 String times = events.get(i).time;
@@ -262,17 +289,21 @@ public class CalendarView extends MainActivity {
                 if (beginningTime.equals(periodStart) && endTime.equals(periodEnd))
                 {
                     courseViews[j] = courseTimes.get(day).get(i).courseCode;
+                    color[j] = colors[counter++%10];
                 }
                 else if (beginningTime.equals(periodStart) && !endTime.equals(periodEnd)) {
                     isNow = true;
                     courseViews[j] = courseTimes.get(day).get(i).courseCode;
+                    color[j] = colors[counter%10];
                 }
                 else if(isNow && !endTime.equals(periodEnd)) {
                     courseViews[j] = courseTimes.get(day).get(i).courseCode;
+                    color[j] = colors[counter%10];
                 }
                 else if(isNow && endTime.equals(periodEnd)) {
                     isNow = false;
                     courseViews[j] = courseTimes.get(day).get(i).courseCode;
+                    color[j] = colors[counter++%10];
                 }
             }
             if (events.get(i).time.equals("Online"))
@@ -281,7 +312,7 @@ public class CalendarView extends MainActivity {
             }
         }
         courseViews[0] = day;
-        Calendar_Adapter calendarAdapter = new Calendar_Adapter(this, periods, courseViews);
+        Calendar_Adapter calendarAdapter = new Calendar_Adapter(this, periods, courseViews, color);
         recyclerView.setAdapter(calendarAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 

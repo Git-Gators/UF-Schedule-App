@@ -17,7 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:weightSum="100">
+            android:weightSum="100"
+            android:id="@+id/row_linearLayout">
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -25,6 +26,7 @@
                 android:layout_weight="65">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/border">
@@ -50,6 +52,7 @@
                 android:layout_weight="35">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayout2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/border">
