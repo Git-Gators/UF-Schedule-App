@@ -158,7 +158,7 @@ public class CalendarView extends MainActivity {
                 //Online courses are counted as taking place every day, at a time section labeled
                 //online, so we add the course to every day's list under the time online
                 String time = "Online";
-                CourseEvent event = new CourseEvent(time, courseCode);
+                CourseEvent event = new CourseEvent(time, courseCode, i);
                 courseTimes.get("Monday").add(event);
                 courseTimes.get("Tuesday").add(event);
                 courseTimes.get("Wednesday").add(event);
@@ -203,27 +203,27 @@ public class CalendarView extends MainActivity {
                     //Now that we have the days each section/discussion/lab takes place, we check
                     //each day of the week, and add the times to our event list for each day
                     if (daySection.contains("M")) {
-                        CourseEvent event = new CourseEvent(timesSection, courseCode);
+                        CourseEvent event = new CourseEvent(timesSection, courseCode, i);
                         courseTimes.get("Monday").add(event);
                     }
                     if (daySection.contains("T")) {
-                        CourseEvent event = new CourseEvent(timesSection, courseCode);
+                        CourseEvent event = new CourseEvent(timesSection, courseCode, i);
                         courseTimes.get("Tuesday").add(event);
                     }
                     if (daySection.contains("W")) {
-                        CourseEvent event = new CourseEvent(timesSection, courseCode);
+                        CourseEvent event = new CourseEvent(timesSection, courseCode, i);
                         courseTimes.get("Wednesday").add(event);
                     }
                     if (daySection.contains("R")) {
-                        CourseEvent event = new CourseEvent(timesSection, courseCode);
+                        CourseEvent event = new CourseEvent(timesSection, courseCode, i);
                         courseTimes.get("Thursday").add(event);
                     }
                     if (daySection.contains("F")) {
-                        CourseEvent event = new CourseEvent(timesSection, courseCode);
+                        CourseEvent event = new CourseEvent(timesSection, courseCode, i);
                         courseTimes.get("Friday").add(event);
                     }
                     if (daySection.contains("S")) {
-                        CourseEvent event = new CourseEvent(timesSection, courseCode);
+                        CourseEvent event = new CourseEvent(timesSection, courseCode, i);
                         courseTimes.get("Saturday").add(event);
                     }
 
@@ -265,7 +265,6 @@ public class CalendarView extends MainActivity {
         {
             courseViews[i] = "";
         }
-        int counter = 0;
         ArrayList<CourseEvent> events = courseTimes.get(day);
         for (int i = 0; i < events.size(); i++)
         {
@@ -289,21 +288,21 @@ public class CalendarView extends MainActivity {
                 if (beginningTime.equals(periodStart) && endTime.equals(periodEnd))
                 {
                     courseViews[j] = courseTimes.get(day).get(i).courseCode;
-                    color[j] = colors[counter++%10];
+                    color[j] = colors[courseTimes.get(day).get(i).position%10];
                 }
                 else if (beginningTime.equals(periodStart) && !endTime.equals(periodEnd)) {
                     isNow = true;
                     courseViews[j] = courseTimes.get(day).get(i).courseCode;
-                    color[j] = colors[counter%10];
+                    color[j] = colors[courseTimes.get(day).get(i).position%10];
                 }
                 else if(isNow && !endTime.equals(periodEnd)) {
                     courseViews[j] = courseTimes.get(day).get(i).courseCode;
-                    color[j] = colors[counter%10];
+                    color[j] = colors[courseTimes.get(day).get(i).position%10];
                 }
                 else if(isNow && endTime.equals(periodEnd)) {
                     isNow = false;
                     courseViews[j] = courseTimes.get(day).get(i).courseCode;
-                    color[j] = colors[counter++%10];
+                    color[j] = colors[courseTimes.get(day).get(i).position%10];
                 }
             }
             if (events.get(i).time.equals("Online"))
