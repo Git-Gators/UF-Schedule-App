@@ -9,11 +9,11 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <TextView
@@ -31,8 +31,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/top"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                >
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/departmentText"
@@ -49,17 +48,46 @@
 
                 <Spinner
                     android:id="@+id/spinnerDepartments"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="40dp"
                     android:layout_marginLeft="40dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginEnd="40dp"
-                    android:layout_marginRight="40dp"
-                    android:background="#FFFFFF"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginRight="30dp"
+                    android:spinnerMode="dialog"
                     app:layout_constraintEnd_toStartOf="@+id/progressBar2"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/departmentText" />
+
+                <TextView
+                    android:id="@+id/courseTextSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="44dp"
+                    android:layout_marginLeft="44dp"
+                    android:layout_marginTop="19dp"
+                    android:text="Course"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/spinnerDepartments" />
+
+                <Spinner
+                    android:id="@+id/spinnerCourse"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginRight="30dp"
+                    android:spinnerMode="dialog"
+                    app:layout_constraintEnd_toStartOf="@+id/progressBar2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/courseTextSpinner" />
 
                 <TextView
                     android:id="@+id/courseNumberText"
@@ -75,12 +103,13 @@
 
                 <EditText
                     android:id="@+id/courseCode"
+                    style="@style/Widget.AppCompat.EditText"
                     android:layout_width="138dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="37dp"
                     android:layout_marginLeft="37dp"
                     android:layout_marginTop="12dp"
-                    android:background="#FFFFFF"
+                    android:background="@drawable/textborder"
                     android:ems="10"
                     android:hint="ex. ACG2021"
                     android:inputType="textPersonName"
@@ -110,7 +139,7 @@
                     android:layout_marginStart="50dp"
                     android:layout_marginLeft="50dp"
                     android:layout_marginTop="12dp"
-                    android:background="#FFFFFF"
+                    android:background="@drawable/textborder"
                     android:ems="10"
                     android:hint="# of Credits"
                     android:inputType="textPersonName"
@@ -139,7 +168,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:layout_marginBottom="20dp"
-                    android:background="#FFFFFF"
+                    android:background="@drawable/textborder"
                     android:ems="10"
                     android:hint="Course Title or Keywords "
                     android:inputType="textPersonName"
@@ -158,24 +187,11 @@
                     android:layout_width="25dp"
                     android:layout_height="50dp"
                     android:layout_marginTop="10dp"
-                    android:layout_marginEnd="44dp"
-                    android:layout_marginRight="44dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginRight="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/spinnerDepartments" />
+                    app:layout_constraintTop_toBottomOf="@+id/courseTextSpinner" />
 
-                <Spinner
-                    android:id="@+id/spinnerCourse"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginLeft="40dp"
-                    android:layout_marginTop="21dp"
-                    android:layout_marginEnd="40dp"
-                    android:layout_marginRight="40dp"
-                    android:background="#FFFFFF"
-                    app:layout_constraintEnd_toStartOf="@+id/progressBar2"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/spinnerDepartments" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
@@ -238,12 +254,14 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/filterButtonLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <ProgressBar
                     android:id="@+id/filterLoad"
@@ -251,6 +269,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
+                    android:layout_marginBottom="32dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -261,8 +281,10 @@
                     android:layout_width="88dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
+                    android:layout_marginBottom="32dp"
                     android:onClick="goToMain"
                     android:text="Filter"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
