@@ -68,11 +68,18 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         getSupportActionBar().setTitle("Filters");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //Set the loading bars to invisible.
+        //Filter Button & Loading inside the linear layout
         ProgressBar filterLoad = findViewById(R.id.filterLoad);
         filterLoad.setVisibility(View.INVISIBLE);
         Button filterButton = findViewById(R.id.button3);
         filterButton.setVisibility(View.VISIBLE);
+
+        //Filter Button & Loading outside the linear layout
+        ProgressBar filterLoadOut = findViewById(R.id.outerFilterLoad);
+        filterLoadOut.setVisibility(View.INVISIBLE);
+        Button filterButtonOut = findViewById(R.id.outerFilter);
+        filterButtonOut.setVisibility(View.INVISIBLE);
+
 
         //Grab info from other activities.
         Intent intent = getIntent();
@@ -128,13 +135,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
     public void filterCourses(String code, String credits, String name){
         System.out.println(code + " " + credits + " "  + name);
-
-        //Hide the filter button and show the load
-        ProgressBar filterLoad = findViewById(R.id.filterLoad);
-        filterLoad.setVisibility(View.VISIBLE);
-        Button filterButton = findViewById(R.id.button3);
-        filterButton.setVisibility(View.INVISIBLE);
-
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
         ValueEventListener postListener = new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -202,11 +202,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                     }
                 }
 
-                ProgressBar filterLoad = findViewById(R.id.filterLoad);
-                filterLoad.setVisibility(View.INVISIBLE);
-                Button filterButton = findViewById(R.id.button3);
-                filterButton.setVisibility(View.VISIBLE);
-
                 startMain();
             }
 
@@ -224,7 +219,15 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                startMain();
+                //If the course was chosen in the spinner
+                if(courseName != null) {
+                    System.out.println("USING SPINNER TEXT");
+                    filterCourses("", "", "");
+                } else {
+                    //The course spinner wasn't chosen
+                    System.out.println("Filtering with code: " + courseCodeText + " credits: " + courseCreditsText + " name: " + courseNameText);
+                    filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
+                }
                 return(true);
         }
 
@@ -280,6 +283,23 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     /** Called when the user taps the FILTER button */
     public void goToMain(View view){
         //If the course was chosen in the spinner
+        if(view.getId() == R.id.outerFilter){
+            //Hide the filter button and show the load
+            Button filterButton = findViewById(R.id.outerFilter);
+            filterButton.setVisibility(View.INVISIBLE);
+            ProgressBar load = findViewById(R.id.outerFilterLoad);
+            load.setVisibility(View.VISIBLE);
+        } else {
+            //Hide the filter button and show the load
+            Button filterButton = findViewById(R.id.button3);
+            filterButton.setVisibility(View.INVISIBLE);
+            ProgressBar load = findViewById(R.id.filterLoad);
+            load.setVisibility(View.VISIBLE);
+        }
+
+
+
+
         if(courseName != null) {
             System.out.println("USING SPINNER TEXT");
             filterCourses("", "", "");
@@ -336,6 +356,22 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                 TextView bar = findViewById(R.id.bottomBar);
                 bar.setText(R.string.meetingOpen);
             }
+        }
+
+        Button filterButton = findViewById(R.id.button3);
+        Button filterButtonOut = findViewById(R.id.outerFilter);
+        if(top.getVisibility() == View.GONE && middle.getVisibility() == View.GONE && bottom.getVisibility() == View.GONE){
+            //Filter Button & Loading inside the linear layout
+            filterButton.setVisibility(View.GONE);
+
+            //Filter Button & Loading outside the linear layout
+            filterButtonOut.setVisibility(View.VISIBLE);
+        } else {
+            //Filter Button & Loading inside the linear layout
+            filterButton.setVisibility(View.VISIBLE);
+
+            //Filter Button & Loading outside the linear layout
+            filterButtonOut.setVisibility(View.GONE);
         }
     }
 }
