@@ -7,6 +7,12 @@
     <string name="course4">Course 4</string>
     <string name="button_send">Send</string>
     <string name="title_activity_filter">Filters</string>
+    <string name="filterBarOpen">-- Filter</string>
+    <string name="filterBarClosed">+ Filter</string>
+    <string name="courseFilterOpen">-- Course Filters</string>
+    <string name="courseFilterClosed">+ Course Filters</string>
+    <string name="meetingOpen">-- Class Meeting</string>
+    <string name="meetingClosed">+ Class Meeting</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>

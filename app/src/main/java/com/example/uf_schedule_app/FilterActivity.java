@@ -309,20 +309,32 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         if(view.getId() == R.id.topBar){
             if(top.getVisibility() == View.VISIBLE){
                 top.setVisibility(View.GONE);
+                TextView bar = findViewById(R.id.topBar);
+                bar.setText(R.string.filterBarClosed);
             } else {
                 top.setVisibility(View.VISIBLE);
+                TextView bar = findViewById(R.id.topBar);
+                bar.setText(R.string.filterBarOpen);
             }
         } else if(view.getId() == R.id.middleBar){
             if(middle.getVisibility() == View.VISIBLE){
                 middle.setVisibility(View.GONE);
+                TextView bar = findViewById(R.id.middleBar);
+                bar.setText(R.string.courseFilterClosed);
             } else {
                 middle.setVisibility(View.VISIBLE);
+                TextView bar = findViewById(R.id.middleBar);
+                bar.setText(R.string.courseFilterOpen);
             }
         } else if(view.getId() == R.id.bottomBar){
             if(bottom.getVisibility() == View.VISIBLE){
                 bottom.setVisibility(View.GONE);
+                TextView bar = findViewById(R.id.bottomBar);
+                bar.setText(R.string.meetingClosed);
             } else {
                 bottom.setVisibility(View.VISIBLE);
+                TextView bar = findViewById(R.id.bottomBar);
+                bar.setText(R.string.meetingOpen);
             }
         }
     }

@@ -24,7 +24,7 @@
                 android:gravity="left"
                 android:onClick="nextFilter"
                 android:paddingLeft="30px"
-                android:text="Filters"
+                android:text="@string/filterBarOpen"
                 android:textColor="#FFFFFF"
                 app:autoSizeTextType="uniform" />
 
@@ -125,10 +125,11 @@
                     android:id="@+id/courseTitleText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="42dp"
+                    android:layout_marginLeft="42dp"
                     android:layout_marginTop="14dp"
                     android:text="Course Title"
                     android:textSize="18sp"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/courseCredits" />
 
@@ -185,7 +186,7 @@
                 android:gravity="left"
                 android:onClick="nextFilter"
                 android:paddingLeft="30px"
-                android:text="Course Filters"
+                android:text="@string/courseFilterClosed"
                 android:textColor="#FFFFFF"
                 app:autoSizeTextType="uniform" />
 
@@ -216,7 +217,7 @@
                 android:gravity="left"
                 android:onClick="nextFilter"
                 android:paddingLeft="30px"
-                android:text="Class Meeting"
+                android:text="@string/meetingClosed"
                 android:textColor="#FFFFFF"
                 app:autoSizeTextType="uniform" />
 
