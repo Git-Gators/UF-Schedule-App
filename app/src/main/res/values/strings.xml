@@ -7,8 +7,8 @@
     <string name="course4">Course 4</string>
     <string name="button_send">Send</string>
     <string name="title_activity_filter">Filters</string>
-    <string name="filterBarOpen">-- Filter</string>
-    <string name="filterBarClosed">+ Filter</string>
+    <string name="filterBarOpen">-- Filters</string>
+    <string name="filterBarClosed">+ Filters</string>
     <string name="courseFilterOpen">-- Course Filters</string>
     <string name="courseFilterClosed">+ Course Filters</string>
     <string name="meetingOpen">-- Class Meeting</string>
@@ -21,6 +21,48 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string-array name="level_minimum">
+        <item>--  </item>
+        <item>1000</item>
+        <item>2000</item>
+        <item>3000</item>
+        <item>4000</item>
+        <item>5000</item>
+        <item>6000</item>
+        <item>7000</item>
+        <item>8000</item>
+    </string-array>
+
+    <string-array name="level_maximum">
+        <item>--  </item>
+        <item>1999</item>
+        <item>2999</item>
+        <item>3999</item>
+        <item>4999</item>
+        <item>5999</item>
+        <item>6999</item>
+        <item>7999</item>
+        <item>8999</item>
+    </string-array>
+
+    <string-array name="periods">
+        <item>--  </item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>E1</item>
+        <item>E2</item>
+        <item>E3</item>
+    </string-array>
 
     <string-array name="programming_languages">
         <item>C++</item>

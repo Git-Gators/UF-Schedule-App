@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -131,6 +132,27 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         courseCodeText = (EditText) findViewById(R.id.courseCode);
         courseCreditsText = (EditText) findViewById(R.id.courseCredits);
         courseNameText = (EditText) findViewById(R.id.courseTitle);
+
+
+        Spinner minSpinner = findViewById(R.id.levelMinSpinner);
+        ArrayAdapter<CharSequence> minSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.level_minimum, android.R.layout.simple_spinner_item);
+        minSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        minSpinner.setAdapter(minSpinnerAdapter);
+
+        Spinner maxSpinner = findViewById(R.id.levelMaxSpinner);
+        ArrayAdapter<CharSequence> maxSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.level_maximum, android.R.layout.simple_spinner_item);
+        maxSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        maxSpinner.setAdapter(maxSpinnerAdapter);
+
+        Spinner periodStart = findViewById(R.id.periodStartSpinner);
+        ArrayAdapter<CharSequence> periodStartAdapter = ArrayAdapter.createFromResource(this, R.array.level_maximum, android.R.layout.simple_spinner_item);
+        maxSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        periodStart.setAdapter(periodStartAdapter);
+
+        Spinner periodEnd = findViewById(R.id.periodEndSpinner);
+        ArrayAdapter<CharSequence> periodEndAdapter = ArrayAdapter.createFromResource(this, R.array.level_maximum, android.R.layout.simple_spinner_item);
+        periodEndAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        periodEnd.setAdapter(periodEndAdapter);
     }
 
     public void filterCourses(String code, String credits, String name){
@@ -360,18 +382,28 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
         Button filterButton = findViewById(R.id.button3);
         Button filterButtonOut = findViewById(R.id.outerFilter);
-        if(top.getVisibility() == View.GONE && middle.getVisibility() == View.GONE && bottom.getVisibility() == View.GONE){
-            //Filter Button & Loading inside the linear layout
+        if(top.getVisibility() == View.GONE && bottom.getVisibility() == View.GONE){
             filterButton.setVisibility(View.GONE);
-
-            //Filter Button & Loading outside the linear layout
             filterButtonOut.setVisibility(View.VISIBLE);
         } else {
-            //Filter Button & Loading inside the linear layout
             filterButton.setVisibility(View.VISIBLE);
-
-            //Filter Button & Loading outside the linear layout
             filterButtonOut.setVisibility(View.GONE);
         }
     }
+
+
+    public void onCheckboxClicked(View view) {
+        // Is the view now checked?
+        boolean checked = ((CheckBox) view).isChecked();
+
+        // Check which checkbox was clicked
+        switch(view.getId()) {
+            case R.id.mondayCheckBox:
+                if (checked){
+
+                }
+                break;
+        }
+    }
+
 }
