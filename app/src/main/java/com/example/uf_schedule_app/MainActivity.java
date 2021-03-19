@@ -218,12 +218,15 @@ public class MainActivity extends AppCompatActivity {
                 //Change data in database to reflect deleted course.
                 user.put("Courses", coursesPicked);
                 //Store the user's information (name, email, and list of course names for now) in the database
-                documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Course Successfully deleted" + userId);
-                    }
-                });
+
+                if(documentReference != null){
+                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "Course Successfully deleted" + userId);
+                        }
+                    });
+                }
             }
         });
 

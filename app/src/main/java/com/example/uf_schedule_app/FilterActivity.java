@@ -145,12 +145,12 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         maxSpinner.setAdapter(maxSpinnerAdapter);
 
         Spinner periodStart = findViewById(R.id.periodStartSpinner);
-        ArrayAdapter<CharSequence> periodStartAdapter = ArrayAdapter.createFromResource(this, R.array.level_maximum, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> periodStartAdapter = ArrayAdapter.createFromResource(this, R.array.periods_filter, android.R.layout.simple_spinner_item);
         maxSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         periodStart.setAdapter(periodStartAdapter);
 
         Spinner periodEnd = findViewById(R.id.periodEndSpinner);
-        ArrayAdapter<CharSequence> periodEndAdapter = ArrayAdapter.createFromResource(this, R.array.level_maximum, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> periodEndAdapter = ArrayAdapter.createFromResource(this, R.array.periods_filter, android.R.layout.simple_spinner_item);
         periodEndAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         periodEnd.setAdapter(periodEndAdapter);
     }
