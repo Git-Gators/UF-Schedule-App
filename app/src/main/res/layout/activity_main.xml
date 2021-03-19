@@ -4,26 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="50px"
-    android:paddingRight="50px"
     tools:context=".MainActivity">
-
-    <TextView
-        android:id="@+id/getStarted"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="180dp"
-        android:gravity="center"
-        android:shadowColor="#272727"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        android:shadowRadius="1"
-        android:text="Get Started"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/filter_button"
@@ -50,20 +31,20 @@
 
     <TextView
         android:id="@+id/courseText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:gravity="center_horizontal"
-        android:text='Courses Chosen:'
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/chosenCourses"
-        app:layout_constraintEnd_toStartOf="@+id/logout"
-        app:layout_constraintStart_toEndOf="@+id/filter_button" />
+        android:layout_width="165dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="128dp"
+        android:layout_marginLeft="128dp"
+        android:layout_marginTop="60dp"
+        android:gravity="center"
+        android:text="Courses Chosen:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ListView
         android:id="@+id/courseList"
-        android:layout_width="405dp"
-        android:layout_height="225dp"
+        android:layout_width="420dp"
+        android:layout_height="285dp"
         android:layout_marginStart="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginEnd="6dp"
@@ -71,39 +52,33 @@
         android:layout_marginBottom="5dp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-    </ListView>
+        app:layout_constraintStart_toStartOf="parent"
+        />
 
     <ListView
         android:id="@+id/chosenCourses"
-        android:layout_width="403dp"
-        android:layout_height="180dp"
+        android:layout_width="409dp"
+        android:layout_height="176dp"
         android:layout_marginStart="4dp"
         android:layout_marginLeft="4dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="11dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:gravity="center_horizontal"
+        android:layout_marginBottom="34dp"
+        app:layout_constraintBottom_toTopOf="@+id/courseList"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logout">
-
-    </ListView>
+        app:layout_constraintTop_toBottomOf="@+id/courseText" />
 
     <TextView
-        android:id="@+id/addACourse"
+        android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="245dp"
-        android:text="Tap to Add a Course"
-        android:gravity="center_horizontal"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        android:text="Add a Course"
+        app:layout_constraintBottom_toTopOf="@+id/courseList"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chosenCourses" />
 
     <Button
         android:id="@+id/login"
@@ -114,6 +89,7 @@
         android:layout_marginRight="21dp"
         android:onClick="createPopup"
         android:text="Log In"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -129,31 +105,33 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/instrText"
-        android:layout_width="wrap_content"
+        android:id="@+id/verifyEmailMsg"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:gravity="center_horizontal"
-        android:text='To view courses within a particular field of study, select from the filter menu and press "Search".'
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:visibility="invisible"
+        android:text="Email Address is Unverified"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/getStarted" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/instrText2"
+    <Button
+        android:id="@+id/verifyEmailBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="center_horizontal"
-        android:text='Courses can be filtered based upon any of the available criteria.'
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.921"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/instrText" />
+        android:layout_marginTop="24dp"
+        android:text="Verify Email"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/logout"
+        app:layout_constraintStart_toEndOf="@+id/filter_button"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
