@@ -5,33 +5,30 @@ import androidx.annotation.RequiresApi;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.PopupWindow;
 import android.app.AlertDialog;
 
 import android.content.Intent;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 
 public class ViewSchedule extends MainActivity {
-    ArrayList<String> coursesPicked = new ArrayList<>();
-    ArrayList<Course> courses = new ArrayList<>();
+    // Courses retrieved from the DB for the user to choose
+    ArrayList<Course> crses = new ArrayList<>();
+
+    //Courses the user has already chosen
+    ArrayList<Course> coursesPicked = new ArrayList<>();
 
     ProgressBar load;
 
@@ -63,35 +60,68 @@ public class ViewSchedule extends MainActivity {
 
 
         //If we're coming from the main, we grab the info
+        Intent intent = getIntent();
         Bundle b = getIntent().getExtras();
         if(b != null){
-            if(b.getStringArrayList("coursesPicked") != null){
-                coursesPicked = b.getStringArrayList("coursesPicked");
+            if(b.getSerializable("coursesPicked") != null){
+                coursesPicked = (ArrayList<Course>) intent.getSerializableExtra("coursesPicked");
 
-                System.out.println(coursesPicked.toString());
-
-                //Gets the courses added after a short delay.
-                load.setVisibility(View.VISIBLE);
-                for(int i = 0; i < coursesPicked.size(); i++)
-                    getCourse(coursesPicked.get(i));
-                if (coursesPicked.size() == 0) {
-                    load.setVisibility(View.INVISIBLE);
+                //Edit all the courseTexts
+                for(int i = 0; i < coursesPicked.size(); i++){
                     TextView text = null;
-                    text = findViewById(R.id.courseText5);
-                    text.setText("No courses selected.");
+                    Button delete = null;
+                    Button info = null;
+
+                    if(i == 0){
+                        text = findViewById(R.id.courseText1);
+                        delete = findViewById(R.id.delete1);
+                        info = findViewById(R.id.details1);
+                    } else if(i == 1){
+                        text = findViewById(R.id.courseText2);
+                        delete = findViewById(R.id.delete2);
+                        info = findViewById(R.id.details2);
+                    } else if(i == 2){
+                        text = findViewById(R.id.courseText3);
+                        delete = findViewById(R.id.delete3);
+                        info = findViewById(R.id.details3);
+                    } else if(i == 3){
+                        text = findViewById(R.id.courseText4);
+                        delete = findViewById(R.id.delete4);
+                        info = findViewById(R.id.details4);
+                    } else if(i == 4) {
+                        text = findViewById(R.id.courseText5);
+                        delete = findViewById(R.id.delete5);
+                        info = findViewById(R.id.details5);
+                    }
+
+                    if (text == null && i == 0) {
+                        text = findViewById(R.id.courseText6);
+                        text.setText("No courses selected.");
+                    }
+                    else if(text != null) {
+                        text.setVisibility(View.VISIBLE);
+                        text.setText(coursesPicked.get(i).toString());
+                    }
+                    //If index exists, enable delete button
+                    Button deleteAll = findViewById(R.id.delete);
+                    deleteAll.setVisibility(View.VISIBLE);
+                    delete.setVisibility(View.VISIBLE);
+                    info.setVisibility(View.VISIBLE);
                 }
-            }
-            else {
+            } else {
                 load.setVisibility(View.VISIBLE);
                 TextView text = null;
-                text = findViewById(R.id.courseText5);
+                text = findViewById(R.id.courseText6);
                 text.setText("No courses selected.");
+            }
+            if(b.getSerializable("crses") != null) {
+                crses = (ArrayList<Course>) intent.getSerializableExtra("crses");
             }
         }
         else {
             load.setVisibility(View.VISIBLE);
             TextView text = null;
-            text = findViewById(R.id.courseText5);
+            text = findViewById(R.id.courseText6);
             text.setText("No courses selected.");
         }
 
@@ -106,22 +136,35 @@ public class ViewSchedule extends MainActivity {
     public void goToCourseFinder(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         Bundle b = new Bundle();
-        b.putStringArrayList("coursesPicked", coursesPicked);
+        intent.putExtra("coursesPicked", coursesPicked);
+        intent.putExtra("crses", crses);
         intent.putExtras(b);
         startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         finish();
     }
     //Delete all courses
     public void goToDelete(View view) {
         coursesPicked.clear();
 
+        user.put("Courses", coursesPicked);
+
+        //Push the map named user to the database
+        if (firebaseUser != null)
+        {
+            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "Course Successfully Added" + userId);
+                }
+            });
+        }
+
         Intent intent = new Intent(this, ViewSchedule.class);
         Bundle b = new Bundle();
-        b.putStringArrayList("coursesPicked", coursesPicked);
+        intent.putExtra("coursesPicked", coursesPicked);
+        intent.putExtra("crses", crses);
         intent.putExtras(b);
         startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         finish();
     }
 
@@ -133,83 +176,30 @@ public class ViewSchedule extends MainActivity {
         //Call tag of delete button and use that as index
         String index = view.getTag().toString();
         if (coursesPicked.size() > Integer.parseInt(index)) {
-
             coursesPicked.remove(Integer.parseInt(index));
+        }
+        user.put("Courses", coursesPicked);
+
+        //Push the map named user to the database
+        if (firebaseUser != null)
+        {
+            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "Course Successfully Added" + userId);
+                }
+            });
         }
 
         Intent intent = new Intent(this, ViewSchedule.class);
         Bundle b = new Bundle();
-        b.putStringArrayList("coursesPicked", coursesPicked);
+        intent.putExtra("coursesPicked", coursesPicked);
+        intent.putExtra("crses", crses);
         intent.putExtras(b);
         startActivity(intent);
         finish();
     }
 
-    public void getCourse(String course){
-        //Get the course objects from that
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        ValueEventListener postListener = new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean found = false;
-                for (DataSnapshot dep : dataSnapshot.getChildren()) {
-                    for (DataSnapshot ds : dep.getChildren()) {
-                        if(Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name"), course)){
-                            courses.add(ds.getValue(Course.class));
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(found)
-                        break;
-                }
-                System.out.println(courses.get(courses.size()-1).courseInfo.get("name"));
-                System.out.println(courses.size() + " " + coursesPicked.size());
-
-                //We have all the courses
-                if(courses.size() == coursesPicked.size()){
-                    load.setVisibility(View.INVISIBLE);
-
-                    //Edit all the courseTexts
-                    for(int i = 0; i < courses.size(); i++){
-                        TextView text = null;
-                        Button button = null;
-
-                        if(i == 0){
-                            text = findViewById(R.id.courseText1);
-                            button = findViewById(R.id.delete1);
-                        } else if(i == 1){
-                            text = findViewById(R.id.courseText2);
-                            button = findViewById(R.id.delete2);
-                        } else if(i == 2){
-                            text = findViewById(R.id.courseText3);
-                            button = findViewById(R.id.delete6);
-                        } else if(i == 3){
-                            text = findViewById(R.id.courseText4);
-                            button = findViewById(R.id.delete7);
-                        }
-                        if (text == null && i == 0) {
-                            text = findViewById(R.id.courseText5);
-                            text.setText("No courses selected.");
-                        }
-                        else if(text != null) {
-                            text.setVisibility(View.VISIBLE);
-                            text.setText(courses.get(i).courseInfo.get("name"));
-                        }
-                        //If index exists, enable delete button
-                        Button deleteAll = findViewById(R.id.delete);
-                        deleteAll.setVisibility(View.VISIBLE);
-                        button.setVisibility(View.VISIBLE);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) { }
-        };
-        mDatabase.addValueEventListener(postListener);
-    }
 
     public void createPopup(View view) {
         //Define elements within popup
@@ -240,13 +230,13 @@ public class ViewSchedule extends MainActivity {
         //Call tag of delete button and use that as index
         String index_num = view.getTag().toString();
         int index = Integer.parseInt(index_num);
-        courseInfopopup_nameBox.setText(courses.get(index).courseInfo.get("name"));
-        courseInfopopup_courseDescriptionBox.setText(courses.get(index).courseInfo.get("description"));
-        courseInfopopup_courseID.setText(courses.get(index).courseInfo.get("courseId"));
-        courseInfopopup_courseCode_box.setText(courses.get(index).courseInfo.get("code"));
-        courseInfopopup_Instructor_box.setText(Objects.requireNonNull(courses.get(index).classSections.get(0).get("Instructors")).replace("[", "").replace("]",""));
-        courseInfopopup_section_number_box.setText(courses.get(index).classSections.get(0).get("classNumber"));
-        courseInfopopup_num_credits_box.setText(courses.get(index).classSections.get(0).get("credits"));
+        courseInfopopup_nameBox.setText(coursesPicked.get(index).courseInfo.get("name"));
+        courseInfopopup_courseDescriptionBox.setText(coursesPicked.get(index).courseInfo.get("description"));
+        courseInfopopup_courseID.setText(coursesPicked.get(index).courseInfo.get("courseId"));
+        courseInfopopup_courseCode_box.setText(coursesPicked.get(index).courseInfo.get("code"));
+        courseInfopopup_Instructor_box.setText(Objects.requireNonNull(coursesPicked.get(index).classSection.get("Instructors")).replace("[", "").replace("]",""));
+        courseInfopopup_section_number_box.setText(coursesPicked.get(index).classSection.get("classNumber"));
+        courseInfopopup_num_credits_box.setText(coursesPicked.get(index).classSection.get("credits"));
         
 
 
@@ -271,24 +261,39 @@ public class ViewSchedule extends MainActivity {
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     int id = 0;
                     Intent in;
+                    Bundle b = new Bundle();
                     switch(item.getItemId()){
                         case R.id.nav_home:
                             in = new Intent(getBaseContext(), MainActivity.class);
-                            Bundle b = new Bundle();
-                            b.putStringArrayList("coursesPicked", coursesPicked);
+                            in.putExtra("coursesPicked", coursesPicked);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                             finish();
                             break;
                         case R.id.nav_schedule:
+                            id = R.id.nav_schedule;
                             break;
                         case R.id.nav_calendar:
                             id = R.id.nav_calendar;
+                            in = new Intent(getBaseContext(), CalendarView.class);
+                            in.putExtra("coursesPicked", coursesPicked);
+                            in.putExtras(b);
+                            startActivity(in);
+                            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                            finish();
                             break;
                     }
                     System.out.println(id);
                     return true;
                 }
             };
+
+    private ArrayList<String> getNames(ArrayList<Course> courses){
+        ArrayList<String> coursesSTR = new ArrayList<>();
+        for(int i = 0; i < courses.size(); i++)
+            coursesSTR.add(courses.get(i).toString());
+
+        return coursesSTR;
+    }
 }

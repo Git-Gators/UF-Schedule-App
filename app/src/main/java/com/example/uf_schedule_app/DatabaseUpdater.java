@@ -19,7 +19,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,15 +26,14 @@ import android.os.UserHandle;
 import android.text.InputType;
 import android.view.Display;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -47,10 +45,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -61,11 +57,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
 
@@ -73,11 +66,7 @@ public class DatabaseUpdater extends Context {
     public ArrayList<Course> retrCourses = new ArrayList<>();
     private final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
-    public void getDatabase(Context baseContext) {
-        updateDB(baseContext);
-    }
-
-    private void updateDatabase(String url, Context baseContext) {
+    private void updateDatabase(String url) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -87,19 +76,26 @@ public class DatabaseUpdater extends Context {
                 {
                     @Override
                     public void onResponse(JSONArray response) {
-                        // display response
-
                         try {
                             for(int c = 0; c < response.getJSONObject(0).getJSONArray("COURSES").length(); c++){
                                 Course courseObj = new Course();
-                                String name = response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c).get("name").toString();
+
                                 JSONObject courseDir = response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c);
 
                                 courseObj.courseInfo.put("code", (String) courseDir.get("code"));
+                                //String code = (String) courseDir.get("code");
+
                                 courseObj.courseInfo.put("courseId", (String) courseDir.get("courseId"));
+                                //String courseID = (String) courseDir.get("courseId");
+
+
+                                String name = response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c).get("name").toString();
                                 courseObj.courseInfo.put("name", name);
+
                                 courseObj.courseInfo.put("termInd", courseDir.get("termInd").toString());
+
                                 courseObj.courseInfo.put("description", courseDir.get("description").toString());
+                                //String description = courseDir.get("description").toString();
 
                                 String prereq = courseDir.get("prerequisites").toString();
                                 prereq = prereq.replace("Prereq: ", "");
@@ -116,7 +112,8 @@ public class DatabaseUpdater extends Context {
                                     sectionMap.put("classNumber", section.get("classNumber").toString());
                                     sectionMap.put("credits", section.get("credits").toString());
 
-                                    sectionMap.put("deptName", section.get("deptName").toString().replace("/", "&"));
+                                    String deptName = section.get("deptName").toString().replace("/", "&");
+                                    sectionMap.put("deptName", deptName);
 
                                     //Get Instructor for the section
                                     JSONArray instructors = sections.getJSONObject(j).getJSONArray("instructors");
@@ -144,9 +141,11 @@ public class DatabaseUpdater extends Context {
                                     sectionMap.put("meetDays", meetDays.toString());
                                     sectionMap.put("meetPeriod", meetPeriod.toString());
                                     sectionMap.put("meetTime", meetTime.toString());
-                                    courseObj.classSections.add(sectionMap);
+
+                                    courseObj.classSection = sectionMap;
+                                    mDatabase.child(deptName).child(section.get("classNumber").toString()).setValue(courseObj);
+                                    System.out.println("C: "+ c + " " + deptName + " url: " + url);
                                 }
-                                mDatabase.child(courseObj.classSections.get(0).get("deptName")).child(courseObj.courseInfo.get("code")).setValue(courseObj);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -157,63 +156,84 @@ public class DatabaseUpdater extends Context {
                 {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        System.out.println("Error.Response" + error.toString());
+                        System.out.println("Error.Response: " + error.toString());
                     }
                 }
         );
 
         // Access the RequestQueue through your singleton class.
+        getRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(getRequest);
     }
 
-    private void updateDB(Context baseContext){
-        String url = "https://one.ufl.edu/apix/soc/schedule/?category=RES&term=2211";
-        updateDatabase(url, baseContext);
+    public void updateDB(Context context) throws IOException {
+        ArrayList<String> depCodes = new ArrayList<>();
+
+        String string = "";
+        InputStream is = context.getAssets().open("departments.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        while (true) {
+            try {
+                if ((string = reader.readLine()) == null) break;
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            depCodes.add(string);
+        }
+        is.close();
+
+        System.out.println("depCodes: " + depCodes);
+
         try {
-            int contNum = 0;
-            while(contNum < 4440){
-                contNum += 50;
-                updateDatabase(url + "&last-control-number=" + contNum, baseContext);
+            int i = 0;
+            while(i < depCodes.size()){
+                String url = "https://one.ufl.edu/apix/soc/schedule/?category=CWSP&term=2211&dept=" + depCodes.get(i).replace("\"", "");
+                System.out.println("CALLING " + url);
+                updateDatabase(url);
+                i++;
             }
         } catch (Exception E){
             System.out.println("Exception caught when updating DB: " + E.toString());
         }
     }
 
-    public void getDepNames(ArrayList<String> deptNames, ProgressBar spinner, Spinner spinnerDept, Spinner spinnerCrse){
+    public void getDepNames(ArrayList<String> deptNames, ProgressBar spinner, Spinner spinnerDept, Spinner spinnerCrse, Context context) throws IOException {
         spinner.setVisibility(View.VISIBLE);
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                deptNames.clear();
-                deptNames.add("Choose a Department");
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    String name = ds.getKey();
-                    deptNames.add(name);
-                }
-                spinner.setVisibility(View.INVISIBLE);
-                spinnerDept.setEnabled(true);
-                spinnerCrse.setEnabled(true);
-            }
+        deptNames.clear();
+        deptNames.add("Choose a Department");
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+        String string = "";
+        InputStream is = context.getAssets().open("depNames.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        while (true) {
+            try {
+                if ((string = reader.readLine()) == null) break;
             }
-        };
-        mDatabase.addValueEventListener(postListener);
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            deptNames.add(string);
+        }
+        is.close();
+
+        spinner.setVisibility(View.INVISIBLE);
+        spinnerDept.setEnabled(true);
+        spinnerCrse.setEnabled(true);
     }
 
-    public void getCourseNames(String deptName, ArrayList<String> coursesNames, ProgressBar spinner, ArrayList<String> courses, Spinner spinnerCrse){
+    public void getCourseNames(String deptName, ArrayList<String> coursesNames, ProgressBar spinner, Spinner spinnerCrse, ArrayList<Course> crses){
         spinner.setVisibility(View.VISIBLE);
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(deptName);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    coursesNames.add(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString());
-                    courses.add(Objects.requireNonNull(ds.child("courseInfo").child("name").getValue()).toString());
+                    coursesNames.add(Objects.requireNonNull(ds.getValue(Course.class).toString()));
+                    crses.add(ds.getValue(Course.class));
                 }
                 spinner.setVisibility(View.INVISIBLE);
                 spinnerCrse.setEnabled(true);
@@ -248,12 +268,12 @@ public class DatabaseUpdater extends Context {
                         course2.setInputType(InputType.TYPE_NULL);
 
                         //Instructors
-                        text = "Instructors: " + course.classSections.get(0).get("Instructors").replace("[", "").replace("]", "");
+                        text = "Instructors: " + course.classSection.get("Instructors").replace("[", "").replace("]", "");
                         course3.setText(text);
                         course3.setInputType(InputType.TYPE_NULL);
 
                         //Class Number
-                        text = "Class Number: " + course.classSections.get(0).get("number");
+                        text = "Class Number: " + course.classSection.get("number");
                         course4.setText(text);
                         course4.setInputType(InputType.TYPE_NULL);
                     }
@@ -676,22 +696,22 @@ public class DatabaseUpdater extends Context {
 
     @Override
     public int checkPermission(@NonNull String permission, int pid, int uid) {
-        return 0;
+        return PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
     public int checkCallingPermission(@NonNull String permission) {
-        return 0;
+        return PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
     public int checkCallingOrSelfPermission(@NonNull String permission) {
-        return 0;
+        return PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
     public int checkSelfPermission(@NonNull String permission) {
-        return 0;
+        return PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -726,22 +746,22 @@ public class DatabaseUpdater extends Context {
 
     @Override
     public int checkUriPermission(Uri uri, int pid, int uid, int modeFlags) {
-        return 0;
+        return PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
     public int checkCallingUriPermission(Uri uri, int modeFlags) {
-        return 0;
+        return PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
     public int checkCallingOrSelfUriPermission(Uri uri, int modeFlags) {
-        return 0;
+        return PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
     public int checkUriPermission(@Nullable Uri uri, @Nullable String readPermission, @Nullable String writePermission, int pid, int uid, int modeFlags) {
-        return 0;
+        return PackageManager.PERMISSION_GRANTED;
     }
 
     @Override

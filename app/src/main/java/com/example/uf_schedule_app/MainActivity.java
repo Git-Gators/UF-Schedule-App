@@ -4,28 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.text.InputType;
-import android.text.Layout;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Filter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.Button;
-import android.app.AlertDialog;
 
 import android.content.Intent;
 import android.widget.TextView;
@@ -36,36 +25,144 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.json.JSONException;
-
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "Tag:";
     //Create a dbUpdater object
     DatabaseUpdater dbUpdater = new DatabaseUpdater();
     ListView courseList;
     ListView chosenCourses;
-    ArrayList<String> courses = new ArrayList<>();
-    ArrayList<String> coursesPicked = new ArrayList<>();
+
     String department;
+    String userId;
+    static FirebaseUser firebaseUser;
+    static DocumentReference documentReference;
+    static Map<String, Object> user = new HashMap<>();
+
+    // Courses retrieved from the DB for the user to choose
+    ArrayList<Course> crses = new ArrayList<>();
+
+    //Courses the user has already chosen
+    ArrayList<Course> coursesPicked = new ArrayList<>();
+
 
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
-    private TextView loginPopup_title, verifyMsg;
-    private Button loginPopup_SignIn, loginPopup_create_account, loginBtnHomePage, logoutBtnHomePage, verifyEmailBtn, loginPopupForgotPasswordBtn;
+    private TextView loginPopup_title;
+    private Button loginPopup_SignIn, loginPopup_create_account, loginBtnHomePage, logoutBtnHomePage;
     private EditText loginPopup_email, loginPopup_password;
-    AlertDialog.Builder reset_alert;
-    LayoutInflater loutInflater;
 
 
 
     FirebaseAuth fAuth;
+    FirebaseFirestore userdb = FirebaseFirestore.getInstance();
+
+
+    public void addCourseToDatabase(ArrayList<Course> course) {
+        user.put("Courses", coursesPicked);
+
+        //Push the map named user to the database
+        if (firebaseUser != null)
+        {
+            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "Course Successfully Added" + userId);
+                }
+            });
+        }
+    }
+
+    //Loads data from database to a hashmap named user
+    public void loadData()
+    {
+        //Find the current user
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        //TODO fix loading
+        if (firebaseUser != null)
+        {
+            //Get the userId and find their data in Firestore
+            this.userId = firebaseUser.getUid();
+            documentReference = userdb.collection("users").document(userId);
+            documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if (documentSnapshot.exists())
+                    {
+                        //If the document snapshot exists, load the data into the user map
+                        user = documentSnapshot.getData();
+                        if (documentSnapshot.get("Courses") != null)
+                        {
+                            System.out.println(documentSnapshot.get("Courses"));
+                            //This has to be like the single worst piece of code that I have ever written
+
+                            //For some reason the courses load as a Hashmap of a Hashmap of strings as opposed to course objects.
+                            //So to fix this we need to load the Hashmap of a Hashmap of strings into a Map, which I called wierd map because nothing here makes sense
+                            ArrayList<HashMap<String, HashMap<String, String>>> wierdMap = (ArrayList<HashMap<String, HashMap<String, String>>>) documentSnapshot.get("Courses");
+
+                            //This part is just to make sure we have enough space in the arraylist to store data on our courses
+                            int courseObjectsSize = coursesPicked.size();
+                            if (courseObjectsSize < wierdMap.size())
+                            {
+                                for (int i = 0; i < wierdMap.size() - courseObjectsSize; i++)
+                                {
+                                    Course course = new Course();
+                                    coursesPicked.add(course);
+                                }
+                            }
+
+                            //So since wierdmap has a hashmap containing two hashmaps, courseInfo and classSection,
+                            //we copy our data from wierdmap into courseObjects for each course.
+                            for (int i = 0; i < wierdMap.size(); i++)
+                            {
+                                coursesPicked.get(i).courseInfo = wierdMap.get(i).get("courseInfo");
+                                coursesPicked.get(i).classSection = wierdMap.get(i).get("classSection");
+                            }
+
+                        }
+                        user.put("Courses", coursesPicked);
+                        //If there's course data in the database try to load it
+                        if (user.get("Courses") != null)
+                        {
+                            //Typecasting the object from the course to a database should be fine
+                            //assuming we store it correctly in the first place
+
+                            for (int i = 0; i < coursesPicked.size(); i++)
+                            {
+                                Course course = (Course) coursesPicked.get(i);
+                                coursesPicked.set(i, course);
+                            }
+                            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
+                            chosenCourses.setAdapter(arrayAdapter);
+                        }
+                    }else
+                    {
+                        //Otherwise print an error message
+                        Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
+                    }
+                    displayHelp();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    displayHelp();
+                    Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, e.toString());
+                }
+            });
+
+        }
+    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -73,6 +170,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        try {
+//            dbUpdater.updateDB(getBaseContext());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
@@ -86,93 +189,65 @@ public class MainActivity extends AppCompatActivity {
 
 
         //If we're coming from the filter, we grab the info
+        Intent intent = getIntent();
         Bundle b = getIntent().getExtras();
-        if (b != null) {
-            if (b.getStringArrayList("coursesPicked") != null) {
-                coursesPicked = b.getStringArrayList("coursesPicked");
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, coursesPicked);
+        if(b != null){
+            if(b.getSerializable("coursesPicked") != null) {
+                coursesPicked = (ArrayList<Course>) intent.getSerializableExtra("coursesPicked");
+
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
                 chosenCourses.setAdapter(arrayAdapter);
             }
-            if (b.getStringArrayList("courses") != null) {
-                courses.remove("");
-                courses = b.getStringArrayList("courses");
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
+            if(b.getSerializable("crses") != null) {
+                crses = (ArrayList<Course>) intent.getSerializableExtra("crses");
+
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getNames(crses));
                 courseList.setAdapter(arrayAdapter);
             }
-            if (b.getString("course") != null) {
-                if (!b.getString("course").equals("")) {
-                    courses.add(b.getString("course"));
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
-                    courseList.setAdapter(arrayAdapter);
-                }
-            }
-            if (b.getString("semester") != null) {
-                //
-            }
-            if (b.getString("department") != null) {
-                department = b.getString("department");
-            }
+            displayHelp();
         }
 
         chosenCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 coursesPicked.remove(position);
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
                 chosenCourses.setAdapter(arrayAdapter);
+                displayHelp();
+
+                //Change data in database to reflect deleted course.
+                user.put("Courses", coursesPicked);
+                //Store the user's information (name, email, and list of course names for now) in the database
+                documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Course Successfully deleted" + userId);
+                    }
+                });
             }
         });
 
         courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (coursesPicked.size() < 4) {
-                    coursesPicked.add(courses.get(position));
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, coursesPicked);
+                if(coursesPicked.size() < 5){
+                    coursesPicked.add(crses.get(position));
+                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
                     chosenCourses.setAdapter(arrayAdapter);
+                    //Add the course to the database
+                    addCourseToDatabase(coursesPicked);
+                    displayHelp();
                 }
             }
         });
-
-        verifyMsg = findViewById(R.id.verifyEmailMsg);
-        verifyEmailBtn = findViewById(R.id.verifyEmailBtn);
-        fAuth = FirebaseAuth.getInstance();
-        reset_alert = new AlertDialog.Builder(this);
-        loutInflater = this.getLayoutInflater();
-
-        if(FirebaseAuth.getInstance().getCurrentUser() != null) {
-
-            if (!fAuth.getCurrentUser().isEmailVerified()) {
-                verifyMsg.setVisibility(View.VISIBLE);
-                verifyEmailBtn.setVisibility(View.VISIBLE);
-
-            }
-
-            verifyEmailBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //send verification email
-                    fAuth.getCurrentUser().sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(MainActivity.this, "Verification Email Sent", Toast.LENGTH_SHORT).show();
-                            verifyMsg.setVisibility(View.GONE);
-                            verifyEmailBtn.setVisibility(View.GONE);
-                        }
-                    });
-                }
-            });
-        }
     }
-
-
-
 
         /** Called when the user taps the Filter button */
         public void goToFilter (View view){
             Intent intent = new Intent(this, FilterActivity.class);
             Bundle b = new Bundle();
-            b.putStringArrayList("coursesPicked", coursesPicked);
+            intent.putExtra("coursesPicked", coursesPicked);
+            intent.putExtra("crses", crses);
             intent.putExtras(b);
             startActivity(intent);
             finish();
@@ -188,8 +263,6 @@ public class MainActivity extends AppCompatActivity {
             loginPopup_password = (EditText) LoginPopupView.findViewById(R.id.input_password);
             loginPopup_SignIn = (Button) LoginPopupView.findViewById(R.id.sign_in_button);
             loginPopup_create_account = (Button) LoginPopupView.findViewById(R.id.create_account_button);
-            loginPopupForgotPasswordBtn = (Button) LoginPopupView.findViewById(R.id.forgotPasswordBtn);
-
 
             dialogBuilder.setView(LoginPopupView);
             dialog = dialogBuilder.create();
@@ -213,10 +286,12 @@ public class MainActivity extends AppCompatActivity {
                     fAuth.signInWithEmailAndPassword(loginPopup_email.getText().toString(), loginPopup_password.getText().toString()).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                         @Override
                         public void onSuccess(AuthResult authResult) {
-                            dialog.dismiss();
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                            finish();
 
+                            //Load the data from the database
+                            loadData();
+                            dialog.dismiss();
+                            startActivity(new Intent(getBaseContext(), MainActivity.class));
+                            finish();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -234,43 +309,6 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(getApplicationContext(), Register.class));
                 }
             });
-
-            loginPopupForgotPasswordBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //start alert dialog
-                    View v = loutInflater.inflate(R.layout.forgot_password_email_form_popup, null);
-                    reset_alert.setTitle("Forgot Password")
-                            .setMessage("Enter Email for Password Reset Link")
-                            .setPositiveButton("Reset", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    //validate email address
-                                    EditText email = v.findViewById(R.id.forgot_password_email_popup);
-                                    if(email.getText().toString().isEmpty()){
-                                        email.setError("Required");
-                                        return;
-                                    }
-                                    //send reset link
-                                    fAuth.sendPasswordResetEmail(email.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Toast.makeText(MainActivity.this, "Reset Email Sent", Toast.LENGTH_SHORT).show();
-
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-
-                                        }
-                                    });
-                                }
-                            }).setNegativeButton("Cancel", null)
-                            .setView(v)
-                            .create().show();
-                }
-            });
         }
 
         private BottomNavigationView.OnNavigationItemSelectedListener navListener =
@@ -279,6 +317,8 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         int id = 0;
                         Intent in;
+                        Bundle b = new Bundle();
+
                         switch (item.getItemId()) {
                             case R.id.nav_home:
                                 id = R.id.nav_home;
@@ -286,8 +326,7 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.nav_schedule:
                                 id = R.id.nav_schedule;
                                 in = new Intent(getBaseContext(), ViewSchedule.class);
-                                Bundle b = new Bundle();
-                                b.putStringArrayList("coursesPicked", coursesPicked);
+                                in.putExtra("coursesPicked", coursesPicked);
                                 in.putExtras(b);
                                 startActivity(in);
                                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -295,6 +334,12 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case R.id.nav_calendar:
                                 id = R.id.nav_calendar;
+                                in = new Intent(getBaseContext(), CalendarView.class);
+                                in.putExtra("coursesPicked", coursesPicked);
+                                in.putExtras(b);
+                                startActivity(in);
+                                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                                finish();
                                 break;
                         }
                         System.out.println(id);
@@ -306,13 +351,9 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-
-
             loginBtnHomePage.setVisibility(View.GONE);
             logoutBtnHomePage.setVisibility(View.VISIBLE);
-
-
-
+            loadData();
         } else {
             loginBtnHomePage.setVisibility(View.VISIBLE);
             logoutBtnHomePage.setVisibility(View.GONE);
@@ -321,30 +362,60 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
+                userId = "";
+                documentReference = null;
+                firebaseUser = null;
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 finish();
             }
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.settings_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+    private ArrayList<String> getNames(ArrayList<Course> courses){
+        ArrayList<String> coursesSTR = new ArrayList<>();
+        for(int i = 0; i < courses.size(); i++)
+            coursesSTR.add(courses.get(i).toString());
+
+        return coursesSTR;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.resetPassword){
-            if(FirebaseAuth.getInstance().getCurrentUser() != null){
-                startActivity(new Intent(getApplicationContext(), ResetPassword.class));
-            }
-            else {
-                Toast.makeText(MainActivity.this, "Please Login First", Toast.LENGTH_SHORT).show();
+
+    //Displays the help menu if the other lists are empty.
+    //Also controls the text above the lists
+    private void displayHelp(){
+        try {
+            TextView getStartedText = findViewById(R.id.getStarted);
+            TextView chosenCoursesText = findViewById(R.id.courseText);
+            TextView addACourseText = findViewById(R.id.addACourse);
+            TextView instrText = findViewById(R.id.instrText);
+            TextView instrText2 = findViewById(R.id.instrText2);
+
+            //Top List
+            if(coursesPicked.isEmpty()){
+                chosenCoursesText.setVisibility(View.INVISIBLE);
+            } else {
+                chosenCoursesText.setVisibility(View.VISIBLE);
             }
 
+            //Bottom List
+            if(crses.isEmpty()){
+                addACourseText.setVisibility(View.INVISIBLE);
+            } else {
+                addACourseText.setVisibility(View.VISIBLE);
+            }
+
+            //Both are empty
+            if(coursesPicked.isEmpty() && crses.isEmpty()) {
+                getStartedText.setVisibility(View.VISIBLE);
+                instrText.setVisibility(View.VISIBLE);
+                instrText2.setVisibility(View.VISIBLE);
+            } else {
+                getStartedText.setVisibility(View.INVISIBLE);
+                instrText.setVisibility(View.INVISIBLE);
+                instrText2.setVisibility(View.INVISIBLE);
+            }
+        } catch (NullPointerException e){
+            //Throws exception when changing to a different view. We gotta catch it.
         }
-        return super.onOptionsItemSelected(item);
     }
 }
