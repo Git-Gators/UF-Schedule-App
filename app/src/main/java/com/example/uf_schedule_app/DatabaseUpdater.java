@@ -201,8 +201,7 @@ public class DatabaseUpdater extends Context {
         }
     }
 
-    public void getDepNames(ArrayList<String> deptNames, ProgressBar spinner, Spinner spinnerDept, Spinner spinnerCrse, Context context) throws IOException {
-        spinner.setVisibility(View.VISIBLE);
+    public void getDepNames(ArrayList<String> deptNames, Spinner spinnerDept, Spinner spinnerCrse, Context context) throws IOException {
         deptNames.clear();
         deptNames.add("Choose a Department");
 
@@ -220,7 +219,6 @@ public class DatabaseUpdater extends Context {
         }
         is.close();
 
-        spinner.setVisibility(View.INVISIBLE);
         spinnerDept.setEnabled(true);
         spinnerCrse.setEnabled(true);
     }

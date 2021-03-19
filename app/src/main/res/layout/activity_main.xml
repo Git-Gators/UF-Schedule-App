@@ -4,7 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingLeft="50px"
+    android:paddingRight="50px"
     tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/getStarted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="180dp"
+        android:gravity="center"
+        android:shadowColor="#272727"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="Get Started"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/filter_button"
@@ -31,15 +50,15 @@
 
     <TextView
         android:id="@+id/courseText"
-        android:layout_width="165dp"
-        android:layout_height="54dp"
-        android:layout_marginStart="128dp"
-        android:layout_marginLeft="128dp"
-        android:layout_marginTop="60dp"
-        android:gravity="center"
-        android:text="Courses Chosen:"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_horizontal"
+        android:text='Courses Chosen:'
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/chosenCourses"
+        app:layout_constraintEnd_toStartOf="@+id/logout"
+        app:layout_constraintStart_toEndOf="@+id/filter_button" />
 
     <ListView
         android:id="@+id/courseList"
@@ -52,7 +71,9 @@
         android:layout_marginBottom="5dp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+    </ListView>
 
     <ListView
         android:id="@+id/chosenCourses"
@@ -63,17 +84,22 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
+        android:gravity="center_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logout" />
+        app:layout_constraintTop_toBottomOf="@+id/logout">
+
+    </ListView>
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/addACourse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="245dp"
-        android:text="Add a Course"
+        android:text="Tap to Add a Course"
+        android:gravity="center_horizontal"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -101,6 +127,33 @@
         android:text="Logout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/instrText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:text='To view courses within a particular field of study, select from the filter menu and press "Search".'
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/getStarted" />
+
+    <TextView
+        android:id="@+id/instrText2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:text='Courses can be filtered based upon any of the available criteria.'
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.921"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/instrText" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,154 +7,569 @@
     android:background="@color/cardview_light_background"
     tools:context=".FilterActivity">
 
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginTop="68dp"
-        android:layout_marginEnd="100dp"
-        android:layout_marginRight="100dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="88dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:onClick="goToMain"
-        android:text="Filter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Spinner
-        android:id="@+id/spinnerCourse"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="100dp"
-        android:layout_marginRight="100dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerDepartments" />
-
     <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="26dp"
-        android:layout_height="29dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="28dp"
-        app:layout_constraintStart_toEndOf="@+id/spinnerDepartments"
-        app:layout_constraintTop_toBottomOf="@+id/spinner" />
-
-    <ProgressBar
-        android:id="@+id/progressBar2"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="28dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginLeft="28dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toEndOf="@+id/spinnerCourse"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
-
-    <Spinner
-        android:id="@+id/spinnerDepartments"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="28dp"
-        android:layout_marginEnd="100dp"
-        android:layout_marginRight="100dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="88dp"
-        android:layout_marginLeft="88dp"
-        android:layout_marginTop="24dp"
-        android:text="Choose a Department"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="128dp"
-        android:layout_marginLeft="128dp"
-        android:layout_marginTop="28dp"
-        android:text="Course Filters"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerCourse" />
-
-    <EditText
-        android:id="@+id/courseCode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="101dp"
-        android:layout_marginLeft="101dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="101dp"
-        android:layout_marginRight="101dp"
-        android:ems="10"
-        android:hint="Course Code"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
-
-    <EditText
-        android:id="@+id/courseCredits"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="101dp"
-        android:layout_marginLeft="101dp"
-        android:layout_marginTop="20dp"
-        android:ems="10"
-        android:hint="# of Credits"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/courseCode" />
-
-    <EditText
-        android:id="@+id/courseTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="101dp"
-        android:layout_marginLeft="101dp"
-        android:layout_marginTop="20dp"
-        android:ems="10"
-        android:hint="Course Title or Keywords "
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/courseCredits" />
-
-    <ProgressBar
-        android:id="@+id/filterLoad"
+        android:id="@+id/outerFilterLoad"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="invisible" />
+
+    <Button
+        android:id="@+id/outerFilter"
+        android:layout_width="88dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:onClick="goToMain"
+        android:text="Filter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/topBar"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bordermenu"
+                android:gravity="left"
+                android:onClick="nextFilter"
+                android:paddingLeft="30px"
+                android:text="@string/filterBarOpen"
+                android:textColor="#FFFFFF"
+                app:autoSizeTextType="uniform" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/top"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:visibility="gone">
+
+                <TextView
+                    android:id="@+id/departmentText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="45dp"
+                    android:layout_marginLeft="45dp"
+                    android:layout_marginTop="18dp"
+                    android:text="Department"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Spinner
+                    android:id="@+id/spinnerDepartments"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginRight="30dp"
+                    android:spinnerMode="dialog"
+                    app:layout_constraintEnd_toStartOf="@+id/progressBar2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/departmentText" />
+
+                <TextView
+                    android:id="@+id/courseTextSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="44dp"
+                    android:layout_marginLeft="44dp"
+                    android:layout_marginTop="19dp"
+                    android:text="Course"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/spinnerDepartments" />
+
+                <Spinner
+                    android:id="@+id/spinnerCourse"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginRight="30dp"
+                    android:spinnerMode="dialog"
+                    app:layout_constraintEnd_toStartOf="@+id/progressBar2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/courseTextSpinner" />
+
+                <TextView
+                    android:id="@+id/courseNumberText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="44dp"
+                    android:text="Course Number"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/spinnerCourse" />
+
+                <EditText
+                    android:id="@+id/courseCode"
+                    style="@style/Widget.AppCompat.EditText"
+                    android:layout_width="138dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="37dp"
+                    android:layout_marginLeft="37dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/textborder"
+                    android:ems="10"
+                    android:hint="ex. ACG2021"
+                    android:inputType="textPersonName"
+                    android:paddingLeft="20px"
+                    android:paddingTop="10px"
+                    android:paddingRight="10px"
+                    android:paddingBottom="10px"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/courseNumberText" />
+
+                <TextView
+                    android:id="@+id/classNumberText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="60dp"
+                    android:layout_marginLeft="60dp"
+                    android:layout_marginTop="44dp"
+                    android:text="Number of Credits"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toEndOf="@+id/courseNumberText"
+                    app:layout_constraintTop_toBottomOf="@+id/spinnerCourse" />
+
+                <EditText
+                    android:id="@+id/courseCredits"
+                    android:layout_width="145dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/textborder"
+                    android:ems="10"
+                    android:hint="# of Credits"
+                    android:inputType="textPersonName"
+                    android:paddingLeft="20px"
+                    android:paddingTop="10px"
+                    android:paddingRight="10px"
+                    android:paddingBottom="10px"
+                    app:layout_constraintStart_toEndOf="@+id/courseCode"
+                    app:layout_constraintTop_toBottomOf="@+id/classNumberText" />
+
+                <TextView
+                    android:id="@+id/courseTitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="42dp"
+                    android:layout_marginLeft="42dp"
+                    android:layout_marginTop="14dp"
+                    android:text="Course Title"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/courseCredits" />
+
+                <EditText
+                    android:id="@+id/courseTitle"
+                    android:layout_width="333dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/textborder"
+                    android:ems="10"
+                    android:hint="Course Title or Keywords "
+                    android:inputType="textPersonName"
+                    android:padding="10px"
+                    android:paddingLeft="10px"
+                    android:paddingTop="10px"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/courseTitleText"
+                    app:layout_constraintVertical_bias="1.0" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar2"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="25dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginRight="10dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/courseTextSpinner" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/middleBar"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bordermenu"
+                android:gravity="left"
+                android:onClick="nextFilter"
+                android:paddingLeft="30px"
+                android:text="@string/courseFilterClosed"
+                android:textColor="#FFFFFF"
+                app:autoSizeTextType="uniform" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/middle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/levelMin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="45dp"
+                    android:layout_marginLeft="45dp"
+                    android:layout_marginTop="18dp"
+                    android:text="Level Minimum"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/levelMaximum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginEnd="44dp"
+                    android:layout_marginRight="44dp"
+                    android:text="Level Maximum"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Spinner
+                    android:id="@+id/levelMinSpinner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="125dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="42dp"
+                    android:layout_marginLeft="42dp"
+                    android:layout_marginTop="10dp"
+                    android:spinnerMode="dialog"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/levelMin" />
+
+                <Spinner
+                    android:id="@+id/levelMaxSpinner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="125dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="48dp"
+                    android:layout_marginRight="48dp"
+                    android:spinnerMode="dialog"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/levelMaximum" />
+
+                <EditText
+                    android:id="@+id/courseTitle2"
+                    android:layout_width="333dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="30dp"
+                    android:background="@drawable/textborder"
+                    android:ems="10"
+                    android:hint="Instructor Last Name"
+                    android:inputType="textPersonName"
+                    android:padding="10px"
+                    android:paddingLeft="10px"
+                    android:paddingTop="10px"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/instructorText" />
+
+                <TextView
+                    android:id="@+id/instructorText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="42dp"
+                    android:layout_marginLeft="42dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Instructor"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/levelMinSpinner" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/bottomBar"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bordermenu"
+                android:gravity="left"
+                android:onClick="nextFilter"
+                android:paddingLeft="30px"
+                android:text="@string/meetingClosed"
+                android:textColor="#FFFFFF"
+                app:autoSizeTextType="uniform" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/daysText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="18dp"
+                    android:text="Days"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <CheckBox
+                    android:id="@+id/mondayCheckBox"
+                    style="@style/Widget.AppCompat.CompoundButton.CheckBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="50dp"
+                    android:layout_marginRight="50dp"
+                    android:onClick="onCheckboxClicked"
+                    android:paddingLeft="20px"
+                    android:paddingRight="20px"
+                    android:text="Monday"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/daysText" />
+
+                <CheckBox
+                    android:id="@+id/tuesdayCheckBox"
+                    style="@style/Widget.AppCompat.CompoundButton.CheckBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginEnd="50dp"
+                    android:layout_marginRight="50dp"
+                    android:onClick="onCheckboxClicked"
+                    android:paddingLeft="20px"
+                    android:paddingRight="20px"
+                    android:text="Tuesday"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/mondayCheckBox" />
+
+                <CheckBox
+                    android:id="@+id/wednesdayCheckBox"
+                    style="@style/Widget.AppCompat.CompoundButton.CheckBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginEnd="50dp"
+                    android:layout_marginRight="50dp"
+                    android:onClick="onCheckboxClicked"
+                    android:paddingLeft="20px"
+                    android:paddingRight="20px"
+                    android:text="Wednesday"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tuesdayCheckBox" />
+
+                <CheckBox
+                    android:id="@+id/thursdayCheckbox"
+                    style="@style/Widget.AppCompat.CompoundButton.CheckBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginEnd="50dp"
+                    android:layout_marginRight="50dp"
+                    android:onClick="onCheckboxClicked"
+                    android:paddingLeft="20px"
+                    android:paddingRight="20px"
+                    android:text="Thursday"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/wednesdayCheckBox" />
+
+                <CheckBox
+                    android:id="@+id/fridayCheckbox"
+                    style="@style/Widget.AppCompat.CompoundButton.CheckBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginEnd="50dp"
+                    android:layout_marginRight="50dp"
+                    android:onClick="onCheckboxClicked"
+                    android:paddingLeft="20px"
+                    android:paddingRight="20px"
+                    android:text="Friday"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/thursdayCheckbox" />
+
+                <CheckBox
+                    android:id="@+id/saturdayCheckbox"
+                    style="@style/Widget.AppCompat.CompoundButton.CheckBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginEnd="50dp"
+                    android:layout_marginRight="50dp"
+                    android:layout_marginBottom="100dp"
+                    android:onClick="onCheckboxClicked"
+                    android:paddingLeft="20px"
+                    android:paddingRight="20px"
+                    android:text="Saturday"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/fridayCheckbox" />
+
+                <TextView
+                    android:id="@+id/periodStart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="45dp"
+                    android:layout_marginLeft="45dp"
+                    android:layout_marginTop="30dp"
+                    android:text="Period Start"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/saturdayCheckbox" />
+
+                <TextView
+                    android:id="@+id/periodEnd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginEnd="84dp"
+                    android:layout_marginRight="84dp"
+                    android:text="Period End"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/saturdayCheckbox" />
+
+                <Spinner
+                    android:id="@+id/periodStartSpinner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="125dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="42dp"
+                    android:layout_marginLeft="42dp"
+                    android:spinnerMode="dialog"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/periodStart" />
+
+                <Spinner
+                    android:id="@+id/periodEndSpinner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="125dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="48dp"
+                    android:layout_marginRight="48dp"
+                    android:spinnerMode="dialog"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/periodEnd" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="331dp"
+                    android:layout_height="328dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/checkbox"
+                    app:layout_constraintBottom_toTopOf="@+id/periodEnd"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/daysText"
+                    tools:visibility="gone" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/filterButtonLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <ProgressBar
+                    android:id="@+id/filterLoad"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginBottom="32dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="invisible" />
+
+                <Button
+                    android:id="@+id/button3"
+                    android:layout_width="88dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginBottom="32dp"
+                    android:onClick="goToMain"
+                    android:text="Filter"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

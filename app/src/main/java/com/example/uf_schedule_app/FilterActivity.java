@@ -2,6 +2,7 @@ package com.example.uf_schedule_app;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.os.Build;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -31,7 +33,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
     String department = "";
     Course courseName = null;
-    String semester;
+    String semester = "Spring 2021";
     ArrayList<Course> coursesInSchedule = new ArrayList<>();
 
     // Courses retrieved from the DB
@@ -47,9 +49,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     Spinner spinnerCrse;
 
     //Progress Bars (Spinning load icon)
-    private ProgressBar pSpinner;
     private ProgressBar pSpinner2;
-    private ProgressBar pSpinner3;
 
     //Used in the Spinner
     ArrayList<String> deptNames = new ArrayList<>();
@@ -69,11 +69,18 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         getSupportActionBar().setTitle("Filters");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //Set the loading bars to invisible.
+        //Filter Button & Loading inside the linear layout
         ProgressBar filterLoad = findViewById(R.id.filterLoad);
         filterLoad.setVisibility(View.INVISIBLE);
         Button filterButton = findViewById(R.id.button3);
         filterButton.setVisibility(View.VISIBLE);
+
+        //Filter Button & Loading outside the linear layout
+        ProgressBar filterLoadOut = findViewById(R.id.outerFilterLoad);
+        filterLoadOut.setVisibility(View.INVISIBLE);
+        Button filterButtonOut = findViewById(R.id.outerFilter);
+        filterButtonOut.setVisibility(View.INVISIBLE);
+
 
         //Grab info from other activities.
         Intent intent = getIntent();
@@ -89,37 +96,35 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         }
 
         //Set the progress bars for spinners to be invisible
-        pSpinner = findViewById(R.id.progressBar);
-        pSpinner.setVisibility(View.INVISIBLE);
         pSpinner2 = findViewById(R.id.progressBar2);
         pSpinner2.setVisibility(View.INVISIBLE);
 
         //Update the lists
-        spinner = (Spinner) findViewById(R.id.spinner);
         spinnerDept = (Spinner) findViewById(R.id.spinnerDepartments);
         spinnerCrse = (Spinner) findViewById(R.id.spinnerCourse);
 
-        spinner.setOnItemSelectedListener(this);
         spinnerDept.setOnItemSelectedListener(this);
         spinnerCrse.setOnItemSelectedListener(this);
 
-        //Going to have to change this if we ever want more semesters //TODO
-        String[] semesters = new String[]{"Select a Semester", "Spring 2021"};
-        deptNames.add("Please Select a Semester First");
-        String[] courses = new String[]{"Please Select a Semester First"};
+        //Add the database information to the list and update the spinner
+        try {
+            dbUpdater.getDepNames(deptNames, spinnerDept, spinnerCrse, getBaseContext());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        deptNames.set(0, " -- ");
+        String[] courses = {" -- "};
+        spinnerCrse.setEnabled(false);
 
         // Create an ArrayAdapter using the string array and a default spinner layout
-        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, semesters);
         final ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, deptNames);
         final ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, courses);
 
         // Specify the layout to use when the list of choices appears
-        spinnerArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         spinnerArrayAdapter2.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
 
         // Apply the adapter to the spinner
-        spinner.setAdapter(spinnerArrayAdapter);
         spinnerDept.setAdapter(spinnerArrayAdapter2);
         spinnerCrse.setAdapter(spinnerArrayAdapter1);
 
@@ -127,17 +132,31 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         courseCodeText = (EditText) findViewById(R.id.courseCode);
         courseCreditsText = (EditText) findViewById(R.id.courseCredits);
         courseNameText = (EditText) findViewById(R.id.courseTitle);
+
+
+        Spinner minSpinner = findViewById(R.id.levelMinSpinner);
+        ArrayAdapter<CharSequence> minSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.level_minimum, android.R.layout.simple_spinner_item);
+        minSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        minSpinner.setAdapter(minSpinnerAdapter);
+
+        Spinner maxSpinner = findViewById(R.id.levelMaxSpinner);
+        ArrayAdapter<CharSequence> maxSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.level_maximum, android.R.layout.simple_spinner_item);
+        maxSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        maxSpinner.setAdapter(maxSpinnerAdapter);
+
+        Spinner periodStart = findViewById(R.id.periodStartSpinner);
+        ArrayAdapter<CharSequence> periodStartAdapter = ArrayAdapter.createFromResource(this, R.array.level_maximum, android.R.layout.simple_spinner_item);
+        maxSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        periodStart.setAdapter(periodStartAdapter);
+
+        Spinner periodEnd = findViewById(R.id.periodEndSpinner);
+        ArrayAdapter<CharSequence> periodEndAdapter = ArrayAdapter.createFromResource(this, R.array.level_maximum, android.R.layout.simple_spinner_item);
+        periodEndAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        periodEnd.setAdapter(periodEndAdapter);
     }
 
     public void filterCourses(String code, String credits, String name){
         System.out.println(code + " " + credits + " "  + name);
-
-        //Hide the filter button and show the load
-        ProgressBar filterLoad = findViewById(R.id.filterLoad);
-        filterLoad.setVisibility(View.VISIBLE);
-        Button filterButton = findViewById(R.id.button3);
-        filterButton.setVisibility(View.INVISIBLE);
-
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
         ValueEventListener postListener = new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -205,11 +224,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                     }
                 }
 
-                ProgressBar filterLoad = findViewById(R.id.filterLoad);
-                filterLoad.setVisibility(View.INVISIBLE);
-                Button filterButton = findViewById(R.id.button3);
-                filterButton.setVisibility(View.VISIBLE);
-
                 startMain();
             }
 
@@ -227,51 +241,30 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                startMain();
+                //If the course was chosen in the spinner
+                if(courseName != null) {
+                    System.out.println("USING SPINNER TEXT");
+                    filterCourses("", "", "");
+                } else {
+                    //The course spinner wasn't chosen
+                    System.out.println("Filtering with code: " + courseCodeText + " credits: " + courseCreditsText + " name: " + courseNameText);
+                    filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
+                }
                 return(true);
         }
 
         return(super.onOptionsItemSelected(item));
     }
 
-    //When an item is selected in either list
+    //When an item is selected in any list
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        // The top spinner
-        if (parent.getId() == R.id.spinner && !parent.getItemAtPosition(pos).toString().equals("Select a Semester")) {
-            String valueFromSpinner = parent.getItemAtPosition(pos).toString();
-            System.out.println("Spinner: " + valueFromSpinner);
-            semester = valueFromSpinner;
-
-            spinnerDept.setEnabled(false);
-            spinnerCrse.setEnabled(false);
-
-            //Add the database information to the list and update the spinner
-            try {
-                dbUpdater.getDepNames(deptNames, pSpinner, spinnerDept, spinnerCrse, getBaseContext());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            deptNames.set(0, "Choose a Department");
-
-            String[] courses = {"Choose a Department"};
-
-            ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, deptNames);
-            spinnerArrayAdapter2.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-            spinnerDept.setAdapter(spinnerArrayAdapter2);
-
-
-            ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, courses);
-            spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-            spinnerCrse.setAdapter(spinnerArrayAdapter1);
-        }
-
         // The middle spinner
         if (parent.getId() == R.id.spinnerDepartments && !parent.getItemAtPosition(pos).toString().equals("Please Select a Semester First")) {
             if(!parent.getItemAtPosition(pos).toString().equals("Choose a Department")) {
                 System.out.println("Spinner: Department Chosen");
                 ArrayList<String> coursesNames = new ArrayList<>();
-                coursesNames.add("Choose a Course");
+                coursesNames.add(" -- ");
                 crses.clear();
                 department = parent.getItemAtPosition(pos).toString();
                 try {
@@ -292,7 +285,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         if (parent.getId() == R.id.spinnerCourse) {
             System.out.println("Spinner: Course Chosen");
 
-            if(parent.getItemAtPosition(pos).toString().equals("Please Select a Semester First") || parent.getItemAtPosition(pos).toString().equals("Choose a Department") || parent.getItemAtPosition(pos).toString().equals("Choose a Course")) {
+            if(parent.getItemAtPosition(pos).toString().equals(" -- ")) {
                 courseName = null;
                 System.out.println("Set courseName: null");
             } else {
@@ -312,6 +305,23 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     /** Called when the user taps the FILTER button */
     public void goToMain(View view){
         //If the course was chosen in the spinner
+        if(view.getId() == R.id.outerFilter){
+            //Hide the filter button and show the load
+            Button filterButton = findViewById(R.id.outerFilter);
+            filterButton.setVisibility(View.INVISIBLE);
+            ProgressBar load = findViewById(R.id.outerFilterLoad);
+            load.setVisibility(View.VISIBLE);
+        } else {
+            //Hide the filter button and show the load
+            Button filterButton = findViewById(R.id.button3);
+            filterButton.setVisibility(View.INVISIBLE);
+            ProgressBar load = findViewById(R.id.filterLoad);
+            load.setVisibility(View.VISIBLE);
+        }
+
+
+
+
         if(courseName != null) {
             System.out.println("USING SPINNER TEXT");
             filterCourses("", "", "");
@@ -332,4 +342,68 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         finish();
     }
+
+    public void nextFilter(View view){
+        ConstraintLayout top = findViewById(R.id.top);
+        ConstraintLayout middle = findViewById(R.id.middle);
+        ConstraintLayout bottom = findViewById(R.id.bottom);
+
+        if(view.getId() == R.id.topBar){
+            if(top.getVisibility() == View.VISIBLE){
+                top.setVisibility(View.GONE);
+                TextView bar = findViewById(R.id.topBar);
+                bar.setText(R.string.filterBarClosed);
+            } else {
+                top.setVisibility(View.VISIBLE);
+                TextView bar = findViewById(R.id.topBar);
+                bar.setText(R.string.filterBarOpen);
+            }
+        } else if(view.getId() == R.id.middleBar){
+            if(middle.getVisibility() == View.VISIBLE){
+                middle.setVisibility(View.GONE);
+                TextView bar = findViewById(R.id.middleBar);
+                bar.setText(R.string.courseFilterClosed);
+            } else {
+                middle.setVisibility(View.VISIBLE);
+                TextView bar = findViewById(R.id.middleBar);
+                bar.setText(R.string.courseFilterOpen);
+            }
+        } else if(view.getId() == R.id.bottomBar){
+            if(bottom.getVisibility() == View.VISIBLE){
+                bottom.setVisibility(View.GONE);
+                TextView bar = findViewById(R.id.bottomBar);
+                bar.setText(R.string.meetingClosed);
+            } else {
+                bottom.setVisibility(View.VISIBLE);
+                TextView bar = findViewById(R.id.bottomBar);
+                bar.setText(R.string.meetingOpen);
+            }
+        }
+
+        Button filterButton = findViewById(R.id.button3);
+        Button filterButtonOut = findViewById(R.id.outerFilter);
+        if(top.getVisibility() == View.GONE && bottom.getVisibility() == View.GONE){
+            filterButton.setVisibility(View.GONE);
+            filterButtonOut.setVisibility(View.VISIBLE);
+        } else {
+            filterButton.setVisibility(View.VISIBLE);
+            filterButtonOut.setVisibility(View.GONE);
+        }
+    }
+
+
+    public void onCheckboxClicked(View view) {
+        // Is the view now checked?
+        boolean checked = ((CheckBox) view).isChecked();
+
+        // Check which checkbox was clicked
+        switch(view.getId()) {
+            case R.id.mondayCheckBox:
+                if (checked){
+
+                }
+                break;
+        }
+    }
+
 }

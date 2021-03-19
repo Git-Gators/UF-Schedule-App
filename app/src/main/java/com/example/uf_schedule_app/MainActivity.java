@@ -4,58 +4,35 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Filter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.Button;
-import android.app.AlertDialog;
 
 import android.content.Intent;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Source;
 
-import org.json.JSONException;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -173,10 +150,12 @@ public class MainActivity extends AppCompatActivity {
                         //Otherwise print an error message
                         Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
                     }
+                    displayHelp();
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
+                    displayHelp();
                     Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, e.toString());
                 }
@@ -225,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getNames(crses));
                 courseList.setAdapter(arrayAdapter);
             }
+            displayHelp();
         }
 
         chosenCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -233,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
                 coursesPicked.remove(position);
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
                 chosenCourses.setAdapter(arrayAdapter);
+                displayHelp();
 
                 //Change data in database to reflect deleted course.
                 user.put("Courses", coursesPicked);
@@ -255,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
                     chosenCourses.setAdapter(arrayAdapter);
                     //Add the course to the database
                     addCourseToDatabase(coursesPicked);
+                    displayHelp();
                 }
             }
         });
@@ -343,7 +325,6 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case R.id.nav_schedule:
                                 id = R.id.nav_schedule;
-                                //We have all the courses
                                 in = new Intent(getBaseContext(), ViewSchedule.class);
                                 in.putExtra("coursesPicked", coursesPicked);
                                 in.putExtras(b);
@@ -398,4 +379,43 @@ public class MainActivity extends AppCompatActivity {
         return coursesSTR;
     }
 
+
+    //Displays the help menu if the other lists are empty.
+    //Also controls the text above the lists
+    private void displayHelp(){
+        try {
+            TextView getStartedText = findViewById(R.id.getStarted);
+            TextView chosenCoursesText = findViewById(R.id.courseText);
+            TextView addACourseText = findViewById(R.id.addACourse);
+            TextView instrText = findViewById(R.id.instrText);
+            TextView instrText2 = findViewById(R.id.instrText2);
+
+            //Top List
+            if(coursesPicked.isEmpty()){
+                chosenCoursesText.setVisibility(View.INVISIBLE);
+            } else {
+                chosenCoursesText.setVisibility(View.VISIBLE);
+            }
+
+            //Bottom List
+            if(crses.isEmpty()){
+                addACourseText.setVisibility(View.INVISIBLE);
+            } else {
+                addACourseText.setVisibility(View.VISIBLE);
+            }
+
+            //Both are empty
+            if(coursesPicked.isEmpty() && crses.isEmpty()) {
+                getStartedText.setVisibility(View.VISIBLE);
+                instrText.setVisibility(View.VISIBLE);
+                instrText2.setVisibility(View.VISIBLE);
+            } else {
+                getStartedText.setVisibility(View.INVISIBLE);
+                instrText.setVisibility(View.INVISIBLE);
+                instrText2.setVisibility(View.INVISIBLE);
+            }
+        } catch (NullPointerException e){
+            //Throws exception when changing to a different view. We gotta catch it.
+        }
+    }
 }
