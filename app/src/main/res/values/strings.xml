@@ -22,7 +22,7 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
-    <string-array name = "periods">
+    <string-array name="periods">
         <item>Periods</item>
         <item>7:25AM-8:15AM</item>
         <item>8:30AM-9:20AM</item>
@@ -41,7 +41,7 @@
         <item>Online</item>
     </string-array>
 
-    <string-array name = "daysOfWeek">
+    <string-array name="daysOfWeek">
         <item>Monday</item>
         <item>Tuesday</item>
         <item>Wednesday</item>
@@ -51,7 +51,7 @@
         <item>Sunday</item>
     </string-array>
 
-    <string-array name = "dayInitials">
+    <string-array name="dayInitials">
         <item>M</item>
         <item>T</item>
         <item>W</item>
@@ -59,7 +59,7 @@
         <item>F</item>
     </string-array>
 
-    <integer name = "numPeriods">16</integer>
+    <integer name="numPeriods">16</integer>
     <string-array name="level_minimum">
         <item>--  </item>
         <item>1000</item>
