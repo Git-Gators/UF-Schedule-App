@@ -41,15 +41,12 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
     //Create a dbUpdater object
     DatabaseUpdater dbUpdater = new DatabaseUpdater();
     ListView courseList;
-    ListView chosenCourses;
 
     @Override
     public void applyCourse(Course course) {
         //Popup stuff
         //coursesPicked.add(crses.get(position));
         coursesPicked.add(course);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
-        chosenCourses.setAdapter(arrayAdapter);
         //Add the course to the database
         addCourseToDatabase(coursesPicked);
         displayHelp();
@@ -152,8 +149,6 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                                 Course course = (Course) coursesPicked.get(i);
                                 coursesPicked.set(i, course);
                             }
-                            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
-                            chosenCourses.setAdapter(arrayAdapter);
                         }
                     }else
                     {
@@ -191,7 +186,6 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
 
         //Course List
         courseList = findViewById(R.id.courseList);
-        chosenCourses = findViewById(R.id.chosenCourses);
 
         loginBtnHomePage = findViewById(R.id.login);
         logoutBtnHomePage = findViewById(R.id.logout);
@@ -203,9 +197,6 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
         if(b != null){
             if(b.getSerializable("coursesPicked") != null) {
                 coursesPicked = (ArrayList<Course>) intent.getSerializableExtra("coursesPicked");
-
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
-                chosenCourses.setAdapter(arrayAdapter);
             }
             if(b.getSerializable("crses") != null) {
                 crses = (ArrayList<Course>) intent.getSerializableExtra("crses");
@@ -215,29 +206,6 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
             }
             displayHelp();
         }
-
-        chosenCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                coursesPicked.remove(position);
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
-                chosenCourses.setAdapter(arrayAdapter);
-                displayHelp();
-
-                //Change data in database to reflect deleted course.
-                user.put("Courses", coursesPicked);
-                //Store the user's information (name, email, and list of course names for now) in the database
-
-                if(documentReference != null){
-                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "Course Successfully deleted" + userId);
-                        }
-                    });
-                }
-            }
-        });
 
         courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -394,27 +362,21 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
     private void displayHelp(){
         try {
             TextView getStartedText = findViewById(R.id.getStarted);
-            TextView chosenCoursesText = findViewById(R.id.courseText);
             TextView addACourseText = findViewById(R.id.addACourse);
             TextView instrText = findViewById(R.id.instrText);
             TextView instrText2 = findViewById(R.id.instrText2);
 
-            //Top List
-            if(coursesPicked.isEmpty()){
-                chosenCoursesText.setVisibility(View.INVISIBLE);
-            } else {
-                chosenCoursesText.setVisibility(View.VISIBLE);
-            }
-
             //Bottom List
             if(crses.isEmpty()){
                 addACourseText.setVisibility(View.INVISIBLE);
+                courseList.setVisibility(View.INVISIBLE);
             } else {
                 addACourseText.setVisibility(View.VISIBLE);
+                courseList.setVisibility(View.VISIBLE);
             }
 
             //Both are empty
-            if(coursesPicked.isEmpty() && crses.isEmpty()) {
+            if(crses.isEmpty()) {
                 getStartedText.setVisibility(View.VISIBLE);
                 instrText.setVisibility(View.VISIBLE);
                 instrText2.setVisibility(View.VISIBLE);
