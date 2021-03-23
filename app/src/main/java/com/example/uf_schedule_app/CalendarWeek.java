@@ -38,7 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class CalendarView extends MainActivity {
+public class CalendarWeek extends MainActivity {
     RecyclerView recyclerView;
     Map<String, ArrayList<CourseEvent>> courseSections = loadCourseEvents(coursesPicked);
 
@@ -103,17 +103,17 @@ public class CalendarView extends MainActivity {
                     Intent in;
                     Bundle b = new Bundle();
                     switch (item.getItemId()) {
-                        case R.id.week:
-                            id = R.id.week;
-                            in = new Intent(getBaseContext(), CalendarWeek.class);
+                        case R.id.day:
+                            id = R.id.day;
+                            in = new Intent(getBaseContext(), CalendarView.class);
                             in.putExtra("coursesPicked", coursesPicked);
                             in.putExtras(b);
                             startActivity(in);
-                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                             finish();
                             break;
-                        case R.id.day:
-                            id = R.id.day;
+                        case R.id.week:
+                            id = R.id.week;
                             break;
                     }
                     System.out.println(id);
