@@ -55,7 +55,7 @@ public class CalendarWeek extends MainActivity {
             R.drawable.border10,
             R.drawable.border11
     };
-    String periods[], courseViews[], daysOfWeek[];
+    String periods[], courseViews[], daysOfWeek[], abbr[], period_abbr[];
     int images[] = {R.drawable.ic_baseline_calendar_view_day_24,
             R.drawable.ic_baseline_calendar_view_day_24, R.drawable.ic_baseline_calendar_view_day_24,
             R.drawable.ic_baseline_calendar_view_day_24, R.drawable.ic_baseline_calendar_view_day_24,
@@ -67,7 +67,7 @@ public class CalendarWeek extends MainActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.calendar_view);
+        setContentView(R.layout.calendar_week);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         bottomNav.setSelectedItemId(R.id.nav_calendar);
@@ -76,7 +76,7 @@ public class CalendarWeek extends MainActivity {
         dayNav.setSelectedItemId(R.id.monday);
         BottomNavigationView dayWeekNav = findViewById(R.id.week_day);
         dayWeekNav.setOnNavigationItemSelectedListener(dayWeekListener);
-        dayWeekNav.setSelectedItemId(R.id.day);
+        dayWeekNav.setSelectedItemId(R.id.week);
         recyclerView = findViewById(R.id.recyclerView);
         courseSections = loadCourseEvents(coursesPicked);
 /**
@@ -109,7 +109,7 @@ public class CalendarWeek extends MainActivity {
                             in.putExtra("coursesPicked", coursesPicked);
                             in.putExtras(b);
                             startActivity(in);
-                            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                             finish();
                             break;
                         case R.id.week:
@@ -279,10 +279,12 @@ public class CalendarWeek extends MainActivity {
         recyclerView = findViewById(R.id.recyclerView);
 
         periods = getResources().getStringArray(R.array.periods);
+        period_abbr = getResources().getStringArray(R.array.periods_filter);
         daysOfWeek = getResources().getStringArray(R.array.daysOfWeek);
+        abbr = getResources().getStringArray(R.array.dayInitials);
         courseViews = new String[numPeriods];
 
-        courseViews[0] = daysOfWeek[0];
+        courseViews[0] = abbr[0];
         int[] color = new int[numPeriods];
         for (int x = 0; x < numPeriods; x++) {
             color[x] = R.drawable.border;
@@ -335,12 +337,12 @@ public class CalendarWeek extends MainActivity {
                 courseViews[numPeriods - 1] = courseTimes.get(day).get(i).courseCode;
             }
         }
-        courseViews[0] = day;
-        Calendar_Adapter calendarAdapter = new Calendar_Adapter(this, periods, courseViews, color);
-        recyclerView.setAdapter(calendarAdapter);
+        courseViews[0] = abbr[0];
+        Week_Adapter weekAdapter = new Week_Adapter(this, period_abbr, courseViews, color);
+        recyclerView.setAdapter(weekAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        System.out.println("\nDay of Week Changed!");
+        System.out.println("\nBruh");
     }
     private BottomNavigationView.OnNavigationItemSelectedListener dayListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {

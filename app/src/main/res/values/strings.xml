@@ -57,6 +57,7 @@
         <item>W</item>
         <item>R</item>
         <item>F</item>
+        <item>S</item>
     </string-array>
 
     <integer name = "numPeriods">16</integer>

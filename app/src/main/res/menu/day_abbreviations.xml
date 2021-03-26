@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/monday"
+        android:icon="@drawable/ic_baseline_calendar_view_day_24"
+        android:title="M"/>
+    <item
+        android:id="@+id/tuesday"
+        android:icon="@drawable/ic_baseline_calendar_view_day_24"
+        android:title="T"/>
+    <item
+        android:id="@+id/wednesday"
+        android:icon="@drawable/ic_baseline_calendar_view_day_24"
+        android:title="W"/>
+    <item
+        android:id="@+id/thursday"
+        android:icon="@drawable/ic_baseline_calendar_view_day_24"
+        android:title="R"/>
+    <item
+        android:id="@+id/friday"
+        android:icon="@drawable/ic_baseline_calendar_view_day_24"
+        android:title="F"/>
+    <item
+        android:id="@+id/saturday"
+        android:icon="@drawable/ic_baseline_calendar_view_day_24"
+        android:title="S"/>
+</menu>
