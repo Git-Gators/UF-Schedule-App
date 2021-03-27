@@ -17,10 +17,10 @@ public class Week_Adapter extends RecyclerView.Adapter<Week_Adapter.CalendarView
 
     String data1[];
     String[][] data2;
-    int colorVal[];
+    int colorVal[][];
     Context context;
 
-    public Week_Adapter(Context ct, String s1[], String s2[][], int colors[])
+    public Week_Adapter(Context ct, String s1[], String s2[][], int colors[][])
     {
         context = ct;
         data1 = s1;
@@ -46,7 +46,12 @@ public class Week_Adapter extends RecyclerView.Adapter<Week_Adapter.CalendarView
         holder.calendarText5.setText(data2[3][position]);
         holder.calendarText6.setText(data2[4][position]);
         holder.calendarText7.setText(data2[5][position]);
-        holder.constraintLayout.setBackground(context.getResources().getDrawable(colorVal[position]));
+        holder.constraintLayoutM.setBackground(context.getResources().getDrawable(colorVal[0][position]));
+        holder.constraintLayoutT.setBackground(context.getResources().getDrawable(colorVal[1][position]));
+        holder.constraintLayoutW.setBackground(context.getResources().getDrawable(colorVal[2][position]));
+        holder.constraintLayoutR.setBackground(context.getResources().getDrawable(colorVal[3][position]));
+        holder.constraintLayoutF.setBackground(context.getResources().getDrawable(colorVal[4][position]));
+        holder.constraintLayoutS.setBackground(context.getResources().getDrawable(colorVal[5][position]));
         //holder.calendarText2.setTextColor(context.getResources().getColor(R.color.white));
         //holder.calendarImage.setImageResource(images[position]);
 
@@ -60,7 +65,7 @@ public class Week_Adapter extends RecyclerView.Adapter<Week_Adapter.CalendarView
     public class CalendarViewHolder extends RecyclerView.ViewHolder{
 
         public View row_linearlayout;
-        public View constraintLayout;
+        public View constraintLayoutM, constraintLayoutT, constraintLayoutW, constraintLayoutR, constraintLayoutF, constraintLayoutS;
         TextView calendarText1, calendarText2, calendarText3, calendarText4, calendarText5, calendarText6, calendarText7;
         //ImageView calendarImage;
 
@@ -74,7 +79,12 @@ public class Week_Adapter extends RecyclerView.Adapter<Week_Adapter.CalendarView
             calendarText6 = itemView.findViewById(R.id.friday);
             calendarText7 = itemView.findViewById(R.id.saturday);
             row_linearlayout = (LinearLayout)itemView.findViewById(R.id.row_linearLayout);
-            constraintLayout = (ConstraintLayout)itemView.findViewById(R.id.constraintLayout2);
+            constraintLayoutM = (ConstraintLayout)itemView.findViewById(R.id.constraintLayout1);
+            constraintLayoutT = (ConstraintLayout)itemView.findViewById(R.id.constraintLayout3);
+            constraintLayoutW = (ConstraintLayout)itemView.findViewById(R.id.constraintLayout2);
+            constraintLayoutR = (ConstraintLayout)itemView.findViewById(R.id.constraintLayout4);
+            constraintLayoutF = (ConstraintLayout)itemView.findViewById(R.id.constraintLayout5);
+            constraintLayoutS = (ConstraintLayout)itemView.findViewById(R.id.constraintLayout6);
             //calendarImage = itemView.findViewById(R.id.calendar_image_view);
         }
     }

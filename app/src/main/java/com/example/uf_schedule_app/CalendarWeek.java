@@ -55,7 +55,7 @@ public class CalendarWeek extends MainActivity {
             R.drawable.border10,
             R.drawable.border11
     };
-    String periods[], monday[], tuesday[], wednesday[], thursday[], friday[], saturday[], daysOfWeek[], abbr[], period_abbr[], week[][];
+    String periods[], daysOfWeek[], abbr[], period_abbr[], week[][];
     int images[] = {R.drawable.ic_baseline_calendar_view_day_24,
             R.drawable.ic_baseline_calendar_view_day_24, R.drawable.ic_baseline_calendar_view_day_24,
             R.drawable.ic_baseline_calendar_view_day_24, R.drawable.ic_baseline_calendar_view_day_24,
@@ -92,8 +92,8 @@ public class CalendarWeek extends MainActivity {
  *     <color name="orange">#FF5722</color>
  */
 
-        //Load the default day as Monday
-        dayUpdate("Monday", courseSections);
+
+        dayUpdate(courseSections);
     }
     private BottomNavigationView.OnNavigationItemSelectedListener dayWeekListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -275,7 +275,7 @@ public class CalendarWeek extends MainActivity {
 
 
     //@Override
-    private void dayUpdate(String bruh, Map<String, ArrayList<CourseEvent>> courseTimes) {
+    private void dayUpdate(Map<String, ArrayList<CourseEvent>> courseTimes) {
         recyclerView = findViewById(R.id.recyclerView);
 
         periods = getResources().getStringArray(R.array.periods);
@@ -284,9 +284,11 @@ public class CalendarWeek extends MainActivity {
         abbr = getResources().getStringArray(R.array.dayInitials);
         week = new String[6][numPeriods];
 
-        int[] color = new int[numPeriods];
-        for (int x = 0; x < numPeriods; x++) {
-            color[x] = R.drawable.border;
+        int[][] color = new int[6][numPeriods];
+        for (int y = 0; y < 6; y++) {
+            for (int x = 0; x < numPeriods; x++) {
+                color[y][x] = R.drawable.border;
+            }
         }
 
         for (int j = 0; j < 6; j++) {
@@ -316,16 +318,16 @@ public class CalendarWeek extends MainActivity {
 
                     if (beginningTime.equals(periodStart) && endTime.equals(periodEnd)) {
                         week[counter][j] = courseTimes.get(day).get(i).courseCode;
-                        color[j] = colors[courseTimes.get(day).get(i).position % 10];
+                        color[counter][j] = colors[courseTimes.get(day).get(i).position % 10];
                     } else if (beginningTime.equals(periodStart) && !endTime.equals(periodEnd)) {
                         isNow = true;
                         week[counter][j] = courseTimes.get(day).get(i).courseCode;
-                        color[j] = colors[courseTimes.get(day).get(i).position % 10];
+                        color[counter][j] = colors[courseTimes.get(day).get(i).position % 10];
                     } else if (isNow && !endTime.equals(periodEnd)) {
-                        color[j] = colors[courseTimes.get(day).get(i).position % 10];
+                        color[counter][j] = colors[courseTimes.get(day).get(i).position % 10];
                     } else if (isNow && endTime.equals(periodEnd)) {
                         isNow = false;
-                        color[j] = colors[courseTimes.get(day).get(i).position % 10];
+                        color[counter][j] = colors[courseTimes.get(day).get(i).position % 10];
                     }
                 }
                 if (events.get(i).time.equals("Online")) {
@@ -334,7 +336,7 @@ public class CalendarWeek extends MainActivity {
             }
             counter++;
         }
-        //monday[0] = abbr[0];
+
         Week_Adapter weekAdapter = new Week_Adapter(this, period_abbr, week, color);
         recyclerView.setAdapter(weekAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -345,30 +347,7 @@ public class CalendarWeek extends MainActivity {
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    int id = 0;
-                    switch(item.getItemId()){
-                        case R.id.monday:
-                            id = R.id.monday;
-                            dayUpdate("Monday", courseSections);
-                            break;
-                        case R.id.tuesday:
-                            id = R.id.tuesday;
-                            dayUpdate("Tuesday", courseSections);
-                            break;
-                        case R.id.wednesday:
-                            id = R.id.wednesday;
-                            dayUpdate("Wednesday", courseSections);
-                            break;
-                        case R.id.thursday:
-                            id = R.id.thursday;
-                            dayUpdate("Thursday", courseSections);
-                            break;
-                        case R.id.friday:
-                            id = R.id.friday;
-                            dayUpdate("Friday", courseSections);
-                            break;
-                    }
-                    System.out.println(id);
+
                     return true;
                 }
             };
