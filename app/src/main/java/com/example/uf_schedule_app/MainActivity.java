@@ -30,6 +30,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
     //Create a dbUpdater object
     DatabaseUpdater dbUpdater = new DatabaseUpdater();
     ListView courseList;
+    static Boolean loaded = false;
 
     @Override
     public void applyCourse(Course course) {
@@ -235,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
         //*Define elements within popup
         dialogBuilder = new AlertDialog.Builder(this);
         final View LoginPopupView = getLayoutInflater().inflate(R.layout.login_popup, null);
-        loginPopup_title = (TextView) LoginPopupView.findViewById(R.id.sign_in_button);
+        loginPopup_title = (TextView) LoginPopupView.findViewById(R.id.sign_in_title);
         loginPopup_email = (EditText) LoginPopupView.findViewById(R.id.input_email);
         loginPopup_password = (EditText) LoginPopupView.findViewById(R.id.input_password);
         loginPopup_SignIn = (Button) LoginPopupView.findViewById(R.id.sign_in_button);
@@ -327,13 +329,32 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
     protected void onStart() {
         super.onStart();
 
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+        if (FirebaseAuth.getInstance().getCurrentUser() != null && !loaded) {
             loginBtnHomePage.setVisibility(View.GONE);
             logoutBtnHomePage.setVisibility(View.VISIBLE);
             loadData();
-        } else {
+            /*Bundle b = new Bundle();
+            Intent in;
+            in = new Intent(getBaseContext(), ContinueAsUser.class);
+            in.putExtras(b);
+            in.putExtra("fAuth", (Serializable) fAuth);
+            startActivity(in);
+            finish();*/
+            loaded = true;
+        } else if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             loginBtnHomePage.setVisibility(View.VISIBLE);
             logoutBtnHomePage.setVisibility(View.GONE);
+            Bundle b = new Bundle();
+            Intent in;
+            in = new Intent(getBaseContext(), LoginPage.class);
+            in.putExtras(b);
+            startActivity(in);
+            finish();
+        } else
+        {
+            loginBtnHomePage.setVisibility(View.GONE);
+            logoutBtnHomePage.setVisibility(View.VISIBLE);
+            loadData();
         }
         logoutBtnHomePage.setOnClickListener(new View.OnClickListener() {
             @Override
