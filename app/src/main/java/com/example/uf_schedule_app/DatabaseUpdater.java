@@ -144,7 +144,6 @@ public class DatabaseUpdater extends Context {
 
                                     courseObj.classSection = sectionMap;
                                     mDatabase.child(deptName).child(section.get("classNumber").toString()).setValue(courseObj);
-                                    System.out.println("C: "+ c + " " + deptName + " url: " + url);
                                 }
                             }
                         } catch (Exception e) {
@@ -186,13 +185,11 @@ public class DatabaseUpdater extends Context {
         }
         is.close();
 
-        System.out.println("depCodes: " + depCodes);
 
         try {
             int i = 0;
             while(i < depCodes.size()){
                 String url = "https://one.ufl.edu/apix/soc/schedule/?category=CWSP&term=2211&dept=" + depCodes.get(i).replace("\"", "");
-                System.out.println("CALLING " + url);
                 updateDatabase(url);
                 i++;
             }

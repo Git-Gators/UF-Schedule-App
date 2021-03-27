@@ -35,6 +35,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     Course courseName = null;
     String semester = "Spring 2021";
     ArrayList<Course> coursesInSchedule = new ArrayList<>();
+    ArrayList<String> days = new ArrayList<>();
 
     // Courses retrieved from the DB
     ArrayList<Course> crses = new ArrayList<>();
@@ -53,11 +54,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
     //Used in the Spinner
     ArrayList<String> deptNames = new ArrayList<>();
-
-    //Used in the filters
-    EditText courseCodeText;
-    EditText courseCreditsText;
-    EditText courseNameText;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -81,13 +77,27 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         setupInterface();
     }
 
-    public void filterCourses(String code, String credits, String name){
+    public void filterCourses(){
+        //Text Listeners
+        EditText courseCodeText = (EditText) findViewById(R.id.courseCode);
+        EditText courseCreditsText = (EditText) findViewById(R.id.courseCredits);
+        EditText courseNameText = (EditText) findViewById(R.id.courseTitle);
+        EditText instructorText = (EditText) findViewById(R.id.instructorInput);
+
+        String code = courseCodeText.getText().toString();
+        String credits = courseCreditsText.getText().toString();
+        String name = courseNameText.getText().toString();
+        String instructor = instructorText.getText().toString();
+        String levelMin = ((Spinner)findViewById(R.id.levelMinSpinner)).getSelectedItem().toString();
+        String levelMax = ((Spinner)findViewById(R.id.levelMaxSpinner)).getSelectedItem().toString();
+        String periodStart = ((Spinner)findViewById(R.id.periodStartSpinner)).getSelectedItem().toString();
+        String periodEnd = ((Spinner)findViewById(R.id.periodEndSpinner)).getSelectedItem().toString();
+
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
         ValueEventListener postListener = new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean match;
                 crses.clear();
 
                 if(courseName != null){
@@ -106,14 +116,14 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                             Course crsToBeAdded = ds.getValue(Course.class);
 
                             //Based on the fields entered we match on things.
-                            if (!name.equals("")) {
+                            if (!name.isEmpty()) {
                                 //There's a name
                                 if(!ds.getValue(Course.class).courseInfo.get("name").contains(name)) {
                                     //The name doesn't match the course name
                                     continue;
                                 }
                             }
-                            if (!code.equals("")) {
+                            if (!code.isEmpty()) {
                                 //There's a code
 
                                 //We've not matched on code.
@@ -121,13 +131,42 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                                     continue;
                                 }
                             }
-                            if (!credits.equals("")) {
+                            if (!credits.isEmpty()) {
                                 //There's a code and we haven't matched yet.
 
                                 //We've not matched on code.
                                 if(!ds.getValue(Course.class).classSection.get("credits").contains(credits)) {
                                     continue;
                                 }
+                            }
+                            if (!instructor.isEmpty()) {
+                                //There's a instructor and we haven't matched yet.
+
+                                //We've not matched on instructor.
+                                if(!ds.getValue(Course.class).classSection.get("Instructors").contains(instructor)) {
+                                    continue;
+                                }
+                            }
+
+                            String level = ds.getValue(Course.class).courseInfo.get("code");
+                            level = level.substring(3, 7);
+                            int levelInt = Integer.parseInt(level);
+                            System.out.println("level " + level + "levelMin " + levelMin);
+                            if (!levelMin.equals("--")) {
+                                int levelMinInt = Integer.parseInt(levelMin);
+                                if(levelInt < levelMinInt)
+                                    continue;
+                            }
+                            if (!levelMax.equals("--")) {
+                                int levelMaxInt = Integer.parseInt(levelMax);
+                                if(levelMaxInt < levelInt)
+                                    continue;
+                            }
+                            if (!periodStart.isEmpty()) {
+
+                            }
+                            if (!periodEnd.isEmpty()) {
+
                             }
 
                             crses.add(crsToBeAdded);
@@ -159,12 +198,10 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             case android.R.id.home:
                 //If the course was chosen in the spinner
                 if(courseName != null) {
-                    System.out.println("USING SPINNER TEXT");
-                    filterCourses("", "", "");
+                    filterCourses();
                 } else {
                     //The course spinner wasn't chosen
-                    System.out.println("Filtering with code: " + courseCodeText + " credits: " + courseCreditsText + " name: " + courseNameText);
-                    filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
+                    filterCourses();
                 }
                 return(true);
         }
@@ -178,7 +215,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         // The middle spinner
         if (parent.getId() == R.id.spinnerDepartments && !parent.getItemAtPosition(pos).toString().equals("Please Select a Semester First")) {
             if(!parent.getItemAtPosition(pos).toString().equals("Choose a Department")) {
-                System.out.println("Spinner: Department Chosen");
                 ArrayList<String> coursesNames = new ArrayList<>();
                 coursesNames.add(" -- ");
                 crses.clear();
@@ -199,15 +235,12 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
         // The bottom spinner
         if (parent.getId() == R.id.spinnerCourse) {
-            System.out.println("Spinner: Course Chosen");
 
             if(parent.getItemAtPosition(pos).toString().equals(" -- ")) {
                 courseName = null;
-                System.out.println("Set courseName: null");
             } else {
                 courseName = crses.get(pos);
                 crses.clear();
-                System.out.println("Set courseName: " + courseName.toString());
             }
         }
     }
@@ -235,16 +268,11 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             load.setVisibility(View.VISIBLE);
         }
 
-
-
-
         if(courseName != null) {
-            System.out.println("USING SPINNER TEXT");
-            filterCourses("", "", "");
+            filterCourses();
         } else {
             //The course spinner wasn't chosen
-            System.out.println("Filtering with code: " + courseCodeText + " credits: " + courseCreditsText + " name: " + courseNameText);
-            filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
+            filterCourses();
         }
     }
 
@@ -318,9 +346,40 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         // Check which checkbox was clicked
         switch(view.getId()) {
             case R.id.mondayCheckBox:
-                if (checked){
-
-                }
+                if(checked)
+                    days.add("Monday");
+                else
+                    days.remove("Monday");
+                break;
+            case R.id.tuesdayCheckBox:
+                if(checked)
+                    days.add("Tuesday");
+                else
+                    days.remove("Tuesday");
+                break;
+            case R.id.wednesdayCheckBox:
+                if(checked)
+                    days.add("Wednesday");
+                else
+                    days.remove("Wednesday");
+                break;
+            case R.id.thursdayCheckbox:
+                if(checked)
+                    days.add("Thursday");
+                else
+                    days.remove("Thursday");
+                break;
+            case R.id.fridayCheckbox:
+                if(checked)
+                    days.add("Friday");
+                else
+                    days.remove("Friday");
+                break;
+            case R.id.saturdayCheckbox:
+                if(checked)
+                    days.add("Saturday");
+                else
+                    days.remove("Saturday");
                 break;
         }
     }
@@ -401,10 +460,5 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         ArrayAdapter<CharSequence> periodEndAdapter = ArrayAdapter.createFromResource(this, R.array.periods_filter, android.R.layout.simple_spinner_item);
         periodEndAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         periodEnd.setAdapter(periodEndAdapter);
-
-        //Text Listeners
-        courseCodeText = (EditText) findViewById(R.id.courseCode);
-        courseCreditsText = (EditText) findViewById(R.id.courseCredits);
-        courseNameText = (EditText) findViewById(R.id.courseTitle);
     }
 }

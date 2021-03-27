@@ -58,8 +58,6 @@ public class Course implements java.io.Serializable{
         ArrayList<String> fixedTimes = new ArrayList<>();
 
         try{
-            System.out.println(Arrays.toString(days));
-            System.out.println(Arrays.toString(meetTimes));
             for(int i = 0; i < days.length; i++){
                 fixedTimes.add(days[i].replace("[", "").replace("\"", "") + ": " + meetTimes[i].replace("[", "").replace("\"", ""));
             }
