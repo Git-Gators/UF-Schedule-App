@@ -71,9 +71,6 @@ public class CalendarWeek extends MainActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         bottomNav.setSelectedItemId(R.id.nav_calendar);
-        BottomNavigationView dayNav = findViewById(R.id.day_of_week);
-        dayNav.setOnNavigationItemSelectedListener(dayListener);
-        dayNav.setSelectedItemId(R.id.monday);
         BottomNavigationView dayWeekNav = findViewById(R.id.week_day);
         dayWeekNav.setOnNavigationItemSelectedListener(dayWeekListener);
         dayWeekNav.setSelectedItemId(R.id.week);
@@ -93,7 +90,7 @@ public class CalendarWeek extends MainActivity {
  */
 
 
-        dayUpdate(courseSections);
+        weekUpdate(courseSections);
     }
     private BottomNavigationView.OnNavigationItemSelectedListener dayWeekListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -275,7 +272,7 @@ public class CalendarWeek extends MainActivity {
 
 
     //@Override
-    private void dayUpdate(Map<String, ArrayList<CourseEvent>> courseTimes) {
+    private void weekUpdate(Map<String, ArrayList<CourseEvent>> courseTimes) {
         recyclerView = findViewById(R.id.recyclerView);
 
         periods = getResources().getStringArray(R.array.periods);
@@ -343,12 +340,4 @@ public class CalendarWeek extends MainActivity {
 
         System.out.println("\nBruh");
     }
-    private BottomNavigationView.OnNavigationItemSelectedListener dayListener =
-            new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-                    return true;
-                }
-            };
 }
