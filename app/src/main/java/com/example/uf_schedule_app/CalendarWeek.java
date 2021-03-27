@@ -55,7 +55,7 @@ public class CalendarWeek extends MainActivity {
             R.drawable.border10,
             R.drawable.border11
     };
-    String periods[], courseViews[], daysOfWeek[], abbr[], period_abbr[];
+    String periods[], monday[], tuesday[], wednesday[], thursday[], friday[], saturday[], daysOfWeek[], abbr[], period_abbr[], week[][];
     int images[] = {R.drawable.ic_baseline_calendar_view_day_24,
             R.drawable.ic_baseline_calendar_view_day_24, R.drawable.ic_baseline_calendar_view_day_24,
             R.drawable.ic_baseline_calendar_view_day_24, R.drawable.ic_baseline_calendar_view_day_24,
@@ -275,70 +275,67 @@ public class CalendarWeek extends MainActivity {
 
 
     //@Override
-    private void dayUpdate(String day, Map<String, ArrayList<CourseEvent>> courseTimes) {
+    private void dayUpdate(String bruh, Map<String, ArrayList<CourseEvent>> courseTimes) {
         recyclerView = findViewById(R.id.recyclerView);
 
         periods = getResources().getStringArray(R.array.periods);
         period_abbr = getResources().getStringArray(R.array.periods_filter);
         daysOfWeek = getResources().getStringArray(R.array.daysOfWeek);
         abbr = getResources().getStringArray(R.array.dayInitials);
-        courseViews = new String[numPeriods];
+        week = new String[6][numPeriods];
 
-        courseViews[0] = abbr[0];
         int[] color = new int[numPeriods];
         for (int x = 0; x < numPeriods; x++) {
             color[x] = R.drawable.border;
         }
 
-        for (int i = 1; i < numPeriods; i++)
-        {
-            courseViews[i] = "";
-        }
-        ArrayList<CourseEvent> events = courseTimes.get(day);
-        for (int i = 0; i < events.size(); i++)
-        {
-            boolean isNow = false;
-            //j is numPeriods - 1 because the first time slot and final time slot don't contain dashes
-            for (int j = 1; j < numPeriods - 1; j++)
-            {
-                String times = events.get(i).time;
-                String beginningTime = "";
-                String endTime = "";
-                if (times.indexOf('-') != -1)
-                {
-                    beginningTime = times.substring(0, times.indexOf('-'));
-                    endTime = times.substring(times.indexOf('-') + 1);
-                }
-
-
-                String periodStart = periods[j].substring(0, periods[j].indexOf('-'));
-                String periodEnd = periods[j].substring(periods[j].indexOf('-') + 1);
-
-                if (beginningTime.equals(periodStart) && endTime.equals(periodEnd))
-                {
-                    courseViews[j] = courseTimes.get(day).get(i).courseCode;
-                    color[j] = colors[courseTimes.get(day).get(i).position%10];
-                }
-                else if (beginningTime.equals(periodStart) && !endTime.equals(periodEnd)) {
-                    isNow = true;
-                    courseViews[j] = courseTimes.get(day).get(i).courseCode;
-                    color[j] = colors[courseTimes.get(day).get(i).position%10];
-                }
-                else if(isNow && !endTime.equals(periodEnd)) {
-                    color[j] = colors[courseTimes.get(day).get(i).position%10];
-                }
-                else if(isNow && endTime.equals(periodEnd)) {
-                    isNow = false;
-                    color[j] = colors[courseTimes.get(day).get(i).position%10];
-                }
-            }
-            if (events.get(i).time.equals("Online"))
-            {
-                courseViews[numPeriods - 1] = courseTimes.get(day).get(i).courseCode;
+        for (int j = 0; j < 6; j++) {
+            week[j][0] = abbr[j];
+            for (int i = 1; i < numPeriods; i++) {
+                week[j][i] = "";
             }
         }
-        courseViews[0] = abbr[0];
-        Week_Adapter weekAdapter = new Week_Adapter(this, period_abbr, courseViews, color);
+        int counter = 0;
+        for(String day : daysOfWeek) {
+            ArrayList<CourseEvent> events = courseTimes.get(day);
+            for (int i = 0; i < events.size(); i++) {
+                boolean isNow = false;
+                //j is numPeriods - 1 because the first time slot and final time slot don't contain dashes
+                for (int j = 1; j < numPeriods - 1; j++) {
+                    String times = events.get(i).time;
+                    String beginningTime = "";
+                    String endTime = "";
+                    if (times.indexOf('-') != -1) {
+                        beginningTime = times.substring(0, times.indexOf('-'));
+                        endTime = times.substring(times.indexOf('-') + 1);
+                    }
+
+
+                    String periodStart = periods[j].substring(0, periods[j].indexOf('-'));
+                    String periodEnd = periods[j].substring(periods[j].indexOf('-') + 1);
+
+                    if (beginningTime.equals(periodStart) && endTime.equals(periodEnd)) {
+                        week[counter][j] = courseTimes.get(day).get(i).courseCode;
+                        color[j] = colors[courseTimes.get(day).get(i).position % 10];
+                    } else if (beginningTime.equals(periodStart) && !endTime.equals(periodEnd)) {
+                        isNow = true;
+                        week[counter][j] = courseTimes.get(day).get(i).courseCode;
+                        color[j] = colors[courseTimes.get(day).get(i).position % 10];
+                    } else if (isNow && !endTime.equals(periodEnd)) {
+                        color[j] = colors[courseTimes.get(day).get(i).position % 10];
+                    } else if (isNow && endTime.equals(periodEnd)) {
+                        isNow = false;
+                        color[j] = colors[courseTimes.get(day).get(i).position % 10];
+                    }
+                }
+                if (events.get(i).time.equals("Online")) {
+                    week[0][numPeriods - 1] = courseTimes.get(day).get(i).courseCode;
+                }
+            }
+            counter++;
+        }
+        //monday[0] = abbr[0];
+        Week_Adapter weekAdapter = new Week_Adapter(this, period_abbr, week, color);
         recyclerView.setAdapter(weekAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
