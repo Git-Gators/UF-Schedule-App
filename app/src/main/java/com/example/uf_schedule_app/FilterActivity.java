@@ -164,11 +164,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                                     continue;
                             }
 
-                            //Get the meetTimes
-                            //Get the days arrays
-                            //Match positions assign meetTimes to day =>
-                            //Filter based on Day's Meet Period
-
                             String meetTime = crsToBeAdded.classSection.get("meetPeriod");
                             Matcher regexPeriods = Pattern.compile("[\\[]([^\\]]+)[\\]]").matcher(meetTime);
                             ArrayList<String> meetTimes = new ArrayList<>();
@@ -509,14 +504,11 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
         //Period Start
         Spinner periodStart = findViewById(R.id.periodStartSpinner);
+        Spinner periodEnd = findViewById(R.id.periodEndSpinner);
+
         ArrayAdapter<CharSequence> periodStartAdapter = ArrayAdapter.createFromResource(this, R.array.periods_filter, android.R.layout.simple_spinner_item);
         maxSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         periodStart.setAdapter(periodStartAdapter);
-
-        //Period End
-        Spinner periodEnd = findViewById(R.id.periodEndSpinner);
-        ArrayAdapter<CharSequence> periodEndAdapter = ArrayAdapter.createFromResource(this, R.array.periods_filter, android.R.layout.simple_spinner_item);
-        periodEndAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        periodEnd.setAdapter(periodEndAdapter);
+        periodEnd.setAdapter(periodStartAdapter);
     }
 }
