@@ -79,7 +79,7 @@ public class Register extends AppCompatActivity {
                 fAuth.createUserWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        //send user to home page on success
+
                         userId = fAuth.getCurrentUser().getUid();
                         DocumentReference documentReference = userdb.collection("users").document(userId);
 
@@ -102,6 +102,7 @@ public class Register extends AppCompatActivity {
                             }
                         });
 
+                        //send user to home page on success
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                         finish();
 

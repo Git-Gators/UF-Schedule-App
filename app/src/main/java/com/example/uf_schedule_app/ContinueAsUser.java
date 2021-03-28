@@ -74,9 +74,24 @@ public class ContinueAsUser extends AppCompatActivity {
             fAuth = FirebaseAuth.getInstance();
         }
 
-        if (fAuth.getCurrentUser() != null && fAuth.getCurrentUser().getDisplayName() != null)
+        firebaseUser = fAuth.getCurrentUser();
+
+        if (firebaseUser != null && firebaseUser.getUid() != null)
         {
-            continueAsUser_name.setText(fAuth.getCurrentUser().getDisplayName());
+            this.userId = firebaseUser.getUid();
+            documentReference = userdb.collection("users").document(userId);
+            documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if (documentSnapshot.exists()) {
+                        if (documentSnapshot.get("Full Name") != null)
+                        {
+                            String name = (String) documentSnapshot.get("Full Name");
+                            continueAsUser_name.setText(name);
+                        }
+                    }
+                }
+            });
         }
         else
         {

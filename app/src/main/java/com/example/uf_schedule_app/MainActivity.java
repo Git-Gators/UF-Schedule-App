@@ -334,14 +334,15 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
         if (FirebaseAuth.getInstance().getCurrentUser() != null && !loaded) {
             loginBtnHomePage.setVisibility(View.GONE);
             logoutBtnHomePage.setVisibility(View.VISIBLE);
+            fAuth = FirebaseAuth.getInstance();
             loadData();
-            /*Bundle b = new Bundle();
+            Bundle b = new Bundle();
             Intent in;
             in = new Intent(getBaseContext(), ContinueAsUser.class);
             in.putExtras(b);
-            in.putExtra("fAuth", (Serializable) fAuth);
+            //in.putExtra("fAuth", (Serializable) fAuth);
             startActivity(in);
-            finish();*/
+            finish();
             loaded = true;
         } else if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             loginBtnHomePage.setVisibility(View.VISIBLE);
