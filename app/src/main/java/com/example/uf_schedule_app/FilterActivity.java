@@ -118,7 +118,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                             //Based on the fields entered we match on things.
                             if (!name.isEmpty()) {
                                 //There's a name
-                                if(!ds.getValue(Course.class).courseInfo.get("name").contains(name)) {
+                                if(!crsToBeAdded.courseInfo.get("name").contains(name)) {
                                     //The name doesn't match the course name
                                     continue;
                                 }
@@ -127,7 +127,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                                 //There's a code
 
                                 //We've not matched on code.
-                                if(!ds.getValue(Course.class).courseInfo.get("code").contains(code)) {
+                                if(!crsToBeAdded.courseInfo.get("code").contains(code)) {
                                     continue;
                                 }
                             }
@@ -135,7 +135,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                                 //There's a code and we haven't matched yet.
 
                                 //We've not matched on code.
-                                if(!ds.getValue(Course.class).classSection.get("credits").contains(credits)) {
+                                if(!crsToBeAdded.classSection.get("credits").contains(credits)) {
                                     continue;
                                 }
                             }
@@ -143,7 +143,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                                 //There's a instructor and we haven't matched yet.
 
                                 //We've not matched on instructor.
-                                if(!ds.getValue(Course.class).classSection.get("Instructors").contains(instructor)) {
+                                if(!crsToBeAdded.classSection.get("Instructors").contains(instructor)) {
                                     continue;
                                 }
                             }
@@ -151,7 +151,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                             String level = ds.getValue(Course.class).courseInfo.get("code");
                             level = level.substring(3, 7);
                             int levelInt = Integer.parseInt(level);
-                            System.out.println("level " + level + "levelMin " + levelMin);
                             if (!levelMin.equals("--")) {
                                 int levelMinInt = Integer.parseInt(levelMin);
                                 if(levelInt < levelMinInt)
@@ -162,11 +161,40 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                                 if(levelMaxInt < levelInt)
                                     continue;
                             }
-                            if (!periodStart.isEmpty()) {
 
-                            }
-                            if (!periodEnd.isEmpty()) {
-
+                            if(!days.isEmpty() && !crsToBeAdded.classSection.get("meetDays").isEmpty()) {
+                                //One+ days checkboxes are clicked
+                                String meetDays = crsToBeAdded.classSection.get("meetDays");
+                                if(days.contains("Monday") && !meetDays.contains("M") || meetDays.contains("M") && !days.contains("Monday")) {
+                                    continue;
+                                } else {
+                                    //Check times
+                                }
+                                if(days.contains("Tuesday") && !meetDays.contains("T") || meetDays.contains("T") && !days.contains("Tuesday")) {
+                                    continue;
+                                } else {
+                                    //Check times
+                                }
+                                if(days.contains("Wednesday") && !meetDays.contains("W") || meetDays.contains("W") && !days.contains("Wednesday")) {
+                                    continue;
+                                } else {
+                                    //Check times
+                                }
+                                if(days.contains("Thursday") && !meetDays.contains("R") || meetDays.contains("R") && !days.contains("Thursday")) {
+                                    continue;
+                                } else {
+                                    //Check times
+                                }
+                                if(days.contains("Friday") && !meetDays.contains("F") || meetDays.contains("F") && !days.contains("Friday")) {
+                                    continue;
+                                } else {
+                                    //Check times
+                                }
+                                if(days.contains("Saturday") && !meetDays.contains("S") || meetDays.contains("S") && !days.contains("Saturday")) {
+                                    continue;
+                                } else {
+                                    //Check times
+                                }
                             }
 
                             crses.add(crsToBeAdded);

@@ -30,6 +30,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -179,7 +180,8 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
 
 //        try {
 //            dbUpdater.updateDB(getBaseContext());
-//        } catch (IOException e) {
+//            //dbUpdater.deleteCourses();
+//        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
 

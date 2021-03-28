@@ -19,6 +19,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,6 +33,7 @@ import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -88,7 +90,6 @@ public class DatabaseUpdater extends Context {
                                 courseObj.courseInfo.put("courseId", (String) courseDir.get("courseId"));
                                 //String courseID = (String) courseDir.get("courseId");
 
-
                                 String name = response.getJSONObject(0).getJSONArray("COURSES").getJSONObject(c).get("name").toString();
                                 courseObj.courseInfo.put("name", name);
 
@@ -135,7 +136,7 @@ public class DatabaseUpdater extends Context {
 
                                     for(int i = 0; i < meetTimes.length(); i++){
                                         meetDays.append(meetTimes.getJSONObject(i).get("meetDays").toString());
-                                        meetPeriod.append(meetTimes.getJSONObject(i).get("meetPeriodBegin").toString()).append("-").append(meetTimes.getJSONObject(i).get("meetPeriodEnd").toString());
+                                        meetPeriod.append("[").append(meetTimes.getJSONObject(i).get("meetPeriodBegin").toString()).append("-").append(meetTimes.getJSONObject(i).get("meetPeriodEnd").toString()).append("]");
                                         meetTime.append("[").append(meetTimes.getJSONObject(i).get("meetTimeBegin").toString()).append("-").append(meetTimes.getJSONObject(i).get("meetTimeEnd").toString()).append("]");
                                     }
                                     sectionMap.put("meetDays", meetDays.toString());
@@ -240,6 +241,11 @@ public class DatabaseUpdater extends Context {
             }
         };
         mDatabase.addValueEventListener(postListener);
+    }
+
+    public void deleteCourses(){
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.removeValue();
     }
 
     public void setTextFields(EditText course1, EditText course2, EditText course3, EditText course4, String deptName, String courseName, ProgressBar pSpinner3) {
