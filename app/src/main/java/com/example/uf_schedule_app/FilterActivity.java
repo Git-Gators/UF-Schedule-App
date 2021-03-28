@@ -28,6 +28,8 @@ import com.r0adkll.slidr.Slidr;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FilterActivity extends MainActivity implements AdapterView.OnItemSelectedListener {
 
@@ -162,38 +164,66 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                                     continue;
                             }
 
-                            if(!days.isEmpty() && !crsToBeAdded.classSection.get("meetDays").isEmpty()) {
+                            //Get the meetTimes
+                            //Get the days arrays
+                            //Match positions assign meetTimes to day =>
+                            //Filter based on Day's Meet Period
+
+                            String meetTime = crsToBeAdded.classSection.get("meetPeriod");
+                            Matcher regexPeriods = Pattern.compile("[\\[]([^\\]]+)[\\]]").matcher(meetTime);
+                            ArrayList<String> meetTimes = new ArrayList<>();
+                            while(regexPeriods.find()) {
+                                meetTimes.add(regexPeriods.group(1));
+                            }
+
+                            for(int i = 0; i < meetTimes.size(); i++){
+                                meetTimes.set(i, meetTimes.get(i).replace("E1", "12").replace("E2", "13").replace("E3", "14"));
+                            }
+
+                            if(!periodStart.equals("--")){
+                                String fixedPeriodStart = periodStart.replace("E1", "12").replace("E2", "13").replace("E3", "14");
+
+                                boolean cont = false;
+                                for(int i = 0; i < meetTimes.size(); i++){
+                                    if(Integer.parseInt(String.valueOf(meetTimes.get(i).charAt(0))) <  Integer.parseInt(fixedPeriodStart))
+                                        cont = true;
+                                }
+                                if(cont)
+                                    continue;
+                            }
+                            if(!periodEnd.equals("--")){
+                                String fixedPeriodEnd = periodEnd.replace("E1", "12").replace("E2", "13").replace("E3", "14");
+
+                                boolean cont = false;
+                                for(int i = 0; i < meetTimes.size(); i++){
+                                    if(Integer.parseInt(String.valueOf(meetTimes.get(i).charAt(meetTimes.get(i).length()-1))) >  Integer.parseInt(fixedPeriodEnd))
+                                        cont = true;
+                                }
+                                if(cont)
+                                    continue;
+                            }
+
+                            if(!days.isEmpty()){
+                                //If the days checkboxes are checked
                                 //One+ days checkboxes are clicked
                                 String meetDays = crsToBeAdded.classSection.get("meetDays");
                                 if(days.contains("Monday") && !meetDays.contains("M") || meetDays.contains("M") && !days.contains("Monday")) {
                                     continue;
-                                } else {
-                                    //Check times
                                 }
                                 if(days.contains("Tuesday") && !meetDays.contains("T") || meetDays.contains("T") && !days.contains("Tuesday")) {
                                     continue;
-                                } else {
-                                    //Check times
                                 }
                                 if(days.contains("Wednesday") && !meetDays.contains("W") || meetDays.contains("W") && !days.contains("Wednesday")) {
                                     continue;
-                                } else {
-                                    //Check times
                                 }
                                 if(days.contains("Thursday") && !meetDays.contains("R") || meetDays.contains("R") && !days.contains("Thursday")) {
                                     continue;
-                                } else {
-                                    //Check times
                                 }
                                 if(days.contains("Friday") && !meetDays.contains("F") || meetDays.contains("F") && !days.contains("Friday")) {
                                     continue;
-                                } else {
-                                    //Check times
                                 }
                                 if(days.contains("Saturday") && !meetDays.contains("S") || meetDays.contains("S") && !days.contains("Saturday")) {
                                     continue;
-                                } else {
-                                    //Check times
                                 }
                             }
 
