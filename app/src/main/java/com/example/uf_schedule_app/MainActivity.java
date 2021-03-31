@@ -353,6 +353,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
             in.putExtras(b);
             startActivity(in);
             finish();
+            loaded = true;
         } else
         {
             loginBtnHomePage.setVisibility(View.GONE);
