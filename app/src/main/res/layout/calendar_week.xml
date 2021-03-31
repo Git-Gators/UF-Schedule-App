@@ -10,9 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/day_of_week" />
+        app:layout_constraintTop_toBottomOf="@+id/week_day" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
@@ -38,14 +38,4 @@
         app:layout_constraintTop_toTopOf="parent"
         app:menu="@menu/week_day" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/day_of_week"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        app:labelVisibilityMode="labeled"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/week_day"
-        app:menu="@menu/day_of_week" />
 </androidx.constraintlayout.widget.ConstraintLayout>

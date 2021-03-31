@@ -38,7 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class CalendarView extends MainActivity {
+public class CalendarWeek extends MainActivity {
     RecyclerView recyclerView;
     Map<String, ArrayList<CourseEvent>> courseSections = loadCourseEvents(coursesPicked);
 
@@ -55,7 +55,7 @@ public class CalendarView extends MainActivity {
             R.drawable.border10,
             R.drawable.border11
     };
-    String periods[], courseViews[], daysOfWeek[];
+    String periods[], daysOfWeek[], abbr[], period_abbr[], week[][];
     int images[] = {R.drawable.ic_baseline_calendar_view_day_24,
             R.drawable.ic_baseline_calendar_view_day_24, R.drawable.ic_baseline_calendar_view_day_24,
             R.drawable.ic_baseline_calendar_view_day_24, R.drawable.ic_baseline_calendar_view_day_24,
@@ -67,16 +67,13 @@ public class CalendarView extends MainActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.calendar_view);
+        setContentView(R.layout.calendar_week);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         bottomNav.setSelectedItemId(R.id.nav_calendar);
-        BottomNavigationView dayNav = findViewById(R.id.day_of_week);
-        dayNav.setOnNavigationItemSelectedListener(dayListener);
-        dayNav.setSelectedItemId(R.id.monday);
         BottomNavigationView dayWeekNav = findViewById(R.id.week_day);
         dayWeekNav.setOnNavigationItemSelectedListener(dayWeekListener);
-        dayWeekNav.setSelectedItemId(R.id.day);
+        dayWeekNav.setSelectedItemId(R.id.week);
         recyclerView = findViewById(R.id.recyclerView);
         courseSections = loadCourseEvents(coursesPicked);
 /**
@@ -92,8 +89,8 @@ public class CalendarView extends MainActivity {
  *     <color name="orange">#FF5722</color>
  */
 
-        //Load the default day as Monday
-        dayUpdate("Monday", courseSections);
+
+        weekUpdate(courseSections);
     }
     private BottomNavigationView.OnNavigationItemSelectedListener dayWeekListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -103,17 +100,17 @@ public class CalendarView extends MainActivity {
                     Intent in;
                     Bundle b = new Bundle();
                     switch (item.getItemId()) {
-                        case R.id.week:
-                            id = R.id.week;
-                            in = new Intent(getBaseContext(), CalendarWeek.class);
+                        case R.id.day:
+                            id = R.id.day;
+                            in = new Intent(getBaseContext(), CalendarView.class);
                             in.putExtra("coursesPicked", coursesPicked);
                             in.putExtras(b);
                             startActivity(in);
-                            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                             finish();
                             break;
-                        case R.id.day:
-                            id = R.id.day;
+                        case R.id.week:
+                            id = R.id.week;
                             break;
                     }
                     System.out.println(id);
@@ -275,102 +272,72 @@ public class CalendarView extends MainActivity {
 
 
     //@Override
-    private void dayUpdate(String day, Map<String, ArrayList<CourseEvent>> courseTimes) {
+    private void weekUpdate(Map<String, ArrayList<CourseEvent>> courseTimes) {
         recyclerView = findViewById(R.id.recyclerView);
 
         periods = getResources().getStringArray(R.array.periods);
+        period_abbr = getResources().getStringArray(R.array.periods_filter);
         daysOfWeek = getResources().getStringArray(R.array.daysOfWeek);
-        courseViews = new String[numPeriods];
+        abbr = getResources().getStringArray(R.array.dayInitials);
+        week = new String[6][numPeriods];
 
-        courseViews[0] = daysOfWeek[0];
-        int[] color = new int[numPeriods];
-        for (int x = 0; x < numPeriods; x++) {
-            color[x] = R.drawable.border;
-        }
-
-        for (int i = 1; i < numPeriods; i++)
-        {
-            courseViews[i] = "";
-        }
-        ArrayList<CourseEvent> events = courseTimes.get(day);
-        for (int i = 0; i < events.size(); i++)
-        {
-            boolean isNow = false;
-            //j is numPeriods - 1 because the first time slot and final time slot don't contain dashes
-            for (int j = 1; j < numPeriods - 1; j++)
-            {
-                String times = events.get(i).time;
-                String beginningTime = "";
-                String endTime = "";
-                if (times.indexOf('-') != -1)
-                {
-                    beginningTime = times.substring(0, times.indexOf('-'));
-                    endTime = times.substring(times.indexOf('-') + 1);
-                }
-
-
-                String periodStart = periods[j].substring(0, periods[j].indexOf('-'));
-                String periodEnd = periods[j].substring(periods[j].indexOf('-') + 1);
-
-                if (beginningTime.equals(periodStart) && endTime.equals(periodEnd))
-                {
-                    courseViews[j] = courseTimes.get(day).get(i).courseCode;
-                    color[j] = colors[courseTimes.get(day).get(i).position%10];
-                }
-                else if (beginningTime.equals(periodStart) && !endTime.equals(periodEnd)) {
-                    isNow = true;
-                    courseViews[j] = courseTimes.get(day).get(i).courseCode;
-                    color[j] = colors[courseTimes.get(day).get(i).position%10];
-                }
-                else if(isNow && !endTime.equals(periodEnd)) {
-                    color[j] = colors[courseTimes.get(day).get(i).position%10];
-                }
-                else if(isNow && endTime.equals(periodEnd)) {
-                    isNow = false;
-                    color[j] = colors[courseTimes.get(day).get(i).position%10];
-                }
-            }
-            if (events.get(i).time.equals("Online"))
-            {
-                courseViews[numPeriods - 1] = courseTimes.get(day).get(i).courseCode;
+        int[][] color = new int[6][numPeriods];
+        for (int y = 0; y < 6; y++) {
+            for (int x = 0; x < numPeriods; x++) {
+                color[y][x] = R.drawable.border;
             }
         }
-        courseViews[0] = day;
-        Calendar_Adapter calendarAdapter = new Calendar_Adapter(this, periods, courseViews, color);
-        recyclerView.setAdapter(calendarAdapter);
+
+        for (int j = 0; j < 6; j++) {
+            week[j][0] = abbr[j];
+            for (int i = 1; i < numPeriods; i++) {
+                week[j][i] = "";
+            }
+        }
+        int counter = 0;
+        for(String day : daysOfWeek) {
+            ArrayList<CourseEvent> events = courseTimes.get(day);
+            for (int i = 0; i < events.size(); i++) {
+                boolean isNow = false;
+                //j is numPeriods - 1 because the first time slot and final time slot don't contain dashes
+                for (int j = 1; j < numPeriods - 1; j++) {
+                    String times = events.get(i).time;
+                    String beginningTime = "";
+                    String endTime = "";
+                    if (times.indexOf('-') != -1) {
+                        beginningTime = times.substring(0, times.indexOf('-'));
+                        endTime = times.substring(times.indexOf('-') + 1);
+                    }
+
+
+                    String periodStart = periods[j].substring(0, periods[j].indexOf('-'));
+                    String periodEnd = periods[j].substring(periods[j].indexOf('-') + 1);
+
+                    if (beginningTime.equals(periodStart) && endTime.equals(periodEnd)) {
+                        week[counter][j] = courseTimes.get(day).get(i).courseCode;
+                        color[counter][j] = colors[courseTimes.get(day).get(i).position % 10];
+                    } else if (beginningTime.equals(periodStart) && !endTime.equals(periodEnd)) {
+                        isNow = true;
+                        week[counter][j] = courseTimes.get(day).get(i).courseCode;
+                        color[counter][j] = colors[courseTimes.get(day).get(i).position % 10];
+                    } else if (isNow && !endTime.equals(periodEnd)) {
+                        color[counter][j] = colors[courseTimes.get(day).get(i).position % 10];
+                    } else if (isNow && endTime.equals(periodEnd)) {
+                        isNow = false;
+                        color[counter][j] = colors[courseTimes.get(day).get(i).position % 10];
+                    }
+                }
+                if (events.get(i).time.equals("Online")) {
+                    week[0][numPeriods - 1] = courseTimes.get(day).get(i).courseCode;
+                }
+            }
+            counter++;
+        }
+
+        Week_Adapter weekAdapter = new Week_Adapter(this, period_abbr, week, color);
+        recyclerView.setAdapter(weekAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        System.out.println("\nDay of Week Changed!");
+        System.out.println("\nBruh");
     }
-    private BottomNavigationView.OnNavigationItemSelectedListener dayListener =
-            new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    int id = 0;
-                    switch(item.getItemId()){
-                        case R.id.monday:
-                            id = R.id.monday;
-                            dayUpdate("Monday", courseSections);
-                            break;
-                        case R.id.tuesday:
-                            id = R.id.tuesday;
-                            dayUpdate("Tuesday", courseSections);
-                            break;
-                        case R.id.wednesday:
-                            id = R.id.wednesday;
-                            dayUpdate("Wednesday", courseSections);
-                            break;
-                        case R.id.thursday:
-                            id = R.id.thursday;
-                            dayUpdate("Thursday", courseSections);
-                            break;
-                        case R.id.friday:
-                            id = R.id.friday;
-                            dayUpdate("Friday", courseSections);
-                            break;
-                    }
-                    System.out.println(id);
-                    return true;
-                }
-            };
 }
