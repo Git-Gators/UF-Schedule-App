@@ -28,6 +28,8 @@ import com.r0adkll.slidr.Slidr;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FilterActivity extends MainActivity implements AdapterView.OnItemSelectedListener {
 
@@ -35,6 +37,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     Course courseName = null;
     String semester = "Spring 2021";
     ArrayList<Course> coursesInSchedule = new ArrayList<>();
+    ArrayList<String> days = new ArrayList<>();
 
     // Courses retrieved from the DB
     ArrayList<Course> crses = new ArrayList<>();
@@ -54,33 +57,11 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     //Used in the Spinner
     ArrayList<String> deptNames = new ArrayList<>();
 
-    //Used in the filters
-    EditText courseCodeText;
-    EditText courseCreditsText;
-    EditText courseNameText;
-
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.filter_view);
-
-        //Display the top section
-        getSupportActionBar().setTitle("Filters");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        //Filter Button & Loading inside the linear layout
-        ProgressBar filterLoad = findViewById(R.id.filterLoad);
-        filterLoad.setVisibility(View.INVISIBLE);
-        Button filterButton = findViewById(R.id.button3);
-        filterButton.setVisibility(View.VISIBLE);
-
-        //Filter Button & Loading outside the linear layout
-        ProgressBar filterLoadOut = findViewById(R.id.outerFilterLoad);
-        filterLoadOut.setVisibility(View.INVISIBLE);
-        Button filterButtonOut = findViewById(R.id.outerFilter);
-        filterButtonOut.setVisibility(View.INVISIBLE);
-
 
         //Grab info from other activities.
         Intent intent = getIntent();
@@ -95,75 +76,30 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             }
         }
 
-        //Set the progress bars for spinners to be invisible
-        pSpinner2 = findViewById(R.id.progressBar2);
-        pSpinner2.setVisibility(View.INVISIBLE);
-
-        //Update the lists
-        spinnerDept = (Spinner) findViewById(R.id.spinnerDepartments);
-        spinnerCrse = (Spinner) findViewById(R.id.spinnerCourse);
-
-        spinnerDept.setOnItemSelectedListener(this);
-        spinnerCrse.setOnItemSelectedListener(this);
-
-        //Add the database information to the list and update the spinner
-        try {
-            dbUpdater.getDepNames(deptNames, spinnerDept, spinnerCrse, getBaseContext());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        deptNames.set(0, " -- ");
-        String[] courses = {" -- "};
-        spinnerCrse.setEnabled(false);
-
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        final ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, deptNames);
-        final ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, courses);
-
-        // Specify the layout to use when the list of choices appears
-        spinnerArrayAdapter2.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-        spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-
-        // Apply the adapter to the spinner
-        spinnerDept.setAdapter(spinnerArrayAdapter2);
-        spinnerCrse.setAdapter(spinnerArrayAdapter1);
-
-        //Text Listeners
-        courseCodeText = (EditText) findViewById(R.id.courseCode);
-        courseCreditsText = (EditText) findViewById(R.id.courseCredits);
-        courseNameText = (EditText) findViewById(R.id.courseTitle);
-
-
-        Spinner minSpinner = findViewById(R.id.levelMinSpinner);
-        ArrayAdapter<CharSequence> minSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.level_minimum, android.R.layout.simple_spinner_item);
-        minSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        minSpinner.setAdapter(minSpinnerAdapter);
-
-        Spinner maxSpinner = findViewById(R.id.levelMaxSpinner);
-        ArrayAdapter<CharSequence> maxSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.level_maximum, android.R.layout.simple_spinner_item);
-        maxSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        maxSpinner.setAdapter(maxSpinnerAdapter);
-
-        Spinner periodStart = findViewById(R.id.periodStartSpinner);
-        ArrayAdapter<CharSequence> periodStartAdapter = ArrayAdapter.createFromResource(this, R.array.level_maximum, android.R.layout.simple_spinner_item);
-        maxSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        periodStart.setAdapter(periodStartAdapter);
-
-        Spinner periodEnd = findViewById(R.id.periodEndSpinner);
-        ArrayAdapter<CharSequence> periodEndAdapter = ArrayAdapter.createFromResource(this, R.array.level_maximum, android.R.layout.simple_spinner_item);
-        periodEndAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        periodEnd.setAdapter(periodEndAdapter);
+        setupInterface();
     }
 
-    public void filterCourses(String code, String credits, String name){
-        System.out.println(code + " " + credits + " "  + name);
+    public void filterCourses(){
+        //Text Listeners
+        EditText courseCodeText = (EditText) findViewById(R.id.courseCode);
+        EditText courseCreditsText = (EditText) findViewById(R.id.courseCredits);
+        EditText courseNameText = (EditText) findViewById(R.id.courseTitle);
+        EditText instructorText = (EditText) findViewById(R.id.instructorInput);
+
+        String code = courseCodeText.getText().toString();
+        String credits = courseCreditsText.getText().toString();
+        String name = courseNameText.getText().toString();
+        String instructor = instructorText.getText().toString();
+        String levelMin = ((Spinner)findViewById(R.id.levelMinSpinner)).getSelectedItem().toString();
+        String levelMax = ((Spinner)findViewById(R.id.levelMaxSpinner)).getSelectedItem().toString();
+        String periodStart = ((Spinner)findViewById(R.id.periodStartSpinner)).getSelectedItem().toString();
+        String periodEnd = ((Spinner)findViewById(R.id.periodEndSpinner)).getSelectedItem().toString();
+
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
         ValueEventListener postListener = new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean match;
-                System.out.println(department);
                 crses.clear();
 
                 if(courseName != null){
@@ -172,53 +108,125 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                     boolean depMatched = false;
                     for (DataSnapshot dep : dataSnapshot.getChildren()) {
                         //if the department isn't right
-                        if(!dep.getKey().equals(department) && !department.equals("") && !department.equals("Choose a Department")) {
-                            System.out.println("Skipping on the basis of department not being equal");
+                        if(!dep.getKey().equals(department) && !department.equals(" -- ")) {
                             continue;
-                        } else if(dep.getKey().equals(department) && !department.equals("") && !department.equals("Choose a Department")) {
+                        } else if(dep.getKey().equals(department) && !department.equals(" -- ")) {
                             depMatched = true;
                         }
 
                         for (DataSnapshot ds : dep.getChildren()) {
-                            match = false;
+                            Course crsToBeAdded = ds.getValue(Course.class);
 
                             //Based on the fields entered we match on things.
-                            if (ds.getValue(Course.class).courseInfo.get("name").contains(name) && credits.equals("") && code.equals("")) {
-                                match = true;
-                                System.out.println("MATCH: " + name + " " + ds.getValue(Course.class).courseInfo.get("name") + ";");
-                                System.out.println("Matched on only name");
-                            } else if (Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSection.get("credits"), credits) && name.equals("") && code.equals("")) {
-                                match = true;
-                                System.out.println("Matched on only credits");
-                            } else if (Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code) && name.equals("") && credits.equals("")) {
-                                match = true;
-                                System.out.println("Matched on only code");
-                            } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSection.get("credits"), credits)
-                                    && code.equals("")){
-                                match = true;
-                                System.out.println("Matched on name and credits");
-                            } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code)
-                                    && credits.equals("")){
-                                match = true;
-                                System.out.println("Matched on name and code");
-                            } else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSection.get("credits"), credits)
-                                    && name.equals("")){
-                                match = true;
-                                System.out.println("Matched on code and credits");
-                            }  else if(Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("name")).contains(name) && Objects.equals(Objects.requireNonNull(ds.getValue(Course.class)).classSection.get("credits"), credits) &&
-                                    Objects.requireNonNull(Objects.requireNonNull(ds.getValue(Course.class)).courseInfo.get("code")).contains(code)){
-                                match = true;
-                                System.out.println("Matched on all fields");
+                            if (!name.isEmpty()) {
+                                //There's a name
+                                if(!crsToBeAdded.courseInfo.get("name").contains(name)) {
+                                    //The name doesn't match the course name
+                                    continue;
+                                }
+                            }
+                            if (!code.isEmpty()) {
+                                //There's a code
+
+                                //We've not matched on code.
+                                if(!crsToBeAdded.courseInfo.get("code").contains(code)) {
+                                    continue;
+                                }
+                            }
+                            if (!credits.isEmpty()) {
+                                //There's a code and we haven't matched yet.
+
+                                //We've not matched on code.
+                                if(!crsToBeAdded.classSection.get("credits").contains(credits)) {
+                                    continue;
+                                }
+                            }
+                            if (!instructor.isEmpty()) {
+                                //There's a instructor and we haven't matched yet.
+
+                                //We've not matched on instructor.
+                                if(!crsToBeAdded.classSection.get("Instructors").contains(instructor)) {
+                                    continue;
+                                }
                             }
 
-                            if(match) {
-                                crses.add(ds.getValue(Course.class));
+                            String level = ds.getValue(Course.class).courseInfo.get("code");
+                            level = level.substring(3, 7);
+                            int levelInt = Integer.parseInt(level);
+                            if (!levelMin.equals("--")) {
+                                int levelMinInt = Integer.parseInt(levelMin);
+                                if(levelInt < levelMinInt)
+                                    continue;
                             }
+                            if (!levelMax.equals("--")) {
+                                int levelMaxInt = Integer.parseInt(levelMax);
+                                if(levelMaxInt < levelInt)
+                                    continue;
+                            }
+
+                            String meetTime = crsToBeAdded.classSection.get("meetPeriod");
+                            Matcher regexPeriods = Pattern.compile("[\\[]([^\\]]+)[\\]]").matcher(meetTime);
+                            ArrayList<String> meetTimes = new ArrayList<>();
+                            while(regexPeriods.find()) {
+                                meetTimes.add(regexPeriods.group(1));
+                            }
+
+                            for(int i = 0; i < meetTimes.size(); i++){
+                                meetTimes.set(i, meetTimes.get(i).replace("E1", "12").replace("E2", "13").replace("E3", "14"));
+                            }
+
+                            if(!periodStart.equals("--")){
+                                String fixedPeriodStart = periodStart.replace("E1", "12").replace("E2", "13").replace("E3", "14");
+
+                                boolean cont = false;
+                                for(int i = 0; i < meetTimes.size(); i++){
+                                    if(Integer.parseInt(String.valueOf(meetTimes.get(i).charAt(0))) <  Integer.parseInt(fixedPeriodStart))
+                                        cont = true;
+                                }
+                                if(cont)
+                                    continue;
+                            }
+                            if(!periodEnd.equals("--")){
+                                String fixedPeriodEnd = periodEnd.replace("E1", "12").replace("E2", "13").replace("E3", "14");
+
+                                boolean cont = false;
+                                for(int i = 0; i < meetTimes.size(); i++){
+                                    if(Integer.parseInt(String.valueOf(meetTimes.get(i).charAt(meetTimes.get(i).length()-1))) >  Integer.parseInt(fixedPeriodEnd))
+                                        cont = true;
+                                }
+                                if(cont)
+                                    continue;
+                            }
+
+                            if(!days.isEmpty()){
+                                //If the days checkboxes are checked
+                                //One+ days checkboxes are clicked
+                                String meetDays = crsToBeAdded.classSection.get("meetDays");
+                                if(days.contains("Monday") && !meetDays.contains("M") || meetDays.contains("M") && !days.contains("Monday")) {
+                                    continue;
+                                }
+                                if(days.contains("Tuesday") && !meetDays.contains("T") || meetDays.contains("T") && !days.contains("Tuesday")) {
+                                    continue;
+                                }
+                                if(days.contains("Wednesday") && !meetDays.contains("W") || meetDays.contains("W") && !days.contains("Wednesday")) {
+                                    continue;
+                                }
+                                if(days.contains("Thursday") && !meetDays.contains("R") || meetDays.contains("R") && !days.contains("Thursday")) {
+                                    continue;
+                                }
+                                if(days.contains("Friday") && !meetDays.contains("F") || meetDays.contains("F") && !days.contains("Friday")) {
+                                    continue;
+                                }
+                                if(days.contains("Saturday") && !meetDays.contains("S") || meetDays.contains("S") && !days.contains("Saturday")) {
+                                    continue;
+                                }
+                            }
+
+                            crses.add(crsToBeAdded);
                         }
 
-                        //If we've found all the departments courses we're done.
+                        //If we've found the department, we don't need to check for more courses.
                         if(depMatched) {
-                            System.out.println("Stopping search because we've found all the dep courses.");
                             break;
                         }
                     }
@@ -243,12 +251,10 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             case android.R.id.home:
                 //If the course was chosen in the spinner
                 if(courseName != null) {
-                    System.out.println("USING SPINNER TEXT");
-                    filterCourses("", "", "");
+                    filterCourses();
                 } else {
                     //The course spinner wasn't chosen
-                    System.out.println("Filtering with code: " + courseCodeText + " credits: " + courseCreditsText + " name: " + courseNameText);
-                    filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
+                    filterCourses();
                 }
                 return(true);
         }
@@ -262,7 +268,6 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         // The middle spinner
         if (parent.getId() == R.id.spinnerDepartments && !parent.getItemAtPosition(pos).toString().equals("Please Select a Semester First")) {
             if(!parent.getItemAtPosition(pos).toString().equals("Choose a Department")) {
-                System.out.println("Spinner: Department Chosen");
                 ArrayList<String> coursesNames = new ArrayList<>();
                 coursesNames.add(" -- ");
                 crses.clear();
@@ -283,24 +288,21 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
         // The bottom spinner
         if (parent.getId() == R.id.spinnerCourse) {
-            System.out.println("Spinner: Course Chosen");
 
             if(parent.getItemAtPosition(pos).toString().equals(" -- ")) {
                 courseName = null;
-                System.out.println("Set courseName: null");
             } else {
                 courseName = crses.get(pos);
                 crses.clear();
-                System.out.println("Set courseName: " + courseName.toString());
             }
         }
     }
 
+    //This might not be needed.
     public void onNothingSelected(AdapterView<?> parent) {
         // Another interface callback
         System.out.println("Spinner: onNothingSelected");
     }
-
 
     /** Called when the user taps the FILTER button */
     public void goToMain(View view){
@@ -319,19 +321,15 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             load.setVisibility(View.VISIBLE);
         }
 
-
-
-
         if(courseName != null) {
-            System.out.println("USING SPINNER TEXT");
-            filterCourses("", "", "");
+            filterCourses();
         } else {
             //The course spinner wasn't chosen
-            System.out.println("Filtering with code: " + courseCodeText + " credits: " + courseCreditsText + " name: " + courseNameText);
-            filterCourses(courseCodeText.getText().toString(), courseCreditsText.getText().toString(), courseNameText.getText().toString());
+            filterCourses();
         }
     }
 
+    //Function that triggers the transition back to the main activity.
     private void startMain(){
         Intent intent = new Intent(this, MainActivity.class);
         Bundle b = new Bundle();
@@ -343,6 +341,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         finish();
     }
 
+    //This is for the manipulation of the filter menus.
     public void nextFilter(View view){
         ConstraintLayout top = findViewById(R.id.top);
         ConstraintLayout middle = findViewById(R.id.middle);
@@ -391,7 +390,8 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         }
     }
 
-
+    //This is for the Days checkboxes.
+    //When they're clicked this is activated.
     public void onCheckboxClicked(View view) {
         // Is the view now checked?
         boolean checked = ((CheckBox) view).isChecked();
@@ -399,11 +399,116 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         // Check which checkbox was clicked
         switch(view.getId()) {
             case R.id.mondayCheckBox:
-                if (checked){
-
-                }
+                if(checked)
+                    days.add("Monday");
+                else
+                    days.remove("Monday");
+                break;
+            case R.id.tuesdayCheckBox:
+                if(checked)
+                    days.add("Tuesday");
+                else
+                    days.remove("Tuesday");
+                break;
+            case R.id.wednesdayCheckBox:
+                if(checked)
+                    days.add("Wednesday");
+                else
+                    days.remove("Wednesday");
+                break;
+            case R.id.thursdayCheckbox:
+                if(checked)
+                    days.add("Thursday");
+                else
+                    days.remove("Thursday");
+                break;
+            case R.id.fridayCheckbox:
+                if(checked)
+                    days.add("Friday");
+                else
+                    days.remove("Friday");
+                break;
+            case R.id.saturdayCheckbox:
+                if(checked)
+                    days.add("Saturday");
+                else
+                    days.remove("Saturday");
                 break;
         }
     }
 
+    //Just using this as a way to clean up onCreate().
+    //Sets up spinners and other user interface elements.
+    private void setupInterface(){
+        //Display the top section
+        getSupportActionBar().setTitle("Filters");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //Filter Button & Loading inside the linear layout
+        ProgressBar filterLoad = findViewById(R.id.filterLoad);
+        filterLoad.setVisibility(View.INVISIBLE);
+        Button filterButton = findViewById(R.id.button3);
+        filterButton.setVisibility(View.VISIBLE);
+
+        //Filter Button & Loading outside the linear layout
+        ProgressBar filterLoadOut = findViewById(R.id.outerFilterLoad);
+        filterLoadOut.setVisibility(View.INVISIBLE);
+        Button filterButtonOut = findViewById(R.id.outerFilter);
+        filterButtonOut.setVisibility(View.INVISIBLE);
+
+        //Set the progress bars for spinners to be invisible
+        pSpinner2 = findViewById(R.id.progressBar2);
+        pSpinner2.setVisibility(View.INVISIBLE);
+
+        //Update the lists
+        spinnerDept = (Spinner) findViewById(R.id.spinnerDepartments);
+        spinnerCrse = (Spinner) findViewById(R.id.spinnerCourse);
+
+        spinnerDept.setOnItemSelectedListener(this);
+        spinnerCrse.setOnItemSelectedListener(this);
+
+        //Add the database information to the list and update the spinner
+        try {
+            dbUpdater.getDepNames(deptNames, spinnerDept, spinnerCrse, getBaseContext());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        deptNames.set(0, " -- ");
+        String[] courses = {" -- "};
+        spinnerCrse.setEnabled(false);
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        final ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, deptNames);
+        final ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, courses);
+
+        // Specify the layout to use when the list of choices appears
+        spinnerArrayAdapter2.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        spinnerDept.setAdapter(spinnerArrayAdapter2);
+        spinnerCrse.setAdapter(spinnerArrayAdapter1);
+
+        //Level Minimum
+        Spinner minSpinner = findViewById(R.id.levelMinSpinner);
+        ArrayAdapter<CharSequence> minSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.level_minimum, android.R.layout.simple_spinner_item);
+        minSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        minSpinner.setAdapter(minSpinnerAdapter);
+
+        //Level Maximum
+        Spinner maxSpinner = findViewById(R.id.levelMaxSpinner);
+        ArrayAdapter<CharSequence> maxSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.level_maximum, android.R.layout.simple_spinner_item);
+        maxSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        maxSpinner.setAdapter(maxSpinnerAdapter);
+
+        //Period Start
+        Spinner periodStart = findViewById(R.id.periodStartSpinner);
+        Spinner periodEnd = findViewById(R.id.periodEndSpinner);
+
+        ArrayAdapter<CharSequence> periodStartAdapter = ArrayAdapter.createFromResource(this, R.array.periods_filter, android.R.layout.simple_spinner_item);
+        maxSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        periodStart.setAdapter(periodStartAdapter);
+        periodEnd.setAdapter(periodStartAdapter);
+    }
 }

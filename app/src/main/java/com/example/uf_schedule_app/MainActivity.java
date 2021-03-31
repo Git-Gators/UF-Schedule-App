@@ -30,17 +30,30 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements addCourseDialog.DialogListener {
     public static final String TAG = "Tag:";
     //Create a dbUpdater object
     DatabaseUpdater dbUpdater = new DatabaseUpdater();
     ListView courseList;
-    ListView chosenCourses;
+    static Boolean loaded = false;
+
+    @Override
+    public void applyCourse(Course course) {
+        //Popup stuff
+        //coursesPicked.add(crses.get(position));
+        coursesPicked.add(course);
+        //Add the course to the database
+        addCourseToDatabase(coursesPicked);
+        displayHelp();
+    }
 
     String department;
     String userId;
@@ -54,14 +67,11 @@ public class MainActivity extends AppCompatActivity {
     //Courses the user has already chosen
     ArrayList<Course> coursesPicked = new ArrayList<>();
 
-
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
     private TextView loginPopup_title;
     private Button loginPopup_SignIn, loginPopup_create_account, loginBtnHomePage, logoutBtnHomePage;
     private EditText loginPopup_email, loginPopup_password;
-
-
 
     FirebaseAuth fAuth;
     FirebaseFirestore userdb = FirebaseFirestore.getInstance();
@@ -142,8 +152,6 @@ public class MainActivity extends AppCompatActivity {
                                 Course course = (Course) coursesPicked.get(i);
                                 coursesPicked.set(i, course);
                             }
-                            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
-                            chosenCourses.setAdapter(arrayAdapter);
                         }
                     }else
                     {
@@ -164,7 +172,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,7 +180,8 @@ public class MainActivity extends AppCompatActivity {
 
 //        try {
 //            dbUpdater.updateDB(getBaseContext());
-//        } catch (IOException e) {
+//            //dbUpdater.deleteCourses();
+//        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
 
@@ -182,7 +190,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Course List
         courseList = findViewById(R.id.courseList);
-        chosenCourses = findViewById(R.id.chosenCourses);
 
         loginBtnHomePage = findViewById(R.id.login);
         logoutBtnHomePage = findViewById(R.id.logout);
@@ -194,9 +201,6 @@ public class MainActivity extends AppCompatActivity {
         if(b != null){
             if(b.getSerializable("coursesPicked") != null) {
                 coursesPicked = (ArrayList<Course>) intent.getSerializableExtra("coursesPicked");
-
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
-                chosenCourses.setAdapter(arrayAdapter);
             }
             if(b.getSerializable("crses") != null) {
                 crses = (ArrayList<Course>) intent.getSerializableExtra("crses");
@@ -207,156 +211,153 @@ public class MainActivity extends AppCompatActivity {
             displayHelp();
         }
 
-        chosenCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                coursesPicked.remove(position);
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
-                chosenCourses.setAdapter(arrayAdapter);
-                displayHelp();
-
-                //Change data in database to reflect deleted course.
-                user.put("Courses", coursesPicked);
-                //Store the user's information (name, email, and list of course names for now) in the database
-                documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Course Successfully deleted" + userId);
-                    }
-                });
-            }
-        });
-
         courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(coursesPicked.size() < 5){
-                    coursesPicked.add(crses.get(position));
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, getNames(coursesPicked));
-                    chosenCourses.setAdapter(arrayAdapter);
-                    //Add the course to the database
-                    addCourseToDatabase(coursesPicked);
-                    displayHelp();
+                if(coursesPicked.size() < 5) {
+                    //Open the add to schedule popup
+                    openDialog(position);
                 }
             }
         });
     }
 
-        /** Called when the user taps the Filter button */
-        public void goToFilter (View view){
-            Intent intent = new Intent(this, FilterActivity.class);
-            Bundle b = new Bundle();
-            intent.putExtra("coursesPicked", coursesPicked);
-            intent.putExtra("crses", crses);
-            intent.putExtras(b);
-            startActivity(intent);
-            finish();
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-        }
-        public void createPopup (View view){
-            fAuth = FirebaseAuth.getInstance();
-            //*Define elements within popup
-            dialogBuilder = new AlertDialog.Builder(this);
-            final View LoginPopupView = getLayoutInflater().inflate(R.layout.login_popup, null);
-            loginPopup_title = (TextView) LoginPopupView.findViewById(R.id.sign_in_button);
-            loginPopup_email = (EditText) LoginPopupView.findViewById(R.id.input_email);
-            loginPopup_password = (EditText) LoginPopupView.findViewById(R.id.input_password);
-            loginPopup_SignIn = (Button) LoginPopupView.findViewById(R.id.sign_in_button);
-            loginPopup_create_account = (Button) LoginPopupView.findViewById(R.id.create_account_button);
+    /** Called when the user taps the Filter button */
+    public void goToFilter (View view){
+        Intent intent = new Intent(this, FilterActivity.class);
+        Bundle b = new Bundle();
+        intent.putExtra("coursesPicked", coursesPicked);
+        intent.putExtra("crses", crses);
+        intent.putExtras(b);
+        startActivity(intent);
+        finish();
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+    }
 
-            dialogBuilder.setView(LoginPopupView);
-            dialog = dialogBuilder.create();
-            dialog.show();
+    public void createPopup (View view){
+        fAuth = FirebaseAuth.getInstance();
+        //*Define elements within popup
+        dialogBuilder = new AlertDialog.Builder(this);
+        final View LoginPopupView = getLayoutInflater().inflate(R.layout.login_popup, null);
+        loginPopup_title = (TextView) LoginPopupView.findViewById(R.id.sign_in_title);
+        loginPopup_email = (EditText) LoginPopupView.findViewById(R.id.input_email);
+        loginPopup_password = (EditText) LoginPopupView.findViewById(R.id.input_password);
+        loginPopup_SignIn = (Button) LoginPopupView.findViewById(R.id.sign_in_button);
+        loginPopup_create_account = (Button) LoginPopupView.findViewById(R.id.create_account_button);
+
+        dialogBuilder.setView(LoginPopupView);
+        dialog = dialogBuilder.create();
+        dialog.show();
 
 
-            loginPopup_SignIn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //extract & validate
-                    if (loginPopup_email.getText().toString().isEmpty()) {
-                        loginPopup_email.setError("Email is Required");
-                        return;
-                    }
-                    if (loginPopup_password.getText().toString().isEmpty()) {
-                        loginPopup_password.setError("Password is Required");
-                        return;
-                    }
-                    //valid data
-                    //login user
-                    fAuth.signInWithEmailAndPassword(loginPopup_email.getText().toString(), loginPopup_password.getText().toString()).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                        @Override
-                        public void onSuccess(AuthResult authResult) {
-
-                            //Load the data from the database
-                            loadData();
-                            dialog.dismiss();
-                            startActivity(new Intent(getBaseContext(), MainActivity.class));
-                            finish();
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
+        loginPopup_SignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //extract & validate
+                if (loginPopup_email.getText().toString().isEmpty()) {
+                    loginPopup_email.setError("Email is Required");
+                    return;
                 }
-            });
-
-            loginPopup_create_account.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    startActivity(new Intent(getApplicationContext(), Register.class));
+                if (loginPopup_password.getText().toString().isEmpty()) {
+                    loginPopup_password.setError("Password is Required");
+                    return;
                 }
-            });
-        }
-
-        private BottomNavigationView.OnNavigationItemSelectedListener navListener =
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                //valid data
+                //login user
+                fAuth.signInWithEmailAndPassword(loginPopup_email.getText().toString(), loginPopup_password.getText().toString()).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        int id = 0;
-                        Intent in;
-                        Bundle b = new Bundle();
+                    public void onSuccess(AuthResult authResult) {
 
-                        switch (item.getItemId()) {
-                            case R.id.nav_home:
-                                id = R.id.nav_home;
-                                break;
-                            case R.id.nav_schedule:
-                                id = R.id.nav_schedule;
-                                in = new Intent(getBaseContext(), ViewSchedule.class);
-                                in.putExtra("coursesPicked", coursesPicked);
-                                in.putExtras(b);
-                                startActivity(in);
-                                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                                finish();
-                                break;
-                            case R.id.nav_calendar:
-                                id = R.id.nav_calendar;
-                                in = new Intent(getBaseContext(), CalendarView.class);
-                                in.putExtra("coursesPicked", coursesPicked);
-                                in.putExtras(b);
-                                startActivity(in);
-                                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                                finish();
-                                break;
-                        }
-                        System.out.println(id);
-                        return false;
+                        //Load the data from the database
+                        loadData();
+                        dialog.dismiss();
+                        startActivity(new Intent(getBaseContext(), MainActivity.class));
+                        finish();
                     }
-                };
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+        });
+
+        loginPopup_create_account.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), Register.class));
+            }
+        });
+    }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    int id = 0;
+                    Intent in;
+                    Bundle b = new Bundle();
+
+                    switch (item.getItemId()) {
+                        case R.id.nav_home:
+                            id = R.id.nav_home;
+                            break;
+                        case R.id.nav_schedule:
+                            id = R.id.nav_schedule;
+                            in = new Intent(getBaseContext(), ViewSchedule.class);
+                            in.putExtra("coursesPicked", coursesPicked);
+                            in.putExtras(b);
+                            startActivity(in);
+                            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                            finish();
+                            break;
+                        case R.id.nav_calendar:
+                            id = R.id.nav_calendar;
+                            in = new Intent(getBaseContext(), CalendarView.class);
+                            in.putExtra("coursesPicked", coursesPicked);
+                            in.putExtras(b);
+                            startActivity(in);
+                            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                            finish();
+                            break;
+                    }
+                    System.out.println(id);
+                    return false;
+                }
+            };
     @Override
     protected void onStart() {
         super.onStart();
 
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+        if (FirebaseAuth.getInstance().getCurrentUser() != null && !loaded) {
+            loginBtnHomePage.setVisibility(View.GONE);
+            logoutBtnHomePage.setVisibility(View.VISIBLE);
+            fAuth = FirebaseAuth.getInstance();
+            loadData();
+            Bundle b = new Bundle();
+            Intent in;
+            in = new Intent(getBaseContext(), ContinueAsUser.class);
+            in.putExtras(b);
+            //in.putExtra("fAuth", (Serializable) fAuth);
+            startActivity(in);
+            finish();
+            loaded = true;
+        } else if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            loginBtnHomePage.setVisibility(View.VISIBLE);
+            logoutBtnHomePage.setVisibility(View.GONE);
+            Bundle b = new Bundle();
+            Intent in;
+            in = new Intent(getBaseContext(), LoginPage.class);
+            in.putExtras(b);
+            startActivity(in);
+            finish();
+        } else
+        {
             loginBtnHomePage.setVisibility(View.GONE);
             logoutBtnHomePage.setVisibility(View.VISIBLE);
             loadData();
-        } else {
-            loginBtnHomePage.setVisibility(View.VISIBLE);
-            logoutBtnHomePage.setVisibility(View.GONE);
         }
         logoutBtnHomePage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -371,6 +372,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //Helper function to get names of the courses
     private ArrayList<String> getNames(ArrayList<Course> courses){
         ArrayList<String> coursesSTR = new ArrayList<>();
         for(int i = 0; i < courses.size(); i++)
@@ -379,33 +381,26 @@ public class MainActivity extends AppCompatActivity {
         return coursesSTR;
     }
 
-
     //Displays the help menu if the other lists are empty.
     //Also controls the text above the lists
     private void displayHelp(){
         try {
             TextView getStartedText = findViewById(R.id.getStarted);
-            TextView chosenCoursesText = findViewById(R.id.courseText);
             TextView addACourseText = findViewById(R.id.addACourse);
             TextView instrText = findViewById(R.id.instrText);
             TextView instrText2 = findViewById(R.id.instrText2);
 
-            //Top List
-            if(coursesPicked.isEmpty()){
-                chosenCoursesText.setVisibility(View.INVISIBLE);
-            } else {
-                chosenCoursesText.setVisibility(View.VISIBLE);
-            }
-
             //Bottom List
             if(crses.isEmpty()){
                 addACourseText.setVisibility(View.INVISIBLE);
+                courseList.setVisibility(View.INVISIBLE);
             } else {
                 addACourseText.setVisibility(View.VISIBLE);
+                courseList.setVisibility(View.VISIBLE);
             }
 
             //Both are empty
-            if(coursesPicked.isEmpty() && crses.isEmpty()) {
+            if(crses.isEmpty()) {
                 getStartedText.setVisibility(View.VISIBLE);
                 instrText.setVisibility(View.VISIBLE);
                 instrText2.setVisibility(View.VISIBLE);
@@ -417,5 +412,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (NullPointerException e){
             //Throws exception when changing to a different view. We gotta catch it.
         }
+    }
+
+    public void openDialog(int position){
+        addCourseDialog addCourseDialog = new addCourseDialog(crses.get(position));
+        addCourseDialog.show(getSupportFragmentManager(), "Add Course Dialog");
     }
 }
