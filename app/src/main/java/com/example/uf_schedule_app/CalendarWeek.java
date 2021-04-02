@@ -275,6 +275,7 @@ public class CalendarWeek extends MainActivity {
     //@Override
     private void weekUpdate(Map<String, ArrayList<CourseEvent>> courseTimes) {
         recyclerView = findViewById(R.id.recyclerView);
+        recyclerView2 = findViewById(R.id.recyclerView2);
 
         periods = getResources().getStringArray(R.array.periods);
         period_abbr = getResources().getStringArray(R.array.periods_filter);
