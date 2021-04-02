@@ -12,7 +12,7 @@
         android:bottomRightRadius="0sp"
         />
     <solid
-        android:color="@color/black"
+        android:color="@color/baby_blue"
         />
 
 </shape>
