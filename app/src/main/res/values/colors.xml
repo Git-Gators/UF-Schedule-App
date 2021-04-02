@@ -11,4 +11,11 @@
     <color name="light_gray">#E4FCFF</color>
     <color name="orange">#FF5722</color>
     <color name="burnt_orange">#975C05</color>
+    <color name="yellow">#FFC107</color>
+    <color name="light_green">#96F824</color>
+    <color name="pink">#FF80AB</color>
+    <color name="baby_blue">#919EF8</color>
+    <color name="booger">#818A02</color>
+    <color name="magenta">#FF00AB</color>
+
 </resources>

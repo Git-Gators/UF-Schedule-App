@@ -12,7 +12,7 @@
         android:bottomRightRadius="0sp"
         />
     <solid
-        android:color="@color/teal_700"
+        android:color="@color/pink"
         />
 
 </shape>

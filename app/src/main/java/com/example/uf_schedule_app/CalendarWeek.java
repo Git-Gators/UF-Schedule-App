@@ -39,9 +39,9 @@ import java.util.regex.Pattern;
 
 
 public class CalendarWeek extends MainActivity {
-    RecyclerView recyclerView;
+    RecyclerView recyclerView, recyclerView2;
     Map<String, ArrayList<CourseEvent>> courseSections = loadCourseEvents(coursesPicked);
-
+    ArrayList<String> Online;
     int numPeriods = 16;
     int[] colors = {
             R.drawable.border2,
@@ -75,6 +75,7 @@ public class CalendarWeek extends MainActivity {
         dayWeekNav.setOnNavigationItemSelectedListener(dayWeekListener);
         dayWeekNav.setSelectedItemId(R.id.week);
         recyclerView = findViewById(R.id.recyclerView);
+        recyclerView2 = findViewById(R.id.recyclerView2);
         courseSections = loadCourseEvents(coursesPicked);
 /**
  *     <color name="purple_200">#FFBB86FC</color>
@@ -274,14 +275,19 @@ public class CalendarWeek extends MainActivity {
     //@Override
     private void weekUpdate(Map<String, ArrayList<CourseEvent>> courseTimes) {
         recyclerView = findViewById(R.id.recyclerView);
+        recyclerView2 = findViewById(R.id.recyclerView2);
 
         periods = getResources().getStringArray(R.array.periods);
         period_abbr = getResources().getStringArray(R.array.periods_filter);
         daysOfWeek = getResources().getStringArray(R.array.daysOfWeek);
         abbr = getResources().getStringArray(R.array.dayInitials);
         week = new String[6][numPeriods];
+        Online = new ArrayList<String>(1);
+        ArrayList<String> online_sched = new ArrayList<String>(1);
+        ArrayList<Integer> color_online = new ArrayList<Integer>(1);
 
         int[][] color = new int[6][numPeriods];
+
         for (int y = 0; y < 6; y++) {
             for (int x = 0; x < numPeriods; x++) {
                 color[y][x] = R.drawable.border;
@@ -327,16 +333,31 @@ public class CalendarWeek extends MainActivity {
                         color[counter][j] = colors[courseTimes.get(day).get(i).position % 10];
                     }
                 }
-                if (events.get(i).time.equals("Online")) {
-                    week[0][numPeriods - 1] = courseTimes.get(day).get(i).courseCode;
+                if (events.get(i).time.equals("Online") && day.equals("Monday")) {
+                    //week[0][numPeriods - 1] = courseTimes.get(day).get(i).courseCode;
+                    Online.add(courseTimes.get(day).get(i).courseCode);
+                    color_online.add(colors[courseTimes.get(day).get(i).position % 10]);
+                    online_sched.add("Online");
                 }
             }
             counter++;
         }
-
+        String[] Online_array = new String[Online.size()];
+        Online_array = Online.toArray(Online_array);
+        String[] sched_array = new String[online_sched.size()];
+        sched_array = online_sched.toArray(sched_array);
+        Integer[] color_online_array = new Integer[color_online.size()];
+        color_online_array = color_online.toArray(color_online_array);
+        int[] color_o = new int[color_online_array.length];
+        for (int i = 0; i < color_online_array.length; i++) {
+            color_o[i] = color_online_array[i].intValue();
+        }
         Week_Adapter weekAdapter = new Week_Adapter(this, period_abbr, week, color);
+        Calendar_Adapter calendarAdapter = new Calendar_Adapter(this, sched_array, Online_array, color_o);
         recyclerView.setAdapter(weekAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView2.setAdapter(calendarAdapter);
+        recyclerView2.setLayoutManager(new LinearLayoutManager(this));
 
         System.out.println("\nBruh");
     }

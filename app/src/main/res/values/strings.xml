@@ -38,7 +38,6 @@
         <item>7:20PM-8:10PM</item>
         <item>8:20PM-9:10PM</item>
         <item>9:20PM-10:10PM</item>
-        <item>Online</item>
     </string-array>
 
     <string-array name="daysOfWeek">
