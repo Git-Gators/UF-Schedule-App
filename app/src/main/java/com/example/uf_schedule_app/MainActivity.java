@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
 
 
     public void addCourseToDatabase(ArrayList<Course> course) {
-        user.put("Courses", coursesPicked);
+        user.put(semester, coursesPicked);
 
         //Push the map named user to the database
         if (firebaseUser != null)
@@ -115,14 +115,14 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                     {
                         //If the document snapshot exists, load the data into the user map
                         user = documentSnapshot.getData();
-                        if (documentSnapshot.get("Courses") != null)
+                        if (documentSnapshot.get(semester) != null)
                         {
-                            System.out.println(documentSnapshot.get("Courses"));
+                            System.out.println(documentSnapshot.get(semester));
                             //This has to be like the single worst piece of code that I have ever written
 
                             //For some reason the courses load as a Hashmap of a Hashmap of strings as opposed to course objects.
                             //So to fix this we need to load the Hashmap of a Hashmap of strings into a Map, which I called wierd map because nothing here makes sense
-                            ArrayList<HashMap<String, HashMap<String, String>>> wierdMap = (ArrayList<HashMap<String, HashMap<String, String>>>) documentSnapshot.get("Courses");
+                            ArrayList<HashMap<String, HashMap<String, String>>> wierdMap = (ArrayList<HashMap<String, HashMap<String, String>>>) documentSnapshot.get(semester);
 
                             //This part is just to make sure we have enough space in the arraylist to store data on our courses
                             int courseObjectsSize = coursesPicked.size();
@@ -144,9 +144,9 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                             }
 
                         }
-                        user.put("Courses", coursesPicked);
+                        user.put(semester, coursesPicked);
                         //If there's course data in the database try to load it
-                        if (user.get("Courses") != null)
+                        if (user.get(semester) != null)
                         {
                             //Typecasting the object from the course to a database should be fine
                             //assuming we store it correctly in the first place
