@@ -220,9 +220,9 @@ public class DatabaseUpdater extends Context {
         spinnerCrse.setEnabled(true);
     }
 
-    public void getCourseNames(String deptName, ArrayList<String> coursesNames, ProgressBar spinner, Spinner spinnerCrse, ArrayList<Course> crses){
+    public void getCourseNames(String deptName, ArrayList<String> coursesNames, ProgressBar spinner, Spinner spinnerCrse, ArrayList<Course> crses, String semester){
         spinner.setVisibility(View.VISIBLE);
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Spring 2021").child(deptName);
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(semester).child(deptName);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -247,9 +247,9 @@ public class DatabaseUpdater extends Context {
         mDatabase.removeValue();
     }
 
-    public void setTextFields(EditText course1, EditText course2, EditText course3, EditText course4, String deptName, String courseName, ProgressBar pSpinner3) {
+    public void setTextFields(EditText course1, EditText course2, EditText course3, EditText course4, String deptName, String courseName, ProgressBar pSpinner3, String semester) {
         pSpinner3.setVisibility(View.VISIBLE);
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Spring 2021").child(deptName);
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(semester).child(deptName);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

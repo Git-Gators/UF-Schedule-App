@@ -98,7 +98,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         String periodStart = ((Spinner)findViewById(R.id.periodStartSpinner)).getSelectedItem().toString();
         String periodEnd = ((Spinner)findViewById(R.id.periodEndSpinner)).getSelectedItem().toString();
 
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Spring 2021");
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(semester);
         ValueEventListener postListener = new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
@@ -277,7 +277,8 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                 department = parent.getItemAtPosition(pos).toString();
                 try {
                     spinnerCrse.setEnabled(false);
-                    dbUpdater.getCourseNames(parent.getItemAtPosition(pos).toString(), coursesNames, pSpinner2, spinnerCrse, crses);
+                    System.out.println("Semester: " + semester);
+                    dbUpdater.getCourseNames(parent.getItemAtPosition(pos).toString(), coursesNames, pSpinner2, spinnerCrse, crses, semester);
                     ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, coursesNames);
                     spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                     spinnerCrse.setAdapter(spinnerArrayAdapter1);

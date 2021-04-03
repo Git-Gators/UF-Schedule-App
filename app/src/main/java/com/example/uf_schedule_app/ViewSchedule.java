@@ -21,6 +21,8 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -60,8 +62,6 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
         load = findViewById(R.id.progressBarSchedule);
         load.setVisibility(View.INVISIBLE);
 
-
-
         //If we're coming from the main, we grab the info
         Intent intent = getIntent();
         Bundle b = getIntent().getExtras();
@@ -69,6 +69,10 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
             if(b.getSerializable("coursesPicked") != null){
                 coursesPicked = (ArrayList<Course>) intent.getSerializableExtra("coursesPicked");
 
+                if(coursesPicked.isEmpty()){
+                    TextView text = findViewById(R.id.courseText6);
+                    text.setText("No courses selected.");
+                }
                 //Edit all the courseTexts
                 for(int i = 0; i < coursesPicked.size(); i++){
                     TextView text = null;
@@ -144,7 +148,7 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         if (parent.getId() == R.id.semesterSpinner) {
-            System.out.println("TRUE");
+            semester = parent.getItemAtPosition(pos).toString();
         }
     }
 
@@ -174,6 +178,8 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
         Bundle b = new Bundle();
         intent.putExtra("coursesPicked", coursesPicked);
         intent.putExtra("crses", crses);
+        intent.putExtra("semester", semester);
+        intent.putExtra("semesters", semesterNames);
         intent.putExtras(b);
         startActivity(intent);
         finish();

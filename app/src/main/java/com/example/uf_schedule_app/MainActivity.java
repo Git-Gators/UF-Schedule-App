@@ -195,6 +195,8 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
 //            e.printStackTrace();
 //        }
 
+        loadData();
+
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
 
@@ -203,7 +205,6 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
 
         loginBtnHomePage = findViewById(R.id.login);
         logoutBtnHomePage = findViewById(R.id.logout);
-
 
         //If we're coming from the filter, we grab the info
         Intent intent = getIntent();
@@ -244,6 +245,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
         Bundle b = new Bundle();
         intent.putExtra("coursesPicked", coursesPicked);
         intent.putExtra("crses", crses);
+        intent.putExtra("semester", semester);
         intent.putExtras(b);
         startActivity(intent);
         finish();
