@@ -35,7 +35,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
     String department = "";
     Course courseName = null;
-    String semester = "Spring 2021";
+    String semester;
     ArrayList<Course> coursesInSchedule = new ArrayList<>();
     ArrayList<String> days = new ArrayList<>();
 
@@ -74,6 +74,9 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             if(b.getSerializable("courseList") != null) {
                 coursesInSchedule = (ArrayList<Course>) intent.getSerializableExtra("courseList");
             }
+            if(b.getSerializable("semester") != null) {
+                semester = (String) intent.getSerializableExtra("semester");
+            }
         }
 
         setupInterface();
@@ -95,7 +98,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         String periodStart = ((Spinner)findViewById(R.id.periodStartSpinner)).getSelectedItem().toString();
         String periodEnd = ((Spinner)findViewById(R.id.periodEndSpinner)).getSelectedItem().toString();
 
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Spring 2021");
         ValueEventListener postListener = new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
@@ -335,6 +338,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         Bundle b = new Bundle();
         intent.putExtra("crses", crses);
         intent.putExtra("coursesPicked", coursesPicked);
+        intent.putExtra("semester", semester);
         intent.putExtras(b);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);

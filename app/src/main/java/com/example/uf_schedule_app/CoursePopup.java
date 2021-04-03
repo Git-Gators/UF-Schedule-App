@@ -89,7 +89,7 @@ public class CoursePopup extends MainActivity {
 
     public void getCourse(String course, String department){
         //Get the course objects from that
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(department);
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Spring 2021").child(department);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

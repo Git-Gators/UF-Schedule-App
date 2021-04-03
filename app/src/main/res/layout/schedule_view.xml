@@ -10,7 +10,7 @@
         android:id="@+id/details5"
         android:layout_width="72dp"
         android:layout_height="52dp"
-        android:layout_marginTop="432dp"
+        android:layout_marginTop="8dp"
         android:onClick="createPopup"
         android:tag="0"
         android:text="Info"
@@ -18,13 +18,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.756"
         app:layout_constraintStart_toEndOf="@+id/courseText5"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/courseText4" />
 
     <Button
         android:id="@+id/details4"
         android:layout_width="72dp"
         android:layout_height="52dp"
-        android:layout_marginTop="376dp"
+        android:layout_marginTop="8dp"
         android:onClick="createPopup"
         android:tag="0"
         android:text="Info"
@@ -32,13 +32,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.756"
         app:layout_constraintStart_toEndOf="@+id/courseText4"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/courseText3" />
 
     <Button
         android:id="@+id/details3"
         android:layout_width="72dp"
         android:layout_height="52dp"
-        android:layout_marginTop="320dp"
+        android:layout_marginTop="8dp"
         android:onClick="createPopup"
         android:tag="0"
         android:text="Info"
@@ -46,13 +46,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.756"
         app:layout_constraintStart_toEndOf="@+id/courseText3"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/courseText2" />
 
     <Button
         android:id="@+id/details2"
         android:layout_width="72dp"
         android:layout_height="52dp"
-        android:layout_marginTop="260dp"
+        android:layout_marginTop="8dp"
         android:onClick="createPopup"
         android:tag="0"
         android:text="Info"
@@ -60,13 +60,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.756"
         app:layout_constraintStart_toEndOf="@+id/courseText2"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/courseText1" />
 
     <Button
         android:id="@+id/details1"
         android:layout_width="72dp"
         android:layout_height="52dp"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="124dp"
         android:onClick="createPopup"
         android:tag="0"
         android:text="Info"
@@ -74,13 +74,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.756"
         app:layout_constraintStart_toEndOf="@+id/courseText1"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/semesterSpinner" />
 
     <Button
         android:id="@+id/delete5"
         android:layout_width="72dp"
         android:layout_height="52dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="8dp"
         android:onClick="deleteCourse"
         android:tag="3"
         android:text="Del"
@@ -88,7 +88,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.036"
         app:layout_constraintStart_toEndOf="@+id/courseText4"
-        app:layout_constraintTop_toBottomOf="@+id/delete3" />
+        app:layout_constraintTop_toBottomOf="@+id/courseText4" />
 
     <TextView
         android:id="@+id/courseText5"
@@ -96,34 +96,23 @@
         android:layout_height="50dp"
         android:layout_marginStart="48dp"
         android:layout_marginLeft="48dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="8dp"
         android:gravity="center"
         android:onClick="createPopup"
         android:tag="3"
         android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/courseText3" />
+        app:layout_constraintTop_toBottomOf="@+id/courseText4" />
 
     <TextView
         android:id="@+id/courseText6"
         android:layout_width="150dp"
         android:layout_height="35dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="67dp"
         android:gravity="center_horizontal|center_vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:onClick="goToCourseFinder"
-        android:text="Course Finder"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/semesterSpinner" />
 
     <ProgressBar
         android:id="@+id/progressBarSchedule"
@@ -140,13 +129,10 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="552dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button"
-        app:layout_constraintVertical_bias="1.0"
         app:menu="@menu/bottom_navigation" />
 
     <TextView
@@ -155,13 +141,13 @@
         android:layout_height="50dp"
         android:layout_marginStart="48dp"
         android:layout_marginLeft="48dp"
-        android:layout_marginTop="104dp"
+        android:layout_marginTop="124dp"
         android:gravity="center"
         android:onClick="createPopup"
         android:tag="0"
         android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+        app:layout_constraintTop_toBottomOf="@+id/semesterSpinner" />
 
     <TextView
         android:id="@+id/courseText2"
@@ -225,7 +211,7 @@
         android:id="@+id/delete1"
         android:layout_width="72dp"
         android:layout_height="52dp"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="124dp"
         android:onClick="deleteCourse"
         android:tag="0"
         android:text="Del"
@@ -233,7 +219,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.036"
         app:layout_constraintStart_toEndOf="@+id/courseText1"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/semesterSpinner" />
 
     <Button
         android:id="@+id/delete2"
@@ -247,13 +233,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.036"
         app:layout_constraintStart_toEndOf="@+id/courseText2"
-        app:layout_constraintTop_toBottomOf="@+id/delete1" />
+        app:layout_constraintTop_toBottomOf="@+id/courseText1" />
 
     <Button
         android:id="@+id/delete3"
         android:layout_width="72dp"
         android:layout_height="52dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:onClick="deleteCourse"
         android:tag="2"
         android:text="Del"
@@ -261,13 +247,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.036"
         app:layout_constraintStart_toEndOf="@+id/courseText3"
-        app:layout_constraintTop_toBottomOf="@+id/delete2" />
+        app:layout_constraintTop_toBottomOf="@+id/courseText2" />
 
     <Button
         android:id="@+id/delete4"
         android:layout_width="72dp"
         android:layout_height="52dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="8dp"
         android:onClick="deleteCourse"
         android:tag="3"
         android:text="Del"
@@ -275,6 +261,33 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.036"
         app:layout_constraintStart_toEndOf="@+id/courseText4"
-        app:layout_constraintTop_toBottomOf="@+id/delete3" />
+        app:layout_constraintTop_toBottomOf="@+id/courseText3" />
+
+    <Spinner
+        android:id="@+id/semesterSpinner"
+        style="@style/Widget.AppCompat.Spinner.Underlined"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="65dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginRight="50dp"
+        android:spinnerMode="dialog"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/semesterText"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/semesterText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="80dp"
+        android:text="Semester: "
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toStartOf="@+id/semesterSpinner"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

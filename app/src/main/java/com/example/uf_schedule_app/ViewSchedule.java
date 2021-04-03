@@ -9,11 +9,13 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.app.AlertDialog;
 
 import android.content.Intent;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -23,9 +25,10 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class ViewSchedule extends MainActivity {
+public class ViewSchedule extends MainActivity implements AdapterView.OnItemSelectedListener {
     // Courses retrieved from the DB for the user to choose
     ArrayList<Course> crses = new ArrayList<>();
+    String[] semesterNames;
 
     //Courses the user has already chosen
     ArrayList<Course> coursesPicked = new ArrayList<>();
@@ -117,6 +120,17 @@ public class ViewSchedule extends MainActivity {
             if(b.getSerializable("crses") != null) {
                 crses = (ArrayList<Course>) intent.getSerializableExtra("crses");
             }
+            if(b.getSerializable("semesters") != null){
+                semesterNames = (String[]) intent.getSerializableExtra("semesters");
+                Spinner semesterSpinner = findViewById(R.id.semesterSpinner);
+                semesterSpinner.setOnItemSelectedListener(this);
+                ArrayAdapter spinnerArrayAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, semesterNames);
+                spinnerArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+                semesterSpinner.setAdapter(spinnerArrayAdapter);
+            }
+            if(b.getSerializable("semester") != null) {
+                semester = (String) intent.getSerializableExtra("semester");
+            }
         }
         else {
             load.setVisibility(View.VISIBLE);
@@ -127,21 +141,18 @@ public class ViewSchedule extends MainActivity {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        if (parent.getId() == R.id.semesterSpinner) {
+            System.out.println("TRUE");
+        }
+    }
+
     public void onNothingSelected(AdapterView<?> parent) {
         // Another interface callback
         System.out.println("Spinner: onNothingSelected");
     }
 
-    /** Called when the user taps the Send button */
-    public void goToCourseFinder(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        Bundle b = new Bundle();
-        intent.putExtra("coursesPicked", coursesPicked);
-        intent.putExtra("crses", crses);
-        intent.putExtras(b);
-        startActivity(intent);
-        finish();
-    }
     //Delete all courses
     public void goToDelete(View view) {
         coursesPicked.clear();
@@ -267,6 +278,8 @@ public class ViewSchedule extends MainActivity {
                             in = new Intent(getBaseContext(), MainActivity.class);
                             in.putExtra("coursesPicked", coursesPicked);
                             in.putExtras(b);
+                            in.putExtra("semesters", semesterNames);
+                            in.putExtra("semester", semester);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                             finish();
@@ -278,6 +291,8 @@ public class ViewSchedule extends MainActivity {
                             id = R.id.nav_calendar;
                             in = new Intent(getBaseContext(), CalendarView.class);
                             in.putExtra("coursesPicked", coursesPicked);
+                            in.putExtra("semesters", semesterNames);
+                            in.putExtra("semester", semester);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);

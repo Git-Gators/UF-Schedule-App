@@ -68,7 +68,7 @@ public class DatabaseUpdater extends Context {
     public ArrayList<Course> retrCourses = new ArrayList<>();
     private final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
-    private void updateDatabase(String url) {
+    private void updateDatabase(String url, String semester) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -144,7 +144,7 @@ public class DatabaseUpdater extends Context {
                                     sectionMap.put("meetTime", meetTime.toString());
 
                                     courseObj.classSection = sectionMap;
-                                    mDatabase.child(deptName).child(section.get("classNumber").toString()).setValue(courseObj);
+                                    mDatabase.child(semester).child(deptName).child(section.get("classNumber").toString()).setValue(courseObj);
                                 }
                             }
                         } catch (Exception e) {
@@ -169,7 +169,7 @@ public class DatabaseUpdater extends Context {
         queue.add(getRequest);
     }
 
-    public void updateDB(Context context) throws IOException {
+    public void updateDB(Context context, String semesterName, int semesterCode) throws IOException {
         ArrayList<String> depCodes = new ArrayList<>();
 
         String string = "";
@@ -187,12 +187,11 @@ public class DatabaseUpdater extends Context {
         is.close();
 
 
+
         try {
-            int i = 0;
-            while(i < depCodes.size()){
-                String url = "https://one.ufl.edu/apix/soc/schedule/?category=CWSP&term=2211&dept=" + depCodes.get(i).replace("\"", "");
-                updateDatabase(url);
-                i++;
+            for(int i = 0; i < depCodes.size(); i++){
+                String url = "https://one.ufl.edu/apix/soc/schedule/?category=CWSP&term=" + semesterCode + "&dept=" + depCodes.get(i).replace("\"", "");
+                updateDatabase(url, semesterName);
             }
         } catch (Exception E){
             System.out.println("Exception caught when updating DB: " + E.toString());
@@ -223,7 +222,7 @@ public class DatabaseUpdater extends Context {
 
     public void getCourseNames(String deptName, ArrayList<String> coursesNames, ProgressBar spinner, Spinner spinnerCrse, ArrayList<Course> crses){
         spinner.setVisibility(View.VISIBLE);
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(deptName);
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Spring 2021").child(deptName);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -250,7 +249,7 @@ public class DatabaseUpdater extends Context {
 
     public void setTextFields(EditText course1, EditText course2, EditText course3, EditText course4, String deptName, String courseName, ProgressBar pSpinner3) {
         pSpinner3.setVisibility(View.VISIBLE);
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(deptName);
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Spring 2021").child(deptName);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

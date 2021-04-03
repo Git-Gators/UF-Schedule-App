@@ -18,6 +18,7 @@ import android.widget.PopupWindow;
 import android.app.AlertDialog;
 
 import android.content.Intent;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -41,6 +42,8 @@ import java.util.regex.Pattern;
 public class CalendarView extends MainActivity {
     RecyclerView recyclerView, recyclerView2;
     Map<String, ArrayList<CourseEvent>> courseSections = loadCourseEvents(coursesPicked);
+    String semester;
+    String[] semesterNames;
 
     int numPeriods = 16;
     int[] colors = {
@@ -95,6 +98,16 @@ public class CalendarView extends MainActivity {
 
         //Load the default day as Monday
         dayUpdate("Monday", courseSections);
+
+        //Grab info from other activities.
+        Intent intent = getIntent();
+        Bundle b = getIntent().getExtras();
+        if(b.getSerializable("semester") != null) {
+            semester = (String) intent.getSerializableExtra("semester");
+        }
+        if(b.getSerializable("semesters") != null){
+            semesterNames = (String[]) intent.getSerializableExtra("semesters");
+        }
     }
     private BottomNavigationView.OnNavigationItemSelectedListener dayWeekListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -132,6 +145,8 @@ public class CalendarView extends MainActivity {
                         case R.id.nav_home:
                             in = new Intent(getBaseContext(), MainActivity.class);
                             in.putExtra("coursesPicked", coursesPicked);
+                            in.putExtra("semesters", semesterNames);
+                            in.putExtra("semester", semester);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -141,6 +156,8 @@ public class CalendarView extends MainActivity {
                             id = R.id.nav_schedule;
                             in = new Intent(getBaseContext(), ViewSchedule.class);
                             in.putExtra("coursesPicked", coursesPicked);
+                            in.putExtra("semesters", semesterNames);
+                            in.putExtra("semester", semester);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);

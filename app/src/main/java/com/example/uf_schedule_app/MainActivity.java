@@ -45,6 +45,10 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
     ListView courseList;
     static Boolean loaded = false;
 
+    String[] semesterNames = {"Fall 2020", "Spring 2021", "Summer 2021", "Fall 2021"};
+    int[] semestersCodes = {2208, 2211, 2215, 2218};
+    String semester = "Spring 2021";
+
     @Override
     public void applyCourse(Course course) {
         //Popup stuff
@@ -178,8 +182,14 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Update Database
 //        try {
-//            dbUpdater.updateDB(getBaseContext());
+//            // [Year (with first 0 removed)][Semester number][optional Summer Semester]
+//            //Spring: 1
+//            //Summer: 5
+//            //Fall: 8
+//
+//            dbUpdater.updateDB(getBaseContext(), semesterNames[2], semestersCodes[2]);
 //            //dbUpdater.deleteCourses();
 //        } catch (Exception e) {
 //            e.printStackTrace();
@@ -207,6 +217,12 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
 
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getNames(crses));
                 courseList.setAdapter(arrayAdapter);
+            }
+            if(b.getSerializable("semester") != null) {
+                semester = (String) intent.getSerializableExtra("semester");
+            }
+            if(b.getSerializable("semesters") != null){
+                semesterNames = (String[]) intent.getSerializableExtra("semesters");
             }
             displayHelp();
         }
@@ -308,6 +324,8 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                             id = R.id.nav_schedule;
                             in = new Intent(getBaseContext(), ViewSchedule.class);
                             in.putExtra("coursesPicked", coursesPicked);
+                            in.putExtra("semesters", semesterNames);
+                            in.putExtra("semester", semester);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -317,6 +335,8 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                             id = R.id.nav_calendar;
                             in = new Intent(getBaseContext(), CalendarView.class);
                             in.putExtra("coursesPicked", coursesPicked);
+                            in.putExtra("semester", semester);
+                            in.putExtra("semesters", semesterNames);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
