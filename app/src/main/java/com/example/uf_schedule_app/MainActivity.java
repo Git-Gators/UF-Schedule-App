@@ -441,7 +441,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
     }
 
     public void openDialog(int position){
-        addCourseDialog addCourseDialog = new addCourseDialog(crses.get(position));
+        addCourseDialog addCourseDialog = new addCourseDialog(crses.get(position), coursesPicked);
         addCourseDialog.show(getSupportFragmentManager(), "Add Course Dialog");
     }
 }
