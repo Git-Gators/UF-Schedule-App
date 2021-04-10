@@ -229,7 +229,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                         }
 
                         //If we've found the department, we don't need to check for more courses.
-                        if(depMatched) {
+                        if(depMatched || crses.size() >= 400) {
                             break;
                         }
                     }
