@@ -177,7 +177,7 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
             if(text != null) {
                 text.setVisibility(View.VISIBLE);
                 text.setText(coursesPicked.get(i).toString());
-                System.out.println("update screen: " + coursesPicked.get(i).toString());
+                //System.out.println("update screen: " + coursesPicked.get(i).toString());
             }
             //If index exists, enable delete button
             Button deleteAll = findViewById(R.id.delete);
@@ -208,7 +208,7 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
                         user = documentSnapshot.getData();
                         if (documentSnapshot.get(semester) != null)
                         {
-                            System.out.println("doc snapshot: " + semester + documentSnapshot.get(semester));
+                            //System.out.println("doc snapshot: " + semester + documentSnapshot.get(semester));
                             //This has to be like the single worst piece of code that I have ever written
 
                             //For some reason the courses load as a Hashmap of a Hashmap of strings as opposed to course objects.
@@ -248,7 +248,7 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
                                 coursesPicked.set(i, course);
                             }
                         }
-                        System.out.println("Courses Picked: " + coursesPicked);
+                        //System.out.println("Courses Picked: " + coursesPicked);
                         updateScreen();
                     }
                 }
@@ -258,7 +258,7 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
 
     public void onNothingSelected(AdapterView<?> parent) {
         // Another interface callback
-        System.out.println("Spinner: onNothingSelected");
+        //System.out.println("Spinner: onNothingSelected");
     }
 
     //Delete all courses
@@ -408,7 +408,7 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
                             finish();
                             break;
                     }
-                    System.out.println(id);
+                    //System.out.println(id);
                     return true;
                 }
             };

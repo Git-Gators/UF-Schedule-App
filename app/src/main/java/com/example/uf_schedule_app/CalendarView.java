@@ -130,7 +130,7 @@ public class CalendarView extends MainActivity {
                             id = R.id.day;
                             break;
                     }
-                    System.out.println(id);
+                    //System.out.println(id);
                     return true;
                 }
             };
@@ -167,7 +167,7 @@ public class CalendarView extends MainActivity {
                             id = R.id.nav_calendar;
                             break;
                     }
-                    System.out.println(id);
+                    //System.out.println(id);
                     return true;
                 }
             };
@@ -379,7 +379,7 @@ public class CalendarView extends MainActivity {
         recyclerView2.setAdapter(calendarAdapter2);
         recyclerView2.setLayoutManager(new LinearLayoutManager(this));
 
-        System.out.println("\nDay of Week Changed!");
+        //System.out.println("\nDay of Week Changed!");
     }
     private BottomNavigationView.OnNavigationItemSelectedListener dayListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -408,7 +408,7 @@ public class CalendarView extends MainActivity {
                             dayUpdate("Friday", courseSections);
                             break;
                     }
-                    System.out.println(id);
+                    //System.out.println(id);
                     return true;
                 }
             };

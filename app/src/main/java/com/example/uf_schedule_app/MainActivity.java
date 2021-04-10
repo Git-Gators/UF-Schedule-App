@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                         user = documentSnapshot.getData();
                         if (documentSnapshot.get(semester) != null)
                         {
-                            System.out.println(documentSnapshot.get(semester));
+                            //System.out.println(documentSnapshot.get(semester));
                             //This has to be like the single worst piece of code that I have ever written
 
                             //For some reason the courses load as a Hashmap of a Hashmap of strings as opposed to course objects.
@@ -345,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                             finish();
                             break;
                     }
-                    System.out.println(id);
+                    //System.out.println(id);
                     return false;
                 }
             };
@@ -412,6 +412,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
             TextView addACourseText = findViewById(R.id.addACourse);
             TextView instrText = findViewById(R.id.instrText);
             TextView instrText2 = findViewById(R.id.instrText2);
+            TextView disclaimer = findViewById(R.id.disclaimerText);
 
             //Bottom List
             if(crses.isEmpty()){
@@ -427,10 +428,12 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                 getStartedText.setVisibility(View.VISIBLE);
                 instrText.setVisibility(View.VISIBLE);
                 instrText2.setVisibility(View.VISIBLE);
+                disclaimer.setVisibility(View.VISIBLE);
             } else {
                 getStartedText.setVisibility(View.INVISIBLE);
                 instrText.setVisibility(View.INVISIBLE);
                 instrText2.setVisibility(View.INVISIBLE);
+                disclaimer.setVisibility(View.INVISIBLE);
             }
         } catch (NullPointerException e){
             //Throws exception when changing to a different view. We gotta catch it.

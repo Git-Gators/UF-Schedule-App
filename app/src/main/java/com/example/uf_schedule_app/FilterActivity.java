@@ -277,7 +277,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                 department = parent.getItemAtPosition(pos).toString();
                 try {
                     spinnerCrse.setEnabled(false);
-                    System.out.println("Semester: " + semester);
+                    //System.out.println("Semester: " + semester);
                     dbUpdater.getCourseNames(parent.getItemAtPosition(pos).toString(), coursesNames, pSpinner2, spinnerCrse, crses, semester);
                     ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, coursesNames);
                     spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
@@ -305,7 +305,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     //This might not be needed.
     public void onNothingSelected(AdapterView<?> parent) {
         // Another interface callback
-        System.out.println("Spinner: onNothingSelected");
+        //System.out.println("Spinner: onNothingSelected");
     }
 
     /** Called when the user taps the FILTER button */
