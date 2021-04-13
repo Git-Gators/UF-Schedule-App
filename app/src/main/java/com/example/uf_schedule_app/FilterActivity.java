@@ -27,6 +27,7 @@ import com.r0adkll.slidr.Slidr;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,6 +84,10 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     }
 
     public void filterCourses(){
+        //Grab the current semester
+        String originalSemester = semester;
+        checkSemesterRegistry();
+
         //Text Listeners
         EditText courseCodeText = (EditText) findViewById(R.id.courseCode);
         EditText courseCreditsText = (EditText) findViewById(R.id.courseCredits);
@@ -235,6 +240,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                     }
                 }
 
+                semester = originalSemester;
                 startMain();
             }
 
@@ -247,18 +253,19 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         mDatabase.addValueEventListener(postListener);
     }
 
+    private void checkSemesterRegistry(){
+        //TODO This is hardcoded to the newest semester
+        int currentIndex = Arrays.asList(semesterNames).indexOf(semester);
+        if(currentIndex > Arrays.asList(semesterNames).indexOf("Fall 2021"))
+            semester = "Fall 2021";
+    }
+
     /** When The Back Button In The Top Right Is Pressed **/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                //If the course was chosen in the spinner
-                if(courseName != null) {
-                    filterCourses();
-                } else {
-                    //The course spinner wasn't chosen
-                    filterCourses();
-                }
+                startMain();
                 return(true);
         }
 
