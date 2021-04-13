@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 
-public class ViewSchedule extends MainActivity implements AdapterView.OnItemSelectedListener {
+public class ViewSchedule extends MainActivity implements AdapterView.OnItemSelectedListener, addCustomCourseDialog.DialogListener {
     // Courses retrieved from the DB for the user to choose
     ArrayList<Course> crses = new ArrayList<>();
     String[] semesterNames;
@@ -278,6 +278,10 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
             });
         }
 
+        restartSchedule();
+    }
+
+    private void restartSchedule(){
         Intent intent = new Intent(this, ViewSchedule.class);
         Bundle b = new Bundle();
         intent.putExtra("coursesPicked", coursesPicked);
@@ -312,13 +316,7 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
             });
         }
 
-        Intent intent = new Intent(this, ViewSchedule.class);
-        Bundle b = new Bundle();
-        intent.putExtra("coursesPicked", coursesPicked);
-        intent.putExtra("crses", crses);
-        intent.putExtras(b);
-        startActivity(intent);
-        finish();
+        restartSchedule();
     }
 
     public void createPopup(View view) {
@@ -419,5 +417,36 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
             coursesSTR.add(courses.get(i).toString());
 
         return coursesSTR;
+    }
+
+    public void addCourse(View view){
+        Course courseCreated = new Course();
+        addCustomCourseDialog addCustomCourseDialog = new addCustomCourseDialog(courseCreated, coursesPicked);
+        addCustomCourseDialog.show(getSupportFragmentManager(), "Add Custom Course Dialog");
+    }
+
+    @Override
+    public void applyCourse(Course course) {
+        //Popup stuff
+        //coursesPicked.add(crses.get(position));
+        coursesPicked.add(course);
+        //Add the course to the database
+        addCourseToDatabase(coursesPicked);
+    }
+
+    public void addCourseToDatabase(ArrayList<Course> course) {
+        user.put(semester, coursesPicked);
+
+        //Push the map named user to the database
+        if (firebaseUser != null)
+        {
+            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "Course Successfully Added" + userId);
+                    restartSchedule();
+                }
+            });
+        }
     }
 }

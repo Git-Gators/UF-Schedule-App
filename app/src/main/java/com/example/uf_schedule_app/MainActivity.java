@@ -52,16 +52,6 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
     int[] semestersCodes = {2208, 2211, 2215, 2218};
     String semester = "Spring 2021";
 
-    @Override
-    public void applyCourse(Course course) {
-        //Popup stuff
-        //coursesPicked.add(crses.get(position));
-        coursesPicked.add(course);
-        //Add the course to the database
-        addCourseToDatabase(coursesPicked);
-        displayHelp();
-    }
-
     String department;
     String userId;
     static FirebaseUser firebaseUser;
@@ -446,5 +436,15 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
     public void openDialog(int position){
         addCourseDialog addCourseDialog = new addCourseDialog(crses.get(position), coursesPicked);
         addCourseDialog.show(getSupportFragmentManager(), "Add Course Dialog");
+    }
+
+    @Override
+    public void applyCourse(Course course) {
+        //Popup stuff
+        //coursesPicked.add(crses.get(position));
+        coursesPicked.add(course);
+        //Add the course to the database
+        addCourseToDatabase(coursesPicked);
+        displayHelp();
     }
 }

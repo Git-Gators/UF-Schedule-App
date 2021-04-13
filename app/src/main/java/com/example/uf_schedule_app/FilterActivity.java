@@ -253,6 +253,8 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         mDatabase.addValueEventListener(postListener);
     }
 
+    //If the semester has no data in our database
+    //If the semester is farther ahead than the most recent database
     private void checkSemesterRegistry(){
         //TODO This is hardcoded to the newest semester
         int currentIndex = Arrays.asList(semesterNames).indexOf(semester);
