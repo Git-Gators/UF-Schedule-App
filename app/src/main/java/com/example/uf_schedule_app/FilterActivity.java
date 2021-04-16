@@ -260,6 +260,8 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         int currentIndex = Arrays.asList(semesterNames).indexOf(semester);
         if(currentIndex > Arrays.asList(semesterNames).indexOf("Fall 2021"))
             semester = "Fall 2021";
+
+        
     }
 
     /** When The Back Button In The Top Right Is Pressed **/

@@ -89,7 +89,7 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
                 semesterNames = (String[]) intent.getSerializableExtra("semesters");
                 Spinner semesterSpinner = findViewById(R.id.semesterSpinner);
                 semesterSpinner.setOnItemSelectedListener(this);
-                ArrayAdapter spinnerArrayAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, semesterNames);
+                ArrayAdapter spinnerArrayAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, semesterNames);
                 spinnerArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                 semesterSpinner.setAdapter(spinnerArrayAdapter);
 
