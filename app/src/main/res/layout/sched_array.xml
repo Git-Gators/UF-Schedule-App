@@ -17,39 +17,75 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.cardview.widget.CardView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_weight="100"
+            android:layout_weight="25"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/courseText"
-                android:layout_width="180dp"
-                android:layout_height="52dp"
-                android:layout_marginStart="28dp"
-                android:layout_marginLeft="28dp"
-                android:gravity="center_horizontal|center_vertical" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <Button
-                android:id="@+id/details"
-                android:layout_width="72dp"
-                android:layout_height="52dp"
-                android:layout_marginStart="229dp"
-                android:layout_marginLeft="229dp"
-                android:text="Info" />
-
-            <Button
-                android:id="@+id/delete"
-                android:layout_width="72dp"
-                android:layout_height="52dp"
-                android:layout_marginStart="322dp"
-                android:layout_marginLeft="322dp"
-                android:tag="0"
-                android:text="Del" />
+                <TextView
+                    android:id="@+id/courseText"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:gravity="center_horizontal|center_vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="37" >
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/details"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="Info"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight= "37" >
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/delete"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:tag="0"
+                    android:text="Del"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
