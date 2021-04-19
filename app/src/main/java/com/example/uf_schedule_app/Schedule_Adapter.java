@@ -153,7 +153,7 @@ public class Schedule_Adapter extends RecyclerView.Adapter<Schedule_Adapter.Sche
                 public void onClick(View view) {
                     //courses.get(index)
                     ViewSchedule schedule = new ViewSchedule();
-                    schedule.deleteCourseFromRecycler(index);
+                    schedule.deleteCourseFromRecycler(index, context);
                 }
             });
         }

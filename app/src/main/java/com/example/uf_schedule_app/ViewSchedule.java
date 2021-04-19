@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -146,40 +147,19 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
 
         //Edit all the courseTexts
         for(int i = 0; i < coursesPicked.size(); i++){
-            TextView text = null;
-
-            if(i == 0){
-                text = findViewById(R.id.courseText1);
-            } else if(i == 1){
-                text = findViewById(R.id.courseText2);
-            } else if(i == 2){
-                text = findViewById(R.id.courseText3);
-            } else if(i == 3){
-                text = findViewById(R.id.courseText4);
-            } else if(i == 4) {
-                text = findViewById(R.id.courseText5);
-            }
-
-
-            if(text != null) {
-                sched.add(coursesPicked.get(i).toString());
-                //System.out.println("update screen: " + coursesPicked.get(i).toString());
-            }
-            //If index exists, enable delete button
+            sched.add(coursesPicked.get(i).toString());
             Button deleteAll = findViewById(R.id.delete);
             deleteAll.setVisibility(View.VISIBLE);
         }
     }
 
     //Loads data from database to a hashmap named user
-    public void loadData()
-    {
+    public void loadData() {
         //Find the current user
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         //TODO fix loading
-        if (firebaseUser != null)
-        {
+        if (firebaseUser != null) {
             //Get the userId and find their data in Firestore
             this.userId = firebaseUser.getUid();
             documentReference = userdb.collection("users").document(userId);
@@ -303,7 +283,7 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
         restartSchedule();
     }
 
-    public void deleteCourseFromRecycler(int index) {
+    public void deleteCourseFromRecycler(int index, Context context) {
         coursesPicked.remove(index);
         user.put("Courses", coursesPicked);
 
@@ -317,6 +297,11 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
         recyclerView.removeViewAt(index);
         scheduleAdapter.notifyItemRemoved(index);
 
+        sched_array = new String[sched.size()];
+        sched_array = sched.toArray(sched_array);
+        scheduleAdapter = new Schedule_Adapter(context, sched_array, coursesPicked, recyclerView);
+        recyclerView.setAdapter(scheduleAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
         //Push the map named user to the database
         if (firebaseUser != null)
