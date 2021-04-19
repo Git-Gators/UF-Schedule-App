@@ -21,7 +21,7 @@
 
                 <TextView
                     android:id="@+id/Course_Code"
-                    android:layout_width="wrap_content"
+                    android:layout_width="110dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="50dp"
                     android:layout_marginLeft="50dp"
@@ -32,7 +32,7 @@
 
                 <TextView
                     android:id="@+id/course_Instructor"
-                    android:layout_width="wrap_content"
+                    android:layout_width="110dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="50dp"
                     android:layout_marginLeft="50dp"
@@ -43,17 +43,20 @@
 
                 <TextView
                     android:id="@+id/num_credits_box"
-                    android:layout_width="201dp"
-                    android:layout_height="18dp"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginLeft="24dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
                     android:layout_marginTop="32dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/num_credits"
                     app:layout_constraintTop_toBottomOf="@+id/course_section_number_box" />
 
                 <TextView
                     android:id="@+id/num_credits"
-                    android:layout_width="wrap_content"
+                    android:layout_width="110dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="50dp"
                     android:layout_marginLeft="50dp"
@@ -64,7 +67,7 @@
 
                 <TextView
                     android:id="@+id/Name"
-                    android:layout_width="wrap_content"
+                    android:layout_width="110dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="50dp"
                     android:layout_marginLeft="50dp"
@@ -75,11 +78,14 @@
 
                 <TextView
                     android:id="@+id/courseID"
-                    android:layout_width="201dp"
-                    android:layout_height="18dp"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginLeft="24dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
                     android:layout_marginTop="32dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/Course_ID"
                     app:layout_constraintTop_toBottomOf="@+id/courseCode_box" />
 
@@ -87,8 +93,8 @@
                     android:id="@+id/Course_Description"
                     android:layout_width="wrap_content"
                     android:layout_height="19dp"
-                    android:layout_marginStart="45dp"
-                    android:layout_marginLeft="45dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginLeft="32dp"
                     android:layout_marginTop="29dp"
                     android:text="Course Description:"
                     app:layout_constraintStart_toStartOf="parent"
@@ -96,18 +102,21 @@
 
                 <TextView
                     android:id="@+id/nameBox"
-                    android:layout_width="201dp"
-                    android:layout_height="18dp"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginLeft="24dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
                     android:layout_marginTop="45dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/Name"
                     app:layout_constraintTop_toBottomOf="@+id/Title" />
 
                 <Button
                     android:id="@+id/Back2Sched"
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="100dp"
                     android:layout_marginLeft="100dp"
                     android:layout_marginTop="32dp"
@@ -123,27 +132,33 @@
 
                 <TextView
                     android:id="@+id/courseCode_box"
-                    android:layout_width="201dp"
-                    android:layout_height="18dp"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginLeft="24dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
                     android:layout_marginTop="32dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/Course_Code"
                     app:layout_constraintTop_toBottomOf="@+id/nameBox" />
 
                 <TextView
                     android:id="@+id/course_section_number_box"
-                    android:layout_width="201dp"
-                    android:layout_height="18dp"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginLeft="24dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
                     android:layout_marginTop="32dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/course_section_number"
                     app:layout_constraintTop_toBottomOf="@+id/courseID" />
 
                 <TextView
                     android:id="@+id/course_section_number"
-                    android:layout_width="wrap_content"
+                    android:layout_width="110dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="50dp"
                     android:layout_marginLeft="50dp"
@@ -185,7 +200,7 @@
 
                 <TextView
                     android:id="@+id/Course_ID"
-                    android:layout_width="wrap_content"
+                    android:layout_width="110dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="50dp"
                     android:layout_marginLeft="50dp"
@@ -196,11 +211,14 @@
 
                 <TextView
                     android:id="@+id/course_Instructor_box"
-                    android:layout_width="201dp"
-                    android:layout_height="18dp"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginLeft="24dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
                     android:layout_marginTop="32dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/course_Instructor"
                     app:layout_constraintTop_toBottomOf="@+id/num_credits_box" />
             </androidx.constraintlayout.widget.ConstraintLayout>

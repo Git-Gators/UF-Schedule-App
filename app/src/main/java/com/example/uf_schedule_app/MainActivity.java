@@ -3,6 +3,7 @@ package com.example.uf_schedule_app;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import android.app.AlertDialog;
 import android.os.Build;
@@ -90,8 +91,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
     }
 
     //Loads data from database to a hashmap named user
-    public void loadData()
-    {
+    public void loadData() {
         //Find the current user
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
