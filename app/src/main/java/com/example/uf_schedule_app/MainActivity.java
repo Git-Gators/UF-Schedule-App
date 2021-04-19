@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                               "Fall 2022", "Spring 2023", "Summer 2023",
                               "Fall 2023", "Spring 2024", "Summer 2024"};
     int[] semestersCodes = {2208, 2211, 2215, 2218};
-    String semester = "Spring 2021";
+    static String semester = "Spring 2021";
 
     String department;
     String userId;
@@ -224,10 +224,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
         courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(coursesPicked.size() < 5) {
-                    //Open the add to schedule popup
-                    openDialog(position);
-                }
+                openDialog(position);
             }
         });
     }

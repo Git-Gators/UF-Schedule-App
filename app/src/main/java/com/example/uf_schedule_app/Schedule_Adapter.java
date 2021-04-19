@@ -2,8 +2,10 @@ package com.example.uf_schedule_app;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,6 +36,7 @@ public class Schedule_Adapter extends RecyclerView.Adapter<Schedule_Adapter.Sche
     int colorVal[];
     Context context;
     ArrayList<Course> courses;
+    RecyclerView recyclerView;
 
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
@@ -45,11 +49,12 @@ public class Schedule_Adapter extends RecyclerView.Adapter<Schedule_Adapter.Sche
     private TextView courseInfopopup_section_number, courseInfopopup_section_number_box;
     private TextView courseInfopopup_num_credits, courseInfopopup_num_credits_box;
     private Button courseInfopopup_Back2Sched;
-    public Schedule_Adapter(Context ct, String s1[], ArrayList<Course> coursesPicked)
-    {
+
+    public Schedule_Adapter(Context ct, String[] s1, ArrayList<Course> coursesPicked, RecyclerView recyclerView_) {
         context = ct;
         data1 = s1;
         courses = coursesPicked;
+        recyclerView = recyclerView_;
         //data2 = s2;
         //colorVal = colors;
         //images = img;
@@ -146,28 +151,9 @@ public class Schedule_Adapter extends RecyclerView.Adapter<Schedule_Adapter.Sche
             itemView.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-//
-//                    //Call tag of delete button and use that as index
-//                    String index = view.getTag().toString();
-//                    if (courses.size() > Integer.parseInt(index)) {
-//                        courses.remove(Integer.parseInt(index));
-//                    }
-//                    user.put("Courses", courses);
-//
-//                    //Push the map named user to the database
-//                    if (firebaseUser != null)
-//                    {
-//                        this.userId = firebaseUser.getUid();
-//                        documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Log.d(TAG, "Course Successfully Deleted" + userId);
-//                            }
-//                        });
-//                    }
-//
-//                    restartSchedule();
+                    //courses.get(index)
+                    ViewSchedule schedule = new ViewSchedule();
+                    schedule.deleteCourseFromRecycler(index);
                 }
             });
         }

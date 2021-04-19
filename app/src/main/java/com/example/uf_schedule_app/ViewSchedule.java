@@ -31,19 +31,23 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.w3c.dom.Text;
 
+import java.net.Inet4Address;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
 
 public class ViewSchedule extends MainActivity implements AdapterView.OnItemSelectedListener, addCustomCourseDialog.DialogListener {
     // Courses retrieved from the DB for the user to choose
-    RecyclerView recyclerView;
-    ArrayList<Course> crses = new ArrayList<>();
-    String[] semesterNames;
+    static RecyclerView recyclerView;
+    static ArrayList<Course> crses = new ArrayList<>();
+    static String[] semesterNames;
+    static Schedule_Adapter scheduleAdapter;
+    static String[] sched_array;
 
     //Courses the user has already chosen
-    ArrayList<Course> coursesPicked = new ArrayList<>();
+    static ArrayList<Course> coursesPicked = new ArrayList<>();
 
     ProgressBar load;
 
@@ -114,9 +118,9 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
             text = findViewById(R.id.courseText6);
             text.setText("No courses selected.");
         }
-        String[] sched_array = new String[sched.size()];
+        sched_array = new String[sched.size()];
         sched_array = sched.toArray(sched_array);
-        Schedule_Adapter scheduleAdapter = new Schedule_Adapter(this, sched_array, coursesPicked);
+        scheduleAdapter = new Schedule_Adapter(this, sched_array, coursesPicked, recyclerView);
         recyclerView.setAdapter(scheduleAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -138,63 +142,32 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
         } else {
             noCourseText.setVisibility(View.INVISIBLE);
         }
-        findViewById(R.id.courseText1).setVisibility(View.INVISIBLE);
-        findViewById(R.id.delete1).setVisibility(View.INVISIBLE);
-        findViewById(R.id.details1).setVisibility(View.INVISIBLE);
-        findViewById(R.id.courseText2).setVisibility(View.INVISIBLE);
-        findViewById(R.id.delete2).setVisibility(View.INVISIBLE);
-        findViewById(R.id.details2).setVisibility(View.INVISIBLE);
-        findViewById(R.id.courseText3).setVisibility(View.INVISIBLE);
-        findViewById(R.id.delete3).setVisibility(View.INVISIBLE);
-        findViewById(R.id.details3).setVisibility(View.INVISIBLE);
-        findViewById(R.id.courseText4).setVisibility(View.INVISIBLE);
-        findViewById(R.id.delete4).setVisibility(View.INVISIBLE);
-        findViewById(R.id.details4).setVisibility(View.INVISIBLE);
-        findViewById(R.id.courseText5).setVisibility(View.INVISIBLE);
-        findViewById(R.id.delete5).setVisibility(View.INVISIBLE);
-        findViewById(R.id.details5).setVisibility(View.INVISIBLE);
 
 
         //Edit all the courseTexts
         for(int i = 0; i < coursesPicked.size(); i++){
             TextView text = null;
-            Button delete = null;
-            Button info = null;
 
             if(i == 0){
                 text = findViewById(R.id.courseText1);
-                delete = findViewById(R.id.delete1);
-                info = findViewById(R.id.details1);
             } else if(i == 1){
                 text = findViewById(R.id.courseText2);
-                delete = findViewById(R.id.delete2);
-                info = findViewById(R.id.details2);
             } else if(i == 2){
                 text = findViewById(R.id.courseText3);
-                delete = findViewById(R.id.delete3);
-                info = findViewById(R.id.details3);
             } else if(i == 3){
                 text = findViewById(R.id.courseText4);
-                delete = findViewById(R.id.delete4);
-                info = findViewById(R.id.details4);
             } else if(i == 4) {
                 text = findViewById(R.id.courseText5);
-                delete = findViewById(R.id.delete5);
-                info = findViewById(R.id.details5);
             }
 
 
             if(text != null) {
-                text.setVisibility(View.VISIBLE);
-                text.setText(coursesPicked.get(i).toString());
                 sched.add(coursesPicked.get(i).toString());
                 //System.out.println("update screen: " + coursesPicked.get(i).toString());
             }
             //If index exists, enable delete button
             Button deleteAll = findViewById(R.id.delete);
             deleteAll.setVisibility(View.VISIBLE);
-            delete.setVisibility(View.VISIBLE);
-            info.setVisibility(View.VISIBLE);
         }
     }
 
@@ -328,6 +301,33 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
         }
 
         restartSchedule();
+    }
+
+    public void deleteCourseFromRecycler(int index) {
+        coursesPicked.remove(index);
+        user.put("Courses", coursesPicked);
+
+        sched = new ArrayList<String>(1);
+        for(int i = 0; i < coursesPicked.size(); i++)
+            sched.add(coursesPicked.get(i).toString());
+
+        sched_array =  new String[sched.size()];
+        sched_array = sched.toArray(sched_array);
+
+        recyclerView.removeViewAt(index);
+        scheduleAdapter.notifyItemRemoved(index);
+
+
+        //Push the map named user to the database
+        if (firebaseUser != null)
+        {
+            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+
+                }
+            });
+        }
     }
 
     public void createPopup(View view) {
