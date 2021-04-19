@@ -2,33 +2,53 @@ package com.example.uf_schedule_app;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.app.AlertDialog;
 
 import android.content.Intent;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 
+import org.w3c.dom.Text;
+
+import java.net.Inet4Address;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Objects;
 
 
-public class ViewSchedule extends MainActivity {
+public class ViewSchedule extends MainActivity implements AdapterView.OnItemSelectedListener, addCustomCourseDialog.DialogListener {
     // Courses retrieved from the DB for the user to choose
-    ArrayList<Course> crses = new ArrayList<>();
+    static RecyclerView recyclerView;
+    static ArrayList<Course> crses = new ArrayList<>();
+    static String[] semesterNames;
+    static Schedule_Adapter scheduleAdapter;
+    static String[] sched_array;
 
     //Courses the user has already chosen
-    ArrayList<Course> coursesPicked = new ArrayList<>();
+    static ArrayList<Course> coursesPicked = new ArrayList<>();
 
     ProgressBar load;
 
@@ -43,6 +63,7 @@ public class ViewSchedule extends MainActivity {
     private TextView courseInfopopup_section_number, courseInfopopup_section_number_box;
     private TextView courseInfopopup_num_credits, courseInfopopup_num_credits_box;
     private Button courseInfopopup_Back2Sched;
+    ArrayList<String> sched = new ArrayList<String>(1);
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -53,10 +74,10 @@ public class ViewSchedule extends MainActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         bottomNav.setSelectedItemId(R.id.nav_schedule);
+        recyclerView = findViewById(R.id.recycler);
 
         load = findViewById(R.id.progressBarSchedule);
         load.setVisibility(View.INVISIBLE);
-
 
 
         //If we're coming from the main, we grab the info
@@ -65,49 +86,7 @@ public class ViewSchedule extends MainActivity {
         if(b != null){
             if(b.getSerializable("coursesPicked") != null){
                 coursesPicked = (ArrayList<Course>) intent.getSerializableExtra("coursesPicked");
-
-                //Edit all the courseTexts
-                for(int i = 0; i < coursesPicked.size(); i++){
-                    TextView text = null;
-                    Button delete = null;
-                    Button info = null;
-
-                    if(i == 0){
-                        text = findViewById(R.id.courseText1);
-                        delete = findViewById(R.id.delete1);
-                        info = findViewById(R.id.details1);
-                    } else if(i == 1){
-                        text = findViewById(R.id.courseText2);
-                        delete = findViewById(R.id.delete2);
-                        info = findViewById(R.id.details2);
-                    } else if(i == 2){
-                        text = findViewById(R.id.courseText3);
-                        delete = findViewById(R.id.delete3);
-                        info = findViewById(R.id.details3);
-                    } else if(i == 3){
-                        text = findViewById(R.id.courseText4);
-                        delete = findViewById(R.id.delete4);
-                        info = findViewById(R.id.details4);
-                    } else if(i == 4) {
-                        text = findViewById(R.id.courseText5);
-                        delete = findViewById(R.id.delete5);
-                        info = findViewById(R.id.details5);
-                    }
-
-                    if (text == null && i == 0) {
-                        text = findViewById(R.id.courseText6);
-                        text.setText("No courses selected.");
-                    }
-                    else if(text != null) {
-                        text.setVisibility(View.VISIBLE);
-                        text.setText(coursesPicked.get(i).toString());
-                    }
-                    //If index exists, enable delete button
-                    Button deleteAll = findViewById(R.id.delete);
-                    deleteAll.setVisibility(View.VISIBLE);
-                    delete.setVisibility(View.VISIBLE);
-                    info.setVisibility(View.VISIBLE);
-                }
+                updateScreen();
             } else {
                 load.setVisibility(View.VISIBLE);
                 TextView text = null;
@@ -117,6 +96,22 @@ public class ViewSchedule extends MainActivity {
             if(b.getSerializable("crses") != null) {
                 crses = (ArrayList<Course>) intent.getSerializableExtra("crses");
             }
+            if(b.getSerializable("semesters") != null){
+                semesterNames = (String[]) intent.getSerializableExtra("semesters");
+                Spinner semesterSpinner = findViewById(R.id.semesterSpinner);
+                semesterSpinner.setOnItemSelectedListener(this);
+                ArrayAdapter spinnerArrayAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, semesterNames);
+                spinnerArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+                semesterSpinner.setAdapter(spinnerArrayAdapter);
+
+                for(int i = 0; i < semesterNames.length; i++){
+                    if(semesterNames[i].equals(semester))
+                        semesterSpinner.setSelection(i);
+                }
+            }
+            if(b.getSerializable("semester") != null) {
+                semester = (String) intent.getSerializableExtra("semester");
+            }
         }
         else {
             load.setVisibility(View.VISIBLE);
@@ -124,24 +119,112 @@ public class ViewSchedule extends MainActivity {
             text = findViewById(R.id.courseText6);
             text.setText("No courses selected.");
         }
+        sched_array = new String[sched.size()];
+        sched_array = sched.toArray(sched_array);
+        scheduleAdapter = new Schedule_Adapter(this, sched_array, coursesPicked, recyclerView);
+        recyclerView.setAdapter(scheduleAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        if (parent.getId() == R.id.semesterSpinner) {
+            semester = parent.getItemAtPosition(pos).toString();
+            coursesPicked.clear();
+            loadData();
+        }
+    }
+
+    public void updateScreen(){
+        TextView noCourseText = findViewById(R.id.courseText6);
+        if(coursesPicked.isEmpty()){
+            noCourseText.setText("No courses selected.");
+            noCourseText.setVisibility(View.VISIBLE);
+        } else {
+            noCourseText.setVisibility(View.INVISIBLE);
+        }
+
+
+        //Edit all the courseTexts
+        for(int i = 0; i < coursesPicked.size(); i++){
+            sched.add(coursesPicked.get(i).toString());
+            Button deleteAll = findViewById(R.id.delete);
+            deleteAll.setVisibility(View.VISIBLE);
+        }
+    }
+
+    //Loads data from database to a hashmap named user
+    public void loadData() {
+        //Find the current user
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        //TODO fix loading
+        if (firebaseUser != null) {
+            //Get the userId and find their data in Firestore
+            this.userId = firebaseUser.getUid();
+            documentReference = userdb.collection("users").document(userId);
+            documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if (documentSnapshot.exists())
+                    {
+                        //If the document snapshot exists, load the data into the user map
+                        user = documentSnapshot.getData();
+                        if (documentSnapshot.get(semester) != null)
+                        {
+                            //System.out.println("doc snapshot: " + semester + documentSnapshot.get(semester));
+                            //This has to be like the single worst piece of code that I have ever written
+
+                            //For some reason the courses load as a Hashmap of a Hashmap of strings as opposed to course objects.
+                            //So to fix this we need to load the Hashmap of a Hashmap of strings into a Map, which I called wierd map because nothing here makes sense
+                            ArrayList<HashMap<String, HashMap<String, String>>> wierdMap = (ArrayList<HashMap<String, HashMap<String, String>>>) documentSnapshot.get(semester);
+
+                            //This part is just to make sure we have enough space in the arraylist to store data on our courses
+                            int courseObjectsSize = coursesPicked.size();
+                            if (courseObjectsSize < wierdMap.size())
+                            {
+                                for (int i = 0; i < wierdMap.size() - courseObjectsSize; i++)
+                                {
+                                    Course course = new Course();
+                                    coursesPicked.add(course);
+                                }
+                            }
+
+                            //So since wierdmap has a hashmap containing two hashmaps, courseInfo and classSection,
+                            //we copy our data from wierdmap into courseObjects for each course.
+                            for (int i = 0; i < wierdMap.size(); i++)
+                            {
+                                coursesPicked.get(i).courseInfo = wierdMap.get(i).get("courseInfo");
+                                coursesPicked.get(i).classSection = wierdMap.get(i).get("classSection");
+                            }
+
+                        }
+                        user.put(semester, coursesPicked);
+                        //If there's course data in the database try to load it
+                        if (user.get(semester) != null)
+                        {
+                            //Typecasting the object from the course to a database should be fine
+                            //assuming we store it correctly in the first place
+
+                            for (int i = 0; i < coursesPicked.size(); i++)
+                            {
+                                Course course = (Course) coursesPicked.get(i);
+                                coursesPicked.set(i, course);
+                            }
+                        }
+                        //System.out.println("Courses Picked: " + coursesPicked);
+                        updateScreen();
+                    }
+                }
+            });
+        }
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
         // Another interface callback
-        System.out.println("Spinner: onNothingSelected");
+        //System.out.println("Spinner: onNothingSelected");
     }
 
-    /** Called when the user taps the Send button */
-    public void goToCourseFinder(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        Bundle b = new Bundle();
-        intent.putExtra("coursesPicked", coursesPicked);
-        intent.putExtra("crses", crses);
-        intent.putExtras(b);
-        startActivity(intent);
-        finish();
-    }
     //Delete all courses
     public void goToDelete(View view) {
         coursesPicked.clear();
@@ -159,10 +242,16 @@ public class ViewSchedule extends MainActivity {
             });
         }
 
+        restartSchedule();
+    }
+
+    private void restartSchedule(){
         Intent intent = new Intent(this, ViewSchedule.class);
         Bundle b = new Bundle();
         intent.putExtra("coursesPicked", coursesPicked);
         intent.putExtra("crses", crses);
+        intent.putExtra("semester", semester);
+        intent.putExtra("semesters", semesterNames);
         intent.putExtras(b);
         startActivity(intent);
         finish();
@@ -191,15 +280,40 @@ public class ViewSchedule extends MainActivity {
             });
         }
 
-        Intent intent = new Intent(this, ViewSchedule.class);
-        Bundle b = new Bundle();
-        intent.putExtra("coursesPicked", coursesPicked);
-        intent.putExtra("crses", crses);
-        intent.putExtras(b);
-        startActivity(intent);
-        finish();
+        restartSchedule();
     }
 
+    public void deleteCourseFromRecycler(int index, Context context) {
+        coursesPicked.remove(index);
+        user.put("Courses", coursesPicked);
+
+        sched = new ArrayList<String>(1);
+        for(int i = 0; i < coursesPicked.size(); i++)
+            sched.add(coursesPicked.get(i).toString());
+
+        sched_array =  new String[sched.size()];
+        sched_array = sched.toArray(sched_array);
+
+        recyclerView.removeViewAt(index);
+        scheduleAdapter.notifyItemRemoved(index);
+
+        sched_array = new String[sched.size()];
+        sched_array = sched.toArray(sched_array);
+        scheduleAdapter = new Schedule_Adapter(context, sched_array, coursesPicked, recyclerView);
+        recyclerView.setAdapter(scheduleAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+
+        //Push the map named user to the database
+        if (firebaseUser != null)
+        {
+            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+
+                }
+            });
+        }
+    }
 
     public void createPopup(View view) {
         //Define elements within popup
@@ -267,6 +381,8 @@ public class ViewSchedule extends MainActivity {
                             in = new Intent(getBaseContext(), MainActivity.class);
                             in.putExtra("coursesPicked", coursesPicked);
                             in.putExtras(b);
+                            in.putExtra("semesters", semesterNames);
+                            in.putExtra("semester", semester);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                             finish();
@@ -278,13 +394,15 @@ public class ViewSchedule extends MainActivity {
                             id = R.id.nav_calendar;
                             in = new Intent(getBaseContext(), CalendarView.class);
                             in.putExtra("coursesPicked", coursesPicked);
+                            in.putExtra("semesters", semesterNames);
+                            in.putExtra("semester", semester);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                             finish();
                             break;
                     }
-                    System.out.println(id);
+                    //System.out.println(id);
                     return true;
                 }
             };
@@ -295,5 +413,36 @@ public class ViewSchedule extends MainActivity {
             coursesSTR.add(courses.get(i).toString());
 
         return coursesSTR;
+    }
+
+    public void addCourse(View view){
+        Course courseCreated = new Course();
+        addCustomCourseDialog addCustomCourseDialog = new addCustomCourseDialog(courseCreated, coursesPicked);
+        addCustomCourseDialog.show(getSupportFragmentManager(), "Add Custom Course Dialog");
+    }
+
+    @Override
+    public void applyCourse(Course course) {
+        //Popup stuff
+        //coursesPicked.add(crses.get(position));
+        coursesPicked.add(course);
+        //Add the course to the database
+        addCourseToDatabase(coursesPicked);
+    }
+
+    public void addCourseToDatabase(ArrayList<Course> course) {
+        user.put(semester, coursesPicked);
+
+        //Push the map named user to the database
+        if (firebaseUser != null)
+        {
+            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "Course Successfully Added" + userId);
+                    restartSchedule();
+                }
+            });
+        }
     }
 }

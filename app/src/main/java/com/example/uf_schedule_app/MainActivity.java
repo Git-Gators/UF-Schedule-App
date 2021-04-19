@@ -45,15 +45,12 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
     ListView courseList;
     static Boolean loaded = false;
 
-    @Override
-    public void applyCourse(Course course) {
-        //Popup stuff
-        //coursesPicked.add(crses.get(position));
-        coursesPicked.add(course);
-        //Add the course to the database
-        addCourseToDatabase(coursesPicked);
-        displayHelp();
-    }
+    String[] semesterNames = {"Fall 2020", "Spring 2021", "Summer 2021",
+                              "Fall 2021", "Spring 2022", "Summer 2022",
+                              "Fall 2022", "Spring 2023", "Summer 2023",
+                              "Fall 2023", "Spring 2024", "Summer 2024"};
+    int[] semestersCodes = {2208, 2211, 2215, 2218};
+    static String semester = "Spring 2021";
 
     String department;
     String userId;
@@ -78,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
 
 
     public void addCourseToDatabase(ArrayList<Course> course) {
-        user.put("Courses", coursesPicked);
+        user.put(semester, coursesPicked);
 
         //Push the map named user to the database
         if (firebaseUser != null)
@@ -111,14 +108,14 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                     {
                         //If the document snapshot exists, load the data into the user map
                         user = documentSnapshot.getData();
-                        if (documentSnapshot.get("Courses") != null)
+                        if (documentSnapshot.get(semester) != null)
                         {
-                            System.out.println(documentSnapshot.get("Courses"));
+                            //System.out.println(documentSnapshot.get(semester));
                             //This has to be like the single worst piece of code that I have ever written
 
                             //For some reason the courses load as a Hashmap of a Hashmap of strings as opposed to course objects.
                             //So to fix this we need to load the Hashmap of a Hashmap of strings into a Map, which I called wierd map because nothing here makes sense
-                            ArrayList<HashMap<String, HashMap<String, String>>> wierdMap = (ArrayList<HashMap<String, HashMap<String, String>>>) documentSnapshot.get("Courses");
+                            ArrayList<HashMap<String, HashMap<String, String>>> wierdMap = (ArrayList<HashMap<String, HashMap<String, String>>>) documentSnapshot.get(semester);
 
                             //This part is just to make sure we have enough space in the arraylist to store data on our courses
                             int courseObjectsSize = coursesPicked.size();
@@ -140,9 +137,9 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                             }
 
                         }
-                        user.put("Courses", coursesPicked);
+                        user.put(semester, coursesPicked);
                         //If there's course data in the database try to load it
-                        if (user.get("Courses") != null)
+                        if (user.get(semester) != null)
                         {
                             //Typecasting the object from the course to a database should be fine
                             //assuming we store it correctly in the first place
@@ -178,12 +175,20 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Update Database
 //        try {
-//            dbUpdater.updateDB(getBaseContext());
+//            // [Year (with first 0 removed)][Semester number][optional Summer Semester]
+//            //Spring: 1
+//            //Summer: 5
+//            //Fall: 8
+//
+//            dbUpdater.updateDB(getBaseContext(), semesterNames[2], semestersCodes[2]);
 //            //dbUpdater.deleteCourses();
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
+
+        loadData();
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
@@ -193,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
 
         loginBtnHomePage = findViewById(R.id.login);
         logoutBtnHomePage = findViewById(R.id.logout);
-
 
         //If we're coming from the filter, we grab the info
         Intent intent = getIntent();
@@ -208,16 +212,19 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getNames(crses));
                 courseList.setAdapter(arrayAdapter);
             }
+            if(b.getSerializable("semester") != null) {
+                semester = (String) intent.getSerializableExtra("semester");
+            }
+            if(b.getSerializable("semesters") != null){
+                semesterNames = (String[]) intent.getSerializableExtra("semesters");
+            }
             displayHelp();
         }
 
         courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(coursesPicked.size() < 5) {
-                    //Open the add to schedule popup
-                    openDialog(position);
-                }
+                openDialog(position);
             }
         });
     }
@@ -228,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
         Bundle b = new Bundle();
         intent.putExtra("coursesPicked", coursesPicked);
         intent.putExtra("crses", crses);
+        intent.putExtra("semester", semester);
         intent.putExtras(b);
         startActivity(intent);
         finish();
@@ -308,6 +316,8 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                             id = R.id.nav_schedule;
                             in = new Intent(getBaseContext(), ViewSchedule.class);
                             in.putExtra("coursesPicked", coursesPicked);
+                            in.putExtra("semesters", semesterNames);
+                            in.putExtra("semester", semester);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -317,13 +327,15 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                             id = R.id.nav_calendar;
                             in = new Intent(getBaseContext(), CalendarView.class);
                             in.putExtra("coursesPicked", coursesPicked);
+                            in.putExtra("semester", semester);
+                            in.putExtra("semesters", semesterNames);
                             in.putExtras(b);
                             startActivity(in);
                             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                             finish();
                             break;
                     }
-                    System.out.println(id);
+                    //System.out.println(id);
                     return false;
                 }
             };
@@ -390,6 +402,7 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
             TextView addACourseText = findViewById(R.id.addACourse);
             TextView instrText = findViewById(R.id.instrText);
             TextView instrText2 = findViewById(R.id.instrText2);
+            TextView disclaimer = findViewById(R.id.disclaimerText);
 
             //Bottom List
             if(crses.isEmpty()){
@@ -405,10 +418,12 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
                 getStartedText.setVisibility(View.VISIBLE);
                 instrText.setVisibility(View.VISIBLE);
                 instrText2.setVisibility(View.VISIBLE);
+                disclaimer.setVisibility(View.VISIBLE);
             } else {
                 getStartedText.setVisibility(View.INVISIBLE);
                 instrText.setVisibility(View.INVISIBLE);
                 instrText2.setVisibility(View.INVISIBLE);
+                disclaimer.setVisibility(View.INVISIBLE);
             }
         } catch (NullPointerException e){
             //Throws exception when changing to a different view. We gotta catch it.
@@ -416,7 +431,17 @@ public class MainActivity extends AppCompatActivity implements addCourseDialog.D
     }
 
     public void openDialog(int position){
-        addCourseDialog addCourseDialog = new addCourseDialog(crses.get(position));
+        addCourseDialog addCourseDialog = new addCourseDialog(crses.get(position), coursesPicked);
         addCourseDialog.show(getSupportFragmentManager(), "Add Course Dialog");
+    }
+
+    @Override
+    public void applyCourse(Course course) {
+        //Popup stuff
+        //coursesPicked.add(crses.get(position));
+        coursesPicked.add(course);
+        //Add the course to the database
+        addCourseToDatabase(coursesPicked);
+        displayHelp();
     }
 }

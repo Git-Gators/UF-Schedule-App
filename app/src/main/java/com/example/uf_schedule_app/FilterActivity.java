@@ -27,6 +27,7 @@ import com.r0adkll.slidr.Slidr;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,7 +36,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
 
     String department = "";
     Course courseName = null;
-    String semester = "Spring 2021";
+    String semester;
     ArrayList<Course> coursesInSchedule = new ArrayList<>();
     ArrayList<String> days = new ArrayList<>();
 
@@ -74,12 +75,19 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
             if(b.getSerializable("courseList") != null) {
                 coursesInSchedule = (ArrayList<Course>) intent.getSerializableExtra("courseList");
             }
+            if(b.getSerializable("semester") != null) {
+                semester = (String) intent.getSerializableExtra("semester");
+            }
         }
 
         setupInterface();
     }
 
     public void filterCourses(){
+        //Grab the current semester
+        String originalSemester = semester;
+        checkSemesterRegistry();
+
         //Text Listeners
         EditText courseCodeText = (EditText) findViewById(R.id.courseCode);
         EditText courseCreditsText = (EditText) findViewById(R.id.courseCredits);
@@ -95,7 +103,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         String periodStart = ((Spinner)findViewById(R.id.periodStartSpinner)).getSelectedItem().toString();
         String periodEnd = ((Spinner)findViewById(R.id.periodEndSpinner)).getSelectedItem().toString();
 
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(semester);
         ValueEventListener postListener = new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
@@ -226,12 +234,13 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                         }
 
                         //If we've found the department, we don't need to check for more courses.
-                        if(depMatched) {
+                        if(depMatched || crses.size() >= 400) {
                             break;
                         }
                     }
                 }
 
+                semester = originalSemester;
                 startMain();
             }
 
@@ -244,18 +253,23 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         mDatabase.addValueEventListener(postListener);
     }
 
+    //If the semester has no data in our database
+    //If the semester is farther ahead than the most recent database
+    private void checkSemesterRegistry(){
+        //TODO This is hardcoded to the newest semester
+        int currentIndex = Arrays.asList(semesterNames).indexOf(semester);
+        if(currentIndex > Arrays.asList(semesterNames).indexOf("Fall 2021"))
+            semester = "Fall 2021";
+
+        
+    }
+
     /** When The Back Button In The Top Right Is Pressed **/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                //If the course was chosen in the spinner
-                if(courseName != null) {
-                    filterCourses();
-                } else {
-                    //The course spinner wasn't chosen
-                    filterCourses();
-                }
+                startMain();
                 return(true);
         }
 
@@ -274,7 +288,8 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
                 department = parent.getItemAtPosition(pos).toString();
                 try {
                     spinnerCrse.setEnabled(false);
-                    dbUpdater.getCourseNames(parent.getItemAtPosition(pos).toString(), coursesNames, pSpinner2, spinnerCrse, crses);
+                    //System.out.println("Semester: " + semester);
+                    dbUpdater.getCourseNames(parent.getItemAtPosition(pos).toString(), coursesNames, pSpinner2, spinnerCrse, crses, semester);
                     ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, coursesNames);
                     spinnerArrayAdapter1.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                     spinnerCrse.setAdapter(spinnerArrayAdapter1);
@@ -301,7 +316,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
     //This might not be needed.
     public void onNothingSelected(AdapterView<?> parent) {
         // Another interface callback
-        System.out.println("Spinner: onNothingSelected");
+        //System.out.println("Spinner: onNothingSelected");
     }
 
     /** Called when the user taps the FILTER button */
@@ -335,6 +350,7 @@ public class FilterActivity extends MainActivity implements AdapterView.OnItemSe
         Bundle b = new Bundle();
         intent.putExtra("crses", crses);
         intent.putExtra("coursesPicked", coursesPicked);
+        intent.putExtra("semester", semester);
         intent.putExtras(b);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
