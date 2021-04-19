@@ -2,6 +2,8 @@ package com.example.uf_schedule_app;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -36,6 +38,7 @@ import java.util.Objects;
 
 public class ViewSchedule extends MainActivity implements AdapterView.OnItemSelectedListener, addCustomCourseDialog.DialogListener {
     // Courses retrieved from the DB for the user to choose
+    RecyclerView recyclerView;
     ArrayList<Course> crses = new ArrayList<>();
     String[] semesterNames;
 
@@ -55,6 +58,7 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
     private TextView courseInfopopup_section_number, courseInfopopup_section_number_box;
     private TextView courseInfopopup_num_credits, courseInfopopup_num_credits_box;
     private Button courseInfopopup_Back2Sched;
+    ArrayList<String> sched = new ArrayList<String>(1);
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -65,9 +69,11 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         bottomNav.setSelectedItemId(R.id.nav_schedule);
+        recyclerView = findViewById(R.id.recycler);
 
         load = findViewById(R.id.progressBarSchedule);
         load.setVisibility(View.INVISIBLE);
+
 
         //If we're coming from the main, we grab the info
         Intent intent = getIntent();
@@ -108,7 +114,11 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
             text = findViewById(R.id.courseText6);
             text.setText("No courses selected.");
         }
-
+        String[] sched_array = new String[sched.size()];
+        sched_array = sched.toArray(sched_array);
+        Schedule_Adapter scheduleAdapter = new Schedule_Adapter(this, sched_array, coursesPicked);
+        recyclerView.setAdapter(scheduleAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -177,6 +187,7 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
             if(text != null) {
                 text.setVisibility(View.VISIBLE);
                 text.setText(coursesPicked.get(i).toString());
+                sched.add(coursesPicked.get(i).toString());
                 //System.out.println("update screen: " + coursesPicked.get(i).toString());
             }
             //If index exists, enable delete button
