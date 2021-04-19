@@ -15,6 +15,7 @@
         android:layout_marginTop="24dp"
         android:onClick="goToFilter"
         android:text="Filters"
+        android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -79,6 +80,7 @@
         android:layout_marginEnd="32dp"
         android:layout_marginRight="32dp"
         android:text="Logout"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -86,7 +88,7 @@
         android:id="@+id/getStarted"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="100dp"
         android:gravity="center"
         android:shadowColor="#272727"
         android:shadowDx="1"
@@ -94,6 +96,7 @@
         android:shadowRadius="1"
         android:text="Get Started"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textSize="18sp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -111,6 +114,7 @@
         android:gravity="center_horizontal"
         android:text='To view courses within a particular field of study, select from the filter menu and press "Search".'
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="14sp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -128,6 +132,7 @@
         android:gravity="center_horizontal"
         android:text='Courses can be filtered based upon any of the available criteria.'
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="14sp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.921"
@@ -147,6 +152,7 @@
         android:gravity="center_horizontal"
         android:text="Keep in mind, this app will not register you for classes. You must register through ONE.UF. This app is simply to help plan your semesters."
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="14sp"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"

@@ -41,20 +41,21 @@
             <TextView
                 android:id="@+id/topBar"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/bordermenu"
                 android:gravity="left"
                 android:onClick="nextFilter"
                 android:paddingLeft="30px"
                 android:text="@string/filterBarOpen"
                 android:textColor="#FFFFFF"
+                android:textSize="30sp"
                 app:autoSizeTextType="uniform" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/top"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:visibility="gone">
+                tools:visibility="visible">
 
                 <TextView
                     android:id="@+id/departmentText"
@@ -64,7 +65,7 @@
                     android:layout_marginLeft="45dp"
                     android:layout_marginTop="18dp"
                     android:text="Department"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -92,7 +93,7 @@
                     android:layout_marginLeft="44dp"
                     android:layout_marginTop="19dp"
                     android:text="Course"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/spinnerDepartments" />
@@ -120,7 +121,7 @@
                     android:layout_marginLeft="40dp"
                     android:layout_marginTop="44dp"
                     android:text="Course Number"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/spinnerCourse" />
 
@@ -140,6 +141,7 @@
                     android:paddingTop="10px"
                     android:paddingRight="10px"
                     android:paddingBottom="10px"
+                    android:textSize="14sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/courseNumberText" />
 
@@ -151,7 +153,7 @@
                     android:layout_marginLeft="60dp"
                     android:layout_marginTop="44dp"
                     android:text="Number of Credits"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     app:layout_constraintStart_toEndOf="@+id/courseNumberText"
                     app:layout_constraintTop_toBottomOf="@+id/spinnerCourse" />
 
@@ -159,8 +161,8 @@
                     android:id="@+id/courseCredits"
                     android:layout_width="145dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="50dp"
-                    android:layout_marginLeft="50dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginLeft="24dp"
                     android:layout_marginTop="12dp"
                     android:background="@drawable/textborder"
                     android:ems="10"
@@ -170,6 +172,7 @@
                     android:paddingTop="10px"
                     android:paddingRight="10px"
                     android:paddingBottom="10px"
+                    android:textSize="14sp"
                     app:layout_constraintStart_toEndOf="@+id/courseCode"
                     app:layout_constraintTop_toBottomOf="@+id/classNumberText" />
 
@@ -181,15 +184,19 @@
                     android:layout_marginLeft="42dp"
                     android:layout_marginTop="14dp"
                     android:text="Course Title"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/courseCredits" />
 
                 <EditText
                     android:id="@+id/courseTitle"
-                    android:layout_width="333dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginLeft="32dp"
                     android:layout_marginTop="12dp"
+                    android:layout_marginEnd="32dp"
+                    android:layout_marginRight="32dp"
                     android:layout_marginBottom="20dp"
                     android:background="@drawable/textborder"
                     android:ems="10"
@@ -198,6 +205,7 @@
                     android:padding="10px"
                     android:paddingLeft="10px"
                     android:paddingTop="10px"
+                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -220,13 +228,14 @@
             <TextView
                 android:id="@+id/middleBar"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/bordermenu"
                 android:gravity="left"
                 android:onClick="nextFilter"
                 android:paddingLeft="30px"
                 android:text="@string/courseFilterClosed"
                 android:textColor="#FFFFFF"
+                android:textSize="30sp"
                 app:autoSizeTextType="uniform" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -244,7 +253,7 @@
                     android:layout_marginLeft="45dp"
                     android:layout_marginTop="18dp"
                     android:text="Level Minimum"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -254,10 +263,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="18dp"
-                    android:layout_marginEnd="44dp"
-                    android:layout_marginRight="44dp"
+                    android:layout_marginEnd="65dp"
+                    android:layout_marginRight="65dp"
                     android:text="Level Maximum"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -288,9 +297,13 @@
 
                 <EditText
                     android:id="@+id/instructorInput"
-                    android:layout_width="333dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginLeft="32dp"
                     android:layout_marginTop="12dp"
+                    android:layout_marginEnd="32dp"
+                    android:layout_marginRight="32dp"
                     android:layout_marginBottom="30dp"
                     android:background="@drawable/textborder"
                     android:ems="10"
@@ -299,6 +312,7 @@
                     android:padding="10px"
                     android:paddingLeft="10px"
                     android:paddingTop="10px"
+                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -312,7 +326,7 @@
                     android:layout_marginLeft="42dp"
                     android:layout_marginTop="20dp"
                     android:text="Instructor"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/levelMinSpinner" />
 
@@ -321,13 +335,14 @@
             <TextView
                 android:id="@+id/bottomBar"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/bordermenu"
                 android:gravity="left"
                 android:onClick="nextFilter"
                 android:paddingLeft="30px"
                 android:text="@string/meetingClosed"
                 android:textColor="#FFFFFF"
+                android:textSize="30sp"
                 app:autoSizeTextType="uniform" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -345,7 +360,7 @@
                     android:layout_marginLeft="50dp"
                     android:layout_marginTop="18dp"
                     android:text="Days"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -364,7 +379,7 @@
                     android:paddingLeft="20px"
                     android:paddingRight="20px"
                     android:text="Monday"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/daysText" />
@@ -383,7 +398,7 @@
                     android:paddingLeft="20px"
                     android:paddingRight="20px"
                     android:text="Tuesday"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
@@ -403,7 +418,7 @@
                     android:paddingLeft="20px"
                     android:paddingRight="20px"
                     android:text="Wednesday"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
@@ -422,7 +437,7 @@
                     android:paddingLeft="20px"
                     android:paddingRight="20px"
                     android:text="Thursday"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
@@ -442,7 +457,7 @@
                     android:paddingLeft="20px"
                     android:paddingRight="20px"
                     android:text="Friday"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
@@ -463,7 +478,7 @@
                     android:paddingLeft="20px"
                     android:paddingRight="20px"
                     android:text="Saturday"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
@@ -478,7 +493,7 @@
                     android:layout_marginLeft="45dp"
                     android:layout_marginTop="30dp"
                     android:text="Period Start"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/saturdayCheckbox" />
@@ -491,7 +506,7 @@
                     android:layout_marginLeft="96dp"
                     android:layout_marginTop="28dp"
                     android:text="Period End"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toEndOf="@+id/periodStart"
                     app:layout_constraintTop_toBottomOf="@+id/saturdayCheckbox" />
@@ -501,8 +516,8 @@
                     style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="125dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="42dp"
-                    android:layout_marginLeft="42dp"
+                    android:layout_marginStart="38dp"
+                    android:layout_marginLeft="38dp"
                     android:spinnerMode="dialog"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/periodStart" />
@@ -512,8 +527,8 @@
                     style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="125dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="71dp"
-                    android:layout_marginLeft="71dp"
+                    android:layout_marginStart="45dp"
+                    android:layout_marginLeft="45dp"
                     android:spinnerMode="dialog"
                     app:layout_constraintStart_toEndOf="@+id/periodStartSpinner"
                     app:layout_constraintTop_toBottomOf="@+id/periodEnd" />
