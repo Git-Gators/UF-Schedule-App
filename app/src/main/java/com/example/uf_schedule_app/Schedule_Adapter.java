@@ -126,7 +126,7 @@ public class Schedule_Adapter extends RecyclerView.Adapter<Schedule_Adapter.Sche
                     courseInfopopup_courseDescriptionBox.setText(courses.get(index).courseInfo.get("description"));
                     courseInfopopup_courseID.setText(courses.get(index).courseInfo.get("courseId"));
                     courseInfopopup_courseCode_box.setText(courses.get(index).courseInfo.get("code"));
-                    courseInfopopup_Instructor_box.setText(Objects.requireNonNull(courses.get(index).classSection.get("Instructors")).replace("[", "").replace("]",""));
+                    courseInfopopup_Instructor_box.setText(Objects.requireNonNull(courses.get(index).classSection.get("Instructors")).replace("[", "").replace("]","").replace(",", ", "));
                     courseInfopopup_section_number_box.setText(courses.get(index).classSection.get("classNumber"));
                     courseInfopopup_num_credits_box.setText(courses.get(index).classSection.get("credits"));
 

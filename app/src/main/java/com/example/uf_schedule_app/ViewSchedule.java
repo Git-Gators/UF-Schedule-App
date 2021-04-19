@@ -359,7 +359,7 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
         courseInfopopup_courseDescriptionBox.setText(coursesPicked.get(index).courseInfo.get("description"));
         courseInfopopup_courseID.setText(coursesPicked.get(index).courseInfo.get("courseId"));
         courseInfopopup_courseCode_box.setText(coursesPicked.get(index).courseInfo.get("code"));
-        courseInfopopup_Instructor_box.setText(Objects.requireNonNull(coursesPicked.get(index).classSection.get("Instructors")).replace("[", "").replace("]",""));
+        courseInfopopup_Instructor_box.setText(Objects.requireNonNull(coursesPicked.get(index).classSection.get("Instructors")).replace("[", "").replace("]","").replace(",", ", "));
         courseInfopopup_section_number_box.setText(coursesPicked.get(index).classSection.get("classNumber"));
         courseInfopopup_num_credits_box.setText(coursesPicked.get(index).classSection.get("credits"));
         
