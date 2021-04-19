@@ -144,13 +144,24 @@ public class ViewSchedule extends MainActivity implements AdapterView.OnItemSele
             noCourseText.setVisibility(View.INVISIBLE);
         }
 
-
+        sched = new ArrayList<String>(1);
         //Edit all the courseTexts
         for(int i = 0; i < coursesPicked.size(); i++){
             sched.add(coursesPicked.get(i).toString());
             Button deleteAll = findViewById(R.id.delete);
             deleteAll.setVisibility(View.VISIBLE);
         }
+
+        if(sched != null && sched_array != null) {
+            sched_array =  new String[sched.size()];
+            sched_array = sched.toArray(sched_array);
+            scheduleAdapter = new Schedule_Adapter(this, sched_array, coursesPicked, recyclerView);
+            recyclerView.setAdapter(scheduleAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            System.out.println("Courses Picked: " + Arrays.toString(sched_array));
+        }
+
+        System.out.println("Courses Picked: " + coursesPicked);
     }
 
     //Loads data from database to a hashmap named user
